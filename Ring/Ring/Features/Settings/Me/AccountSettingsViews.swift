@@ -84,36 +84,7 @@ struct NotificationsSettingsView: View {
                 )
             }
 
-            if model.proxyEnabled {
-                Section(header: Text(L10n.AccountPage.proxyHeader), footer: Text(L10n.AccountPage.proxyExplanation)) {
-                    ToggleCell(
-                        toggleText: L10n.AccountPage.useProxyList,
-                        getAction: { model.proxyListEnabled },
-                        setAction: { newValue in model.enableProxyList(enable: newValue) }
-                    )
 
-                    if model.proxyListEnabled, !model.currentProxy.isEmpty {
-                        FieldRowView(label: L10n.AccountPage.currentProxy, value: model.currentProxy)
-                    }
-
-                    if model.proxyListEnabled {
-                        NavigationLink(destination: EditableFieldView(value: $model.proxyListUrl, title: L10n.AccountPage.proxyListURL, placeholder: L10n.AccountPage.proxyListURL, onDisappearAction: {
-                            model.saveProxyListUrl()
-                        })) {
-                            FieldRowView(label: L10n.AccountPage.proxyListURL, value: model.proxyListUrl)
-                        }
-                    } else {
-                        NavigationLink(destination: EditableFieldView(value: $model.proxyAddress,
-                                                                      title: L10n.AccountPage.proxyPaceholder,
-                                                                      placeholder: L10n.AccountPage.proxyPaceholder,
-                                                                      onDisappearAction: {
-                                                                        model.saveProxyAddress()
-                                                                      })) {
-                            FieldRowView(label: L10n.AccountPage.proxyPaceholder, value: model.proxyAddress)
-                        }
-                    }
-                }
-            }
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle(L10n.AccountPage.notificationTitle)
@@ -184,8 +155,6 @@ struct ConnectivitySettingsView: View {
                     }
                 }
 
-            } else {
-                dhtConfigurationView()
             }
             connectivityView()
         }

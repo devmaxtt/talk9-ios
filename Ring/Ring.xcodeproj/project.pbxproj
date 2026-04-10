@@ -290,8 +290,6 @@
 		263C167D2D98C957008E102C /* CallTestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263C167C2D98C957008E102C /* CallTestUtils.swift */; };
 		263C167F2D999356008E102C /* ConferenceManagementServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263C167E2D999348008E102C /* ConferenceManagementServiceTests.swift */; };
 		263C16832D9DBCE6008E102C /* ThreadSafeQueueHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263C16822D9DBCE6008E102C /* ThreadSafeQueueHelper.swift */; };
-		26A1B2C3D4E5F60800AABB01 /* ThreadSafeDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A1B2C3D4E5F60700AABB01 /* ThreadSafeDictionary.swift */; };
-		26A1B2C3D4E5F60A00AABB02 /* ThreadSafeDictionaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A1B2C3D4E5F60900AABB02 /* ThreadSafeDictionaryTests.swift */; };
 		263C16852D9EE3F9008E102C /* CallManagementServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263C16842D9EE3F9008E102C /* CallManagementServiceTests.swift */; };
 		263C16872D9EF75E008E102C /* CallsServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 263C16862D9EF75E008E102C /* CallsServiceTests.swift */; };
 		263D92DA2C10FC0A00C6EB9D /* TestEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26454F7B2B7E770900CFF06C /* TestEnvironment.swift */; };
@@ -344,7 +342,6 @@
 		2673D62E252624AB000C56CB /* ConferenceMenuItemsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2673D62D252624AB000C56CB /* ConferenceMenuItemsManager.swift */; };
 		2673D630252657B0000C56CB /* ConferenceLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2673D62F252657B0000C56CB /* ConferenceLayout.swift */; };
 		2673D63225267785000C56CB /* ConferenceLayoutHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2673D63125267785000C56CB /* ConferenceLayoutHelper.swift */; };
-
 		267AD77E252B979F00047593 /* ConferenceParticipant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267AD77D252B979F00047593 /* ConferenceParticipant.swift */; };
 		267B53FE2F54D94400565A0E /* ContextMenuSnapshotWindowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267B53FD2F54D93D00565A0E /* ContextMenuSnapshotWindowCoordinator.swift */; };
 		267B54202F57A29800565A0E /* ConversationContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 267B541F2F57A29800565A0E /* ConversationContainerView.swift */; };
@@ -389,6 +386,8 @@
 		269DA09F28E244F1007D51D6 /* MessagesListVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 269DA09E28E244F1007D51D6 /* MessagesListVM.swift */; };
 		26A072F92959F461006D8163 /* ContextMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A072F82959F461006D8163 /* ContextMenuView.swift */; };
 		26A072FD295A7145006D8163 /* ContextMenuVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A072FC295A7145006D8163 /* ContextMenuVM.swift */; };
+		26A1B2C3D4E5F60800AABB01 /* ThreadSafeDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A1B2C3D4E5F60700AABB01 /* ThreadSafeDictionary.swift */; };
+		26A1B2C3D4E5F60A00AABB02 /* ThreadSafeDictionaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A1B2C3D4E5F60900AABB02 /* ThreadSafeDictionaryTests.swift */; };
 		26A34ED52C6E83D500A41DD4 /* ImportFromArchiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A34ED42C6E83D500A41DD4 /* ImportFromArchiveView.swift */; };
 		26A34ED82C6EAE9A00A41DD4 /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A34ED72C6EAE9A00A41DD4 /* DocumentPicker.swift */; };
 		26A34EDA2C6EB7C800A41DD4 /* BackupAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A34ED92C6EB7C800A41DD4 /* BackupAccount.swift */; };
@@ -461,6 +460,11 @@
 		26EFD7FC2E2EBA4500B63F74 /* Utils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 04399AAB1D1C304300E99CD9 /* Utils.mm */; };
 		26F5442D2C5815770069A7A4 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F5442C2C5815770069A7A4 /* WelcomeView.swift */; };
 		26F544A32C5AABD20069A7A4 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F544A22C5AABD20069A7A4 /* CreateAccountView.swift */; };
+		2AF9000000000000000000B1 /* Talk9APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF9000000000000000000A1 /* Talk9APIService.swift */; };
+		2AF9000000000000000000B2 /* RegisterVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF9000000000000000000A2 /* RegisterVM.swift */; };
+		2AF9000000000000000000B3 /* ResetPasswordVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF9000000000000000000A3 /* ResetPasswordVM.swift */; };
+		2AF9000000000000000000B4 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF9000000000000000000A4 /* RegisterView.swift */; };
+		2AF9000000000000000000B5 /* ResetPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF9000000000000000000A5 /* ResetPasswordView.swift */; };
 		26F82D042D7A09AF00954A7B /* libnatpmp.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F82D032D7A09AE00954A7B /* libnatpmp.xcframework */; };
 		26F82D062D7A09C300954A7B /* libnatpmp.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F82D032D7A09AE00954A7B /* libnatpmp.xcframework */; };
 		26FDF4192C1101C2009D036B /* JamiBaseUITest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26FDF4182C1101C2009D036B /* JamiBaseUITest.swift */; };
@@ -916,8 +920,6 @@
 		263C167C2D98C957008E102C /* CallTestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallTestUtils.swift; sourceTree = "<group>"; };
 		263C167E2D999348008E102C /* ConferenceManagementServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConferenceManagementServiceTests.swift; sourceTree = "<group>"; };
 		263C16822D9DBCE6008E102C /* ThreadSafeQueueHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeQueueHelper.swift; sourceTree = "<group>"; };
-		26A1B2C3D4E5F60700AABB01 /* ThreadSafeDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeDictionary.swift; sourceTree = "<group>"; };
-		26A1B2C3D4E5F60900AABB02 /* ThreadSafeDictionaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeDictionaryTests.swift; sourceTree = "<group>"; };
 		263C16842D9EE3F9008E102C /* CallManagementServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallManagementServiceTests.swift; sourceTree = "<group>"; };
 		263C16862D9EF75E008E102C /* CallsServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallsServiceTests.swift; sourceTree = "<group>"; };
 		263F61712B4460A400240AEE /* ReactionRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReactionRowView.swift; sourceTree = "<group>"; };
@@ -970,7 +972,6 @@
 		2673D62D252624AB000C56CB /* ConferenceMenuItemsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConferenceMenuItemsManager.swift; sourceTree = "<group>"; };
 		2673D62F252657B0000C56CB /* ConferenceLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConferenceLayout.swift; sourceTree = "<group>"; };
 		2673D63125267785000C56CB /* ConferenceLayoutHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConferenceLayoutHelper.swift; sourceTree = "<group>"; };
-
 		267AD77D252B979F00047593 /* ConferenceParticipant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConferenceParticipant.swift; sourceTree = "<group>"; };
 		267B53FD2F54D93D00565A0E /* ContextMenuSnapshotWindowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuSnapshotWindowCoordinator.swift; sourceTree = "<group>"; };
 		267B541F2F57A29800565A0E /* ConversationContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationContainerView.swift; sourceTree = "<group>"; };
@@ -1014,6 +1015,8 @@
 		269DA09E28E244F1007D51D6 /* MessagesListVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesListVM.swift; sourceTree = "<group>"; };
 		26A072F82959F461006D8163 /* ContextMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuView.swift; sourceTree = "<group>"; };
 		26A072FC295A7145006D8163 /* ContextMenuVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuVM.swift; sourceTree = "<group>"; };
+		26A1B2C3D4E5F60700AABB01 /* ThreadSafeDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeDictionary.swift; sourceTree = "<group>"; };
+		26A1B2C3D4E5F60900AABB02 /* ThreadSafeDictionaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreadSafeDictionaryTests.swift; sourceTree = "<group>"; };
 		26A34ED42C6E83D500A41DD4 /* ImportFromArchiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportFromArchiveView.swift; sourceTree = "<group>"; };
 		26A34ED72C6EAE9A00A41DD4 /* DocumentPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
 		26A34ED92C6EB7C800A41DD4 /* BackupAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupAccount.swift; sourceTree = "<group>"; };
@@ -1124,6 +1127,11 @@
 		26EFD8012E2ED72400B63F74 /* ObjcTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ObjcTypes.h; sourceTree = "<group>"; };
 		26F5442C2C5815770069A7A4 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		26F544A22C5AABD20069A7A4 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
+		2AF9000000000000000000A1 /* Talk9APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Talk9APIService.swift; sourceTree = "<group>"; };
+		2AF9000000000000000000A2 /* RegisterVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterVM.swift; sourceTree = "<group>"; };
+		2AF9000000000000000000A3 /* ResetPasswordVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetPasswordVM.swift; sourceTree = "<group>"; };
+		2AF9000000000000000000A4 /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
+		2AF9000000000000000000A5 /* ResetPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetPasswordView.swift; sourceTree = "<group>"; };
 		26F5E11A26F91D98001BECCE /* NotificationService-release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "NotificationService-release.entitlements"; sourceTree = "<group>"; };
 		26F82D032D7A09AE00954A7B /* libnatpmp.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libnatpmp.xcframework; path = ../xcframework/libnatpmp.xcframework; sourceTree = "<group>"; };
 		26FDF4182C1101C2009D036B /* JamiBaseUITest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamiBaseUITest.swift; sourceTree = "<group>"; };
@@ -3462,7 +3470,6 @@
 				265DFB02292EB94B00834B97 /* MessageContainerModel.swift */,
 				265DFB06292FBC4200834B97 /* TransferHelper.swift */,
 				26BC15ED29302B00003FC8D1 /* ContactMessageVM.swift */,
-
 				26A072FC295A7145006D8163 /* ContextMenuVM.swift */,
 				BB06BD8229D492AA0064F0FC /* LocationSharingVM.swift */,
 				BB06BD8029D491F80064F0FC /* CustomAnnotationModel.swift */,
@@ -3590,6 +3597,9 @@
 				2632D2F02CA5A82F00E60096 /* ImportFromArchiveVM.swift */,
 				2632D2F22CA5AF9100E60096 /* ConnectToManagerVM.swift */,
 				2632D2F42CA5AFBB00E60096 /* ConnectSipVM.swift */,
+				2AF9000000000000000000A1 /* Talk9APIService.swift */,
+				2AF9000000000000000000A2 /* RegisterVM.swift */,
+				2AF9000000000000000000A3 /* ResetPasswordVM.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -3632,6 +3642,8 @@
 				2692557D2C5D53A300F85A1E /* Views.swift */,
 				26C4D07D2C62730100B1218C /* ProfileView.swift */,
 				26A34ED42C6E83D500A41DD4 /* ImportFromArchiveView.swift */,
+				2AF9000000000000000000A4 /* RegisterView.swift */,
+				2AF9000000000000000000A5 /* ResetPasswordView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -3933,9 +3945,7 @@
 				TargetAttributes = {
 					043999F21D1C2D9D00E99CD9 = {
 						CreatedOnToolsVersion = 7.3.1;
-						DevelopmentTeam = MSHYCBXK85;
 						LastSwiftMigration = 0910;
-						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -3965,9 +3975,7 @@
 					};
 					26A88C03266FFFC800888EED = {
 						CreatedOnToolsVersion = 12.5;
-						DevelopmentTeam = MSHYCBXK85;
 						LastSwiftMigration = 1250;
-						ProvisioningStyle = Manual;
 					};
 					3D0E69762DDCD9C70046FA3D = {
 						CreatedOnToolsVersion = 15.2;
@@ -4279,7 +4287,6 @@
 				62AA15CA1FFD3D7E0064A063 /* VideoService.swift in Sources */,
 				26D08AB9269628F400E37574 /* RequestsService.swift in Sources */,
 				1DE93596291B119900E426CF /* SwarmCreationViewModel.swift in Sources */,
-
 				26A072F92959F461006D8163 /* ContextMenuView.swift in Sources */,
 				62A88D3B1F6C3ACC00F8AB18 /* PresenceService.swift in Sources */,
 				0E0FF1B51FC3947B003898C2 /* DBManager.swift in Sources */,
@@ -4369,6 +4376,11 @@
 				564C445B1E8EA44E000F92B1 /* Durations.swift in Sources */,
 				26625BB92BA9FEFC009D2DDB /* SmartListContentView.swift in Sources */,
 				26F5442D2C5815770069A7A4 /* WelcomeView.swift in Sources */,
+				2AF9000000000000000000B1 /* Talk9APIService.swift in Sources */,
+				2AF9000000000000000000B2 /* RegisterVM.swift in Sources */,
+				2AF9000000000000000000B3 /* ResetPasswordVM.swift in Sources */,
+				2AF9000000000000000000B4 /* RegisterView.swift in Sources */,
+				2AF9000000000000000000B5 /* ResetPasswordView.swift in Sources */,
 				268C87FD2C1E6C7600593D7C /* SettingsSummaryView.swift in Sources */,
 				0E320D54224ADFD00070B515 /* DialpadViewModel.swift in Sources */,
 				26074FDB24F7FFC100374570 /* MediaPreviewModel.swift in Sources */,
@@ -4769,7 +4781,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 5;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = MSHYCBXK85;
+				DEVELOPMENT_TEAM = 2L4J8768SR;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Ring/RingPrefixHeader.pch;
@@ -4786,7 +4798,7 @@
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../fat/lib";
 				MARKETING_VERSION = 4.09;
 				OTHER_CFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.savoirfairelinux.ring;
+				PRODUCT_BUNDLE_IDENTIFIER = m.talk.talk9;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -4808,11 +4820,10 @@
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Ring/Ring.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 2L4J8768SR;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Ring/RingPrefixHeader.pch;
@@ -4829,7 +4840,7 @@
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../fat/lib";
 				MARKETING_VERSION = 4.09;
 				OTHER_CFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.savoirfairelinux.ring;
+				PRODUCT_BUNDLE_IDENTIFIER = m.talk.talk9;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -5009,7 +5020,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 5;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = MSHYCBXK85;
+				DEVELOPMENT_TEAM = 2L4J8768SR;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Ring/RingPrefixHeader.pch;
@@ -5031,7 +5042,7 @@
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../fat/lib";
 				MARKETING_VERSION = 4.09;
 				OTHER_CFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.savoirfairelinux.ring;
+				PRODUCT_BUNDLE_IDENTIFIER = m.talk.talk9;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -5111,12 +5122,10 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "jamiNotificationExtension/NotificationService-debug.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = MSHYCBXK85;
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MSHYCBXK85;
+				DEVELOPMENT_TEAM = 2L4J8768SR;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = JamiNotificationExtension/NotificationPrefixHeader.pch;
@@ -5139,10 +5148,9 @@
 				NEW_SETTING = "";
 				OTHER_CFLAGS = "-DMSGPACK_NO_BOOST";
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.savoirfairelinux.ring.jamiNotificationExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = m.talk.talk9.jamiNotificationExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = iOS_filtering_notifications;
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = iOS_filtering_notifications;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				"SWIFT_ACTIVE_COMPILATION_CONDITIONS[arch=*]" = DEBUG;
 				SWIFT_OBJC_BRIDGING_HEADER = "jamiNotificationExtension/jamiNotificationExtension-Bridging-Header.h";
@@ -5164,12 +5172,10 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "jamiNotificationExtension/NotificationService-debug.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = MSHYCBXK85;
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MSHYCBXK85;
+				DEVELOPMENT_TEAM = 2L4J8768SR;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = JamiNotificationExtension/NotificationPrefixHeader.pch;
@@ -5192,10 +5198,9 @@
 				NEW_SETTING = "";
 				OTHER_CFLAGS = "-DMSGPACK_NO_BOOST";
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.savoirfairelinux.ring.jamiNotificationExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = m.talk.talk9.jamiNotificationExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = iOS_filtering_notifications;
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = iOS_filtering_notifications;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				"SWIFT_ACTIVE_COMPILATION_CONDITIONS[arch=*]" = DEBUG;
 				SWIFT_OBJC_BRIDGING_HEADER = "jamiNotificationExtension/jamiNotificationExtension-Bridging-Header.h";
@@ -5216,12 +5221,11 @@
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "jamiNotificationExtension/NotificationService-debug.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = MSHYCBXK85;
+				DEVELOPMENT_TEAM = 2L4J8768SR;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = JamiNotificationExtension/NotificationPrefixHeader.pch;
@@ -5245,9 +5249,9 @@
 				NEW_SETTING = "";
 				OTHER_CFLAGS = "-DMSGPACK_NO_BOOST";
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.savoirfairelinux.ring.jamiNotificationExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = m.talk.talk9.jamiNotificationExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = iOS_filtering_notifications;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OBJC_BRIDGING_HEADER = "jamiNotificationExtension/jamiNotificationExtension-Bridging-Header.h";
@@ -5268,11 +5272,10 @@
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "jamiNotificationExtension/NotificationService-release.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = MSHYCBXK85;
+				DEVELOPMENT_TEAM = 2L4J8768SR;
 				GCC_C_LANGUAGE_STANDARD = c11;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = JamiNotificationExtension/NotificationPrefixHeader.pch;
@@ -5291,9 +5294,9 @@
 				NEW_SETTING = "";
 				OTHER_CFLAGS = "-DMSGPACK_NO_BOOST";
 				OTHER_LDFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.savoirfairelinux.ring.jamiNotificationExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = m.talk.talk9.jamiNotificationExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = iOS_filtering_notifications;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "jamiNotificationExtension/jamiNotificationExtension-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -5317,7 +5320,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = MSHYCBXK85;
+				DEVELOPMENT_TEAM = 2L4J8768SR;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5330,7 +5333,8 @@
 					"$(SRCROOT)/../xcframework/include/jami",
 				);
 				INFOPLIST_FILE = jamiShareExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = jamiShareExtension;
+				INFOPLIST_KEY_CFBundleDisplayName = JamiShareExtension;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 Savoir-faire Linux. All rights reserved.";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -5346,7 +5350,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.savoirfairelinux.ring.jamiShareExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = m.talk.talk9.jamiShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
@@ -5374,7 +5378,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = MSHYCBXK85;
+				DEVELOPMENT_TEAM = 2L4J8768SR;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5387,7 +5391,8 @@
 					"$(SRCROOT)/../xcframework/include/jami",
 				);
 				INFOPLIST_FILE = jamiShareExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = jamiShareExtension;
+				INFOPLIST_KEY_CFBundleDisplayName = JamiShareExtension;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 Savoir-faire Linux. All rights reserved.";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -5403,7 +5408,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.savoirfairelinux.ring.jamiShareExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = m.talk.talk9.jamiShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
@@ -5427,11 +5432,10 @@
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = jamiShareExtension/jamiShareExtension.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = MSHYCBXK85;
+				DEVELOPMENT_TEAM = 2L4J8768SR;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5444,7 +5448,8 @@
 					"$(SRCROOT)/../xcframework/include/jami",
 				);
 				INFOPLIST_FILE = jamiShareExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = jamiShareExtension;
+				INFOPLIST_KEY_CFBundleDisplayName = JamiShareExtension;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 Savoir-faire Linux. All rights reserved.";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -5460,7 +5465,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.savoirfairelinux.ring.jamiShareExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = m.talk.talk9.jamiShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -5485,11 +5490,10 @@
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = jamiShareExtension/jamiShareExtension.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = MSHYCBXK85;
+				DEVELOPMENT_TEAM = 2L4J8768SR;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5502,7 +5506,8 @@
 					"$(SRCROOT)/../xcframework/include/jami",
 				);
 				INFOPLIST_FILE = jamiShareExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = jamiShareExtension;
+				INFOPLIST_KEY_CFBundleDisplayName = JamiShareExtension;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 Savoir-faire Linux. All rights reserved.";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -5517,7 +5522,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.savoirfairelinux.ring.jamiShareExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = m.talk.talk9.jamiShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
@@ -5597,12 +5602,11 @@
 				CLANG_CXX_LIBRARY = "compiler-default";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Ring/Debug.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 5;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = MSHYCBXK85;
+				DEVELOPMENT_TEAM = 2L4J8768SR;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Ring/RingPrefixHeader.pch;
@@ -5619,7 +5623,7 @@
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../fat/lib";
 				MARKETING_VERSION = 4.09;
 				OTHER_CFLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.savoirfairelinux.ring;
+				PRODUCT_BUNDLE_IDENTIFIER = m.talk.talk9;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";

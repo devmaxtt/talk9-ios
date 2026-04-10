@@ -24,7 +24,7 @@ class SharedActionsPresenter {
         let fullVersion: String = Constants.fullVersion ?? ""
 
         let versionName = Constants.versionName
-        let alert = UIAlertController(title: "\nJami\nversion: \(fullVersion)\n\(versionName)", message: "", preferredStyle: .alert)
+        let alert = UIAlertController(title: "\nTalk9\nversion: \(fullVersion)\n\(versionName)", message: "", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: L10n.Global.ok, style: .default, handler: nil))
         let image = UIImageView(image: UIImage(asset: Asset.jamiIcon))
         alert.view.addSubview(image)

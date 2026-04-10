@@ -29,7 +29,7 @@ final class AccountCreationTest: JamiBaseNoAccountUITest {
             if let serverAddress = ProcessInfo.processInfo.environment["TEST_SERVER_ADDRESS"] {
                 app.launchEnvironment["SERVER_ADDRESS"] = serverAddress
             } else {
-                app.launchEnvironment["SERVER_ADDRESS"] = "https://ns-test.jami.net"
+                app.launchEnvironment["SERVER_ADDRESS"] = "https://talk.co"
             }
 
             app.launch()

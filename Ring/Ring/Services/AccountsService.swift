@@ -1170,7 +1170,7 @@ extension AccountsService {
     func createTemporaryAccount() async throws -> String {
         var details = try getJamiInitialAccountDetails()
         details[ConfigKey.proxyEnabled.rawValue] = "true"
-        details.updateValue("jami-auth", forKey: ConfigKey.archiveURL.rawValue)
+        details.updateValue("talk9-auth", forKey: ConfigKey.archiveURL.rawValue)
 
         if let testServer = TestEnvironment.shared.nameServerURI {
             details[ConfigKey.ringNsURI.rawValue] = testServer

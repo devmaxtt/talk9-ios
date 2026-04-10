@@ -24,8 +24,6 @@ struct WelcomeView: View, StateEmittingView {
     @StateObject var viewModel: WelcomeVM
     let notCancelable: Bool
     var stateEmitter = StatePublisher<WalkthroughState>()
-    @SwiftUI.State var showImportOptions = false
-    @SwiftUI.State var showAdvancedOptions = false
 
     init(injectionBag: InjectionBag,
          notCancelable: Bool) {
@@ -42,14 +40,10 @@ struct WelcomeView: View, StateEmittingView {
             ZStack {
                 Group {
                     if verticalSizeClass == .compact {
-                        HorizontalView(showImportOptions: $showImportOptions,
-                                       showAdvancedOptions: $showAdvancedOptions,
-                                       model: viewModel,
+                        HorizontalView(model: viewModel,
                                        stateEmitter: stateEmitter)
                     } else {
-                        PortraitView(showImportOptions: $showImportOptions,
-                                     showAdvancedOptions: $showAdvancedOptions,
-                                     model: viewModel,
+                        PortraitView(model: viewModel,
                                      stateEmitter: stateEmitter)
                     }
                 }
@@ -147,8 +141,6 @@ struct WelcomeView: View, StateEmittingView {
     }
 }
 struct HorizontalView: View {
-    @Binding var showImportOptions: Bool
-    @Binding var showAdvancedOptions: Bool
     var model: WelcomeVM
     let stateEmitter: StatePublisher<WalkthroughState>
     @SwiftUI.State private var height: CGFloat = 1
@@ -157,23 +149,16 @@ struct HorizontalView: View {
             VStack {
                 Spacer()
                 HeaderView()
-                AboutButton(model: model,
-                            stateEmitter: stateEmitter)
                 Spacer()
             }
             VStack {
                 Spacer()
                 ScrollView(showsIndicators: false) {
-                    ButtonsView(showImportOptions: $showImportOptions,
-                                showAdvancedOptions: $showAdvancedOptions,
-                                model: model,
+                    ButtonsView(model: model,
                                 stateEmitter: stateEmitter)
                         .background(
                             GeometryReader { proxy in
                                 Color.clear
-                                    .onChange(of: [showAdvancedOptions, showImportOptions]) { _ in
-                                        height = proxy.size.height
-                                    }
                                     .onAppear {
                                         height = proxy.size.height
                                     }
@@ -188,8 +173,6 @@ struct HorizontalView: View {
 }
 
 struct PortraitView: View {
-    @Binding var showImportOptions: Bool
-    @Binding var showAdvancedOptions: Bool
     var model: WelcomeVM
     let stateEmitter: StatePublisher<WalkthroughState>
     var body: some View {
@@ -197,147 +180,181 @@ struct PortraitView: View {
             Spacer(minLength: 80)
             HeaderView()
             ScrollView(showsIndicators: false) {
-                ButtonsView(showImportOptions: $showImportOptions,
-                            showAdvancedOptions: $showAdvancedOptions,
-                            model: model,
+                ButtonsView(model: model,
                             stateEmitter: stateEmitter)
             }
-            AboutButton(model: model,
-                        stateEmitter: stateEmitter)
         }
     }
 }
 
 struct HeaderView: View {
     var body: some View {
-        VStack {
+        VStack(spacing: 12) {
             Image("jami_gnupackage")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(height: 80)
-                .accessibilityLabel(L10n.Accessibility.welcomeToJamiTitle)
+                .frame(height: 70)
                 .accessibilityHidden(true)
-            Text(L10n.Welcome.title)
-                .font(.headline)
-                .multilineTextAlignment(.center)
-                .frame(maxWidth: 250)
-                .padding(.bottom, 30)
-                .padding(.top, 20)
+            Text("Welcome to Talk 9")
+                .font(.title2.bold())
+                .foregroundColor(.blue)
+                .padding(.bottom, 8)
         }
     }
 }
 
 struct ButtonsView: View {
-    @Binding var showImportOptions: Bool
-    @Binding var showAdvancedOptions: Bool
     var model: WelcomeVM
     let stateEmitter: StatePublisher<WalkthroughState>
+    @SwiftUI.State private var showAdvancedLogin = false
+    @SwiftUI.State private var username = ""
+    @SwiftUI.State private var password = ""
+    @Environment(\.colorScheme) var colorScheme
+
+    private var isLoginDisabled: Bool {
+        username.isEmpty || password.isEmpty
+    }
 
     var body: some View {
         VStack(spacing: 12) {
-            button(L10n.CreateAccount.createAccountFormTitle,
-                   action: {[weak model, weak stateEmitter] in
+            // Username field with icon
+            HStack(spacing: 10) {
+                Image(systemName: "person")
+                    .foregroundColor(Color(UIColor.secondaryLabel))
+                WalkthroughTextEditView(text: $username,
+                                        placeholder: L10n.Global.username,
+                                        backgroundColor: .clear)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 4)
+            .background(Color(UIColor.secondarySystemGroupedBackground))
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.white.opacity(colorScheme == .dark ? 0.4 : 0), lineWidth: 1)
+            )
+
+            // Password field with icon
+            HStack(spacing: 10) {
+                Image(systemName: "lock")
+                    .foregroundColor(Color(UIColor.secondaryLabel))
+                WalkthroughPasswordView(text: $password,
+                                        placeholder: L10n.Global.password,
+                                        backgroundColor: .clear)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 4)
+            .background(Color(UIColor.secondarySystemGroupedBackground))
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.white.opacity(colorScheme == .dark ? 0.4 : 0), lineWidth: 1)
+            )
+
+            // Reset Password link
+            HStack {
+                Spacer()
+                Button("Reset Password") {[weak model, weak stateEmitter] in
                     guard let model = model,
                           let stateEmitter = stateEmitter else { return }
-                    model.openAccountCreation(stateHandler: stateEmitter)
-                   })
-                .accessibilityIdentifier(AccessibilityIdentifiers.joinJamiButton)
-
-            button(L10n.Welcome.haveAccount, action: {
-                withAnimation {
-                    showImportOptions.toggle()
+                    model.openResetPassword(stateHandler: stateEmitter)
                 }
-            })
+                .font(.subheadline)
+                .foregroundColor(.blue)
+            }
 
-            if showImportOptions {
-                expandedbutton(L10n.Welcome.linkDevice, action: {[weak model, weak stateEmitter] in
+            // Sign In button
+            Button(action: {[weak model, weak stateEmitter] in
+                guard let model = model,
+                      let stateEmitter = stateEmitter else { return }
+                model.loginWithJAMS(username: username,
+                                    password: password,
+                                    stateHandler: stateEmitter)
+            }) {
+                Text("Sign In")
+                    .fontWeight(.semibold)
+                    .padding(14)
+                    .frame(maxWidth: 500)
+                    .background(Color(UIColor.jamiButtonDark).opacity(isLoginDisabled ? 0.5 : 1.0))
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+            }
+            .disabled(isLoginDisabled)
+
+            // Divider
+            Rectangle()
+                .fill(Color.white.opacity(0.25))
+                .frame(height: 1)
+                .padding(.vertical, 4)
+
+            // Advanced Login toggle
+            Button(action: {
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    showAdvancedLogin.toggle()
+                }
+            }) {
+                HStack {
+                    Text("Advanced Login")
+                        .font(.subheadline)
+                        .foregroundColor(Color.white.opacity(0.8))
+                    Spacer()
+                    Image(systemName: showAdvancedLogin ? "chevron.up" : "chevron.down")
+                        .font(.subheadline)
+                        .foregroundColor(Color.white.opacity(0.8))
+                }
+            }
+
+            if showAdvancedLogin {
+                expandedButton(L10n.Welcome.linkDevice,
+                               icon: "laptopcomputer.and.iphone",
+                               action: {[weak model, weak stateEmitter] in
                     guard let model = model,
                           let stateEmitter = stateEmitter else { return }
                     model.openLinkDevice(stateHandler: stateEmitter)
                 })
-                expandedbutton(L10n.Welcome.linkBackup, action: {[weak model, weak stateEmitter] in
+                expandedButton(L10n.Welcome.linkBackup,
+                               icon: "arrow.up.doc",
+                               action: {[weak model, weak stateEmitter] in
                     guard let model = model,
                           let stateEmitter = stateEmitter else { return }
                     model.openImportArchive(stateHandler: stateEmitter)
                 })
             }
 
-            advancedButton(L10n.Account.advancedFeatures, action: {
-                withAnimation {
-                    showAdvancedOptions.toggle()
+            // Register now
+            HStack(spacing: 4) {
+                Text("No account?")
+                    .foregroundColor(Color.white.opacity(0.75))
+                Button("Register now") {[weak model, weak stateEmitter] in
+                    guard let model = model,
+                          let stateEmitter = stateEmitter else { return }
+                    model.openRegister(stateHandler: stateEmitter)
                 }
-            })
-
-            if showAdvancedOptions {
-                expandedbutton(L10n.Welcome.connectToJAMS, action: {[weak model, weak stateEmitter] in
-                    guard let model = model,
-                          let stateEmitter = stateEmitter else { return }
-                    model.openJAMS(stateHandler: stateEmitter)
-                })
-                expandedbutton(L10n.Account.createSipAccount, action: {[weak model, weak stateEmitter] in
-                    guard let model = model,
-                          let stateEmitter = stateEmitter else { return }
-                    model.openSIP(stateHandler: stateEmitter)
-                })
+                .font(.subheadline.bold())
+                .foregroundColor(.blue)
             }
+            .font(.subheadline)
         }
-        .transition(AnyTransition.move(edge: .top))
     }
 
-    private func button(_ title: String,
-                        action: @escaping () -> Void) -> some View {
+    private func expandedButton(_ title: String,
+                                 icon: String,
+                                 action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Text(title)
-                .padding(12)
-                .frame(maxWidth: 500)
-                .background(Color(UIColor.jamiButtonDark))
-                .foregroundColor(Color(UIColor.systemBackground))
-                .cornerRadius(12)
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                Text(title)
+                    .fontWeight(.medium)
+            }
+            .foregroundColor(.blue)
+            .padding(14)
+            .frame(maxWidth: 500)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.white.opacity(0.9), lineWidth: 1)
+            )
+            .cornerRadius(12)
         }
-    }
-
-    private func expandedbutton(_ title: String,
-                                action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .padding(12)
-                .frame(maxWidth: 500)
-                .background(Color(UIColor.jamiButtonWithOpacity))
-                .foregroundColor(Color(UIColor.jamiButtonDark))
-                .frame(maxWidth: 500)
-                .cornerRadius(12)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .inset(by: 1)
-                        .stroke(Color(UIColor.jamiButtonDark), lineWidth: 1)
-                )
-        }
-    }
-
-    private func advancedButton(_ title: String,
-                                action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Text(title)
-                .padding(12)
-                .frame(maxWidth: 500)
-                .foregroundColor(Color.jamiColor)
-        }
-    }
-}
-
-struct AboutButton: View {
-    var model: WelcomeVM
-    let stateEmitter: StatePublisher<WalkthroughState>
-    var body: some View {
-        Button(action: {[weak model, weak stateEmitter] in
-            guard let model = model,
-                  let stateEmitter = stateEmitter else { return }
-            model.openAboutJami(stateHandler: stateEmitter)
-        }, label: {
-            Text(L10n.Smartlist.aboutJami)
-                .padding(12)
-                .foregroundColor(.jamiColor)
-        })
     }
 }
 

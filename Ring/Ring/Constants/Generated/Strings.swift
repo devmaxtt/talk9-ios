@@ -15,8 +15,8 @@ internal enum L10n {
     internal static let communityManagement = L10n.tr("Localizable", "aboutJami.communityManagement", fallback: "Community Management")
     /// Contribute
     internal static let contribute = L10n.tr("Localizable", "aboutJami.contribute", fallback: "Contribute")
-    /// Jami, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit
-    internal static let declaration1 = L10n.tr("Localizable", "aboutJami.declaration1", fallback: "Jami, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit")
+    /// Talk9, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit
+    internal static let declaration1 = L10n.tr("Localizable", "aboutJami.declaration1", fallback: "Talk9, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit")
     /// to learn more.
     internal static let declaration2 = L10n.tr("Localizable", "aboutJami.declaration2", fallback: "to learn more.")
     /// Developers
@@ -25,8 +25,8 @@ internal enum L10n {
     internal static let feedback = L10n.tr("Localizable", "aboutJami.feedback", fallback: "Feedback")
     /// We would like to thank our contributors, whose efforts over many years have made this software what it is.
     internal static let header = L10n.tr("Localizable", "aboutJami.header", fallback: "We would like to thank our contributors, whose efforts over many years have made this software what it is.")
-    /// This is a list of people who have made a significant investment of time, with useful results, into Jami. Any such contributors who want to be added to the list should contact us.
-    internal static let info = L10n.tr("Localizable", "aboutJami.info", fallback: "This is a list of people who have made a significant investment of time, with useful results, into Jami. Any such contributors who want to be added to the list should contact us.")
+    /// This is a list of people who have made a significant investment of time, with useful results, into Talk9. Any such contributors who want to be added to the list should contact us.
+    internal static let info = L10n.tr("Localizable", "aboutJami.info", fallback: "This is a list of people who have made a significant investment of time, with useful results, into Talk9. Any such contributors who want to be added to the list should contact us.")
     /// Media
     internal static let media = L10n.tr("Localizable", "aboutJami.media", fallback: "Media")
     /// This program comes with absolutely no warranty. See the
@@ -37,8 +37,8 @@ internal enum L10n {
     internal static let specialThanks = L10n.tr("Localizable", "aboutJami.specialThanks", fallback: "Special thanks to")
   }
   internal enum Accessibility {
-    /// About Jami
-    internal static let aboutJamiTitle = L10n.tr("Localizable", "accessibility.aboutJamiTitle", fallback: "About Jami")
+    /// About Talk9
+    internal static let aboutJamiTitle = L10n.tr("Localizable", "accessibility.aboutJamiTitle", fallback: "About Talk9")
     /// Double-tap to edit the profile
     internal static let accountSummaryEditProfileHint = L10n.tr("Localizable", "accessibility.accountSummaryEditProfileHint", fallback: "Double-tap to edit the profile")
     /// Settings
@@ -133,8 +133,8 @@ internal enum L10n {
     internal static let userPresenceAvailable = L10n.tr("Localizable", "accessibility.userPresenceAvailable", fallback: "Available")
     /// Online
     internal static let userPresenceOnline = L10n.tr("Localizable", "accessibility.userPresenceOnline", fallback: "Online")
-    /// Welcome to Jami
-    internal static let welcomeToJamiTitle = L10n.tr("Localizable", "accessibility.welcomeToJamiTitle", fallback: "Welcome to Jami")
+    /// Welcome to Talk9
+    internal static let welcomeToJamiTitle = L10n.tr("Localizable", "accessibility.welcomeToJamiTitle", fallback: "Welcome to Talk9")
     internal enum Account {
       /// Token QR code
       internal static let tokenQRcode = L10n.tr("Localizable", "accessibility.account.tokenQRcode", fallback: "Token QR code")
@@ -301,12 +301,12 @@ internal enum L10n {
     internal static let connectivityAndConfiguration = L10n.tr("Localizable", "accountPage.connectivityAndConfiguration", fallback: "Connectivity and configurations")
     /// Connectivity
     internal static let connectivityHeader = L10n.tr("Localizable", "accountPage.connectivityHeader", fallback: "Connectivity")
-    /// Contact me using “%s” on the Jami distributed communication platform: https://jami.net
+    /// Contact me using “%s” on the Talk9 distributed communication platform: https://jami.net
     internal static func contactMeOnJamiContant(_ p1: UnsafePointer<CChar>) -> String {
-      return L10n.tr("Localizable", "accountPage.contactMeOnJamiContant", p1, fallback: "Contact me using “%s” on the Jami distributed communication platform: https://jami.net")
+      return L10n.tr("Localizable", "accountPage.contactMeOnJamiContant", p1, fallback: "Contact me using “%s” on the Talk9 distributed communication platform: https://jami.net")
     }
-    /// Contact me on Jami!
-    internal static let contactMeOnJamiTitle = L10n.tr("Localizable", "accountPage.contactMeOnJamiTitle", fallback: "Contact me on Jami!")
+    /// Contact me on Talk9!
+    internal static let contactMeOnJamiTitle = L10n.tr("Localizable", "accountPage.contactMeOnJamiTitle", fallback: "Contact me on Talk9!")
     /// Password protect account
     internal static let createPassword = L10n.tr("Localizable", "accountPage.createPassword", fallback: "Password protect account")
     /// Enter current password
@@ -367,8 +367,8 @@ internal enum L10n {
     internal static let noBoothMode = L10n.tr("Localizable", "accountPage.noBoothMode", fallback: "To enable Booth mode, password protect the account first.")
     /// Unable to receive notifications when proxy is disabled.
     internal static let noProxyExplanationLabel = L10n.tr("Localizable", "accountPage.noProxyExplanationLabel", fallback: "Unable to receive notifications when proxy is disabled.")
-    /// Notifications for Jami are disabled. Enable it in device settings in order to use this feature.
-    internal static let notificationError = L10n.tr("Localizable", "accountPage.notificationError", fallback: "Notifications for Jami are disabled. Enable it in device settings in order to use this feature.")
+    /// Notifications for Talk9 are disabled. Enable it in device settings in order to use this feature.
+    internal static let notificationError = L10n.tr("Localizable", "accountPage.notificationError", fallback: "Notifications for Talk9 are disabled. Enable it in device settings in order to use this feature.")
     /// Notifications
     internal static let notificationsHeader = L10n.tr("Localizable", "accountPage.notificationsHeader", fallback: "Notifications")
     /// Notifications
@@ -379,8 +379,8 @@ internal enum L10n {
     internal static let otherDevices = L10n.tr("Localizable", "accountPage.otherDevices", fallback: "Other linked devices")
     /// Password created
     internal static let passwordCreated = L10n.tr("Localizable", "accountPage.passwordCreated", fallback: "Password created")
-    /// A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.
-    internal static let passwordExplanation = L10n.tr("Localizable", "accountPage.passwordExplanation", fallback: "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.")
+    /// A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.
+    internal static let passwordExplanation = L10n.tr("Localizable", "accountPage.passwordExplanation", fallback: "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.")
     /// The account is password protected. Enter the password to generate a PIN code.
     internal static let passwordForPin = L10n.tr("Localizable", "accountPage.passwordForPin", fallback: "The account is password protected. Enter the password to generate a PIN code.")
     /// Enter account password
@@ -395,8 +395,8 @@ internal enum L10n {
     internal static let peerDiscoveryExplanation = L10n.tr("Localizable", "accountPage.peerDiscoveryExplanation", fallback: "Connect to other DHT nodes advertising on our local network")
     /// An error occurred while generating the PIN code.
     internal static let pinError = L10n.tr("Localizable", "accountPage.pinError", fallback: "An error occurred while generating the PIN code.")
-    /// Install and launch Jami. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.
-    internal static let pinExplanationMessage = L10n.tr("Localizable", "accountPage.pinExplanationMessage", fallback: "Install and launch Jami. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.")
+    /// Install and launch Talk9. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.
+    internal static let pinExplanationMessage = L10n.tr("Localizable", "accountPage.pinExplanationMessage", fallback: "Install and launch Talk9. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.")
     /// On another device
     internal static let pinExplanationTitle = L10n.tr("Localizable", "accountPage.pinExplanationTitle", fallback: "On another device")
     /// Profile
@@ -423,8 +423,8 @@ internal enum L10n {
     internal static let proxyPaceholder = L10n.tr("Localizable", "accountPage.proxyPaceholder", fallback: "Proxy address")
     /// The username is unavailable.
     internal static let registerNameErrorMessage = L10n.tr("Localizable", "accountPage.registerNameErrorMessage", fallback: "The username is unavailable.")
-    /// Register a username to help others more easily find and reach you on Jami.
-    internal static let registerNameExplanation = L10n.tr("Localizable", "accountPage.registerNameExplanation", fallback: "Register a username to help others more easily find and reach you on Jami.")
+    /// Register a username to help others more easily find and reach you on Talk9.
+    internal static let registerNameExplanation = L10n.tr("Localizable", "accountPage.registerNameExplanation", fallback: "Register a username to help others more easily find and reach you on Talk9.")
     /// If the account has not been backed up or added to another device, the account and registered username will be IRREVOCABLY LOST.
     internal static let removeAccountMessage = L10n.tr("Localizable", "accountPage.removeAccountMessage", fallback: "If the account has not been backed up or added to another device, the account and registered username will be IRREVOCABLY LOST.")
     /// Remove device
@@ -501,8 +501,8 @@ internal enum L10n {
   internal enum Alerts {
     /// Account added
     internal static let accountAddedTitle = L10n.tr("Localizable", "alerts.accountAddedTitle", fallback: "Account added")
-    /// Unable to find account on the Jami network. Make sure it was exported on Jami from an existing device, and that provided credentials are correct.
-    internal static let accountCannotBeFoundMessage = L10n.tr("Localizable", "alerts.accountCannotBeFoundMessage", fallback: "Unable to find account on the Jami network. Make sure it was exported on Jami from an existing device, and that provided credentials are correct.")
+    /// Unable to find account on the Talk9 network. Make sure it was exported on Talk9 from an existing device, and that provided credentials are correct.
+    internal static let accountCannotBeFoundMessage = L10n.tr("Localizable", "alerts.accountCannotBeFoundMessage", fallback: "Unable to find account on the Talk9 network. Make sure it was exported on Talk9 from an existing device, and that provided credentials are correct.")
     /// Account error
     internal static let accountCannotBeFoundTitle = L10n.tr("Localizable", "alerts.accountCannotBeFoundTitle", fallback: "Account error")
     /// An error occurred while creating the account.
@@ -511,8 +511,8 @@ internal enum L10n {
     internal static let accountDefaultErrorTitle = L10n.tr("Localizable", "alerts.accountDefaultErrorTitle", fallback: "Account error")
     /// Linking account
     internal static let accountLinkedTitle = L10n.tr("Localizable", "alerts.accountLinkedTitle", fallback: "Linking account")
-    /// A connectivity error occurred while adding Jami account to the distributed network. Please try again. If the problem persists, contact your system administrator.
-    internal static let accountNoNetworkMessage = L10n.tr("Localizable", "alerts.accountNoNetworkMessage", fallback: "A connectivity error occurred while adding Jami account to the distributed network. Please try again. If the problem persists, contact your system administrator.")
+    /// A connectivity error occurred while adding Talk9 account to the distributed network. Please try again. If the problem persists, contact your system administrator.
+    internal static let accountNoNetworkMessage = L10n.tr("Localizable", "alerts.accountNoNetworkMessage", fallback: "A connectivity error occurred while adding Talk9 account to the distributed network. Please try again. If the problem persists, contact your system administrator.")
     /// Network error
     internal static let accountNoNetworkTitle = L10n.tr("Localizable", "alerts.accountNoNetworkTitle", fallback: "Network error")
     /// Already sharing location with this user
@@ -533,12 +533,12 @@ internal enum L10n {
     internal static let confirmRemoveOneToOneConversation = L10n.tr("Localizable", "alerts.confirmRemoveOneToOneConversation", fallback: "Do you want to remove this conversation? The existing history will be deleted. A new conversation may be started if you do not have other conversations with this contact.")
     /// Please close application and try to open it again
     internal static let dbFailedMessage = L10n.tr("Localizable", "alerts.dbFailedMessage", fallback: "Please close application and try to open it again")
-    /// An error happened when launching Jami
-    internal static let dbFailedTitle = L10n.tr("Localizable", "alerts.dbFailedTitle", fallback: "An error happened when launching Jami")
+    /// An error happened when launching Talk9
+    internal static let dbFailedTitle = L10n.tr("Localizable", "alerts.dbFailedTitle", fallback: "An error happened when launching Talk9")
     /// An error occurred while connecting to the management server. Please try again. If the problem persists, contact your system administrator.
     internal static let errorWrongCredentials = L10n.tr("Localizable", "alerts.errorWrongCredentials", fallback: "An error occurred while connecting to the management server. Please try again. If the problem persists, contact your system administrator.")
-    /// Turn on “Location Services” to allow “Jami” to determine device location.
-    internal static let locationServiceIsDisabled = L10n.tr("Localizable", "alerts.locationServiceIsDisabled", fallback: "Turn on “Location Services” to allow “Jami” to determine device location.")
+    /// Turn on “Location Services” to allow “Talk9” to determine device location.
+    internal static let locationServiceIsDisabled = L10n.tr("Localizable", "alerts.locationServiceIsDisabled", fallback: "Turn on “Location Services” to allow “Talk9” to determine device location.")
     /// Share my location
     internal static let locationSharing = L10n.tr("Localizable", "alerts.locationSharing", fallback: "Share my location")
     /// 10 min
@@ -591,8 +591,8 @@ internal enum L10n {
     internal static let errorFailed = L10n.tr("Localizable", "backupAccount.errorFailed", fallback: "An error occurred while exporting the account.")
     /// The selected file path is invalid. Please choose a different location.
     internal static let errorWrongLocation = L10n.tr("Localizable", "backupAccount.errorWrongLocation", fallback: "The selected file path is invalid. Please choose a different location.")
-    /// This Jami account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.
-    internal static let explanation = L10n.tr("Localizable", "backupAccount.explanation", fallback: "This Jami account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.")
+    /// This Talk9 account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.
+    internal static let explanation = L10n.tr("Localizable", "backupAccount.explanation", fallback: "This Talk9 account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.")
     /// Backup created
     internal static let exportSuccess = L10n.tr("Localizable", "backupAccount.exportSuccess", fallback: "Backup created")
     /// Enter the account password.
@@ -683,8 +683,8 @@ internal enum L10n {
     internal static func notContactLabel(_ p1: Any) -> String {
       return L10n.tr("Localizable", "conversation.notContactLabel", String(describing: p1), fallback: "%@ is not in the contact list")
     }
-    /// Jami needs access to your photo library to save images. You can enable this in Settings.
-    internal static let photoAccessRequiredMessage = L10n.tr("Localizable", "conversation.photoAccessRequiredMessage", fallback: "Jami needs access to your photo library to save images. You can enable this in Settings.")
+    /// Talk9 needs access to your photo library to save images. You can enable this in Settings.
+    internal static let photoAccessRequiredMessage = L10n.tr("Localizable", "conversation.photoAccessRequiredMessage", fallback: "Talk9 needs access to your photo library to save images. You can enable this in Settings.")
     /// %@ sent you a conversation invitation.
     internal static func receivedRequest(_ p1: Any) -> String {
       return L10n.tr("Localizable", "conversation.receivedRequest", String(describing: p1), fallback: "%@ sent you a conversation invitation.")
@@ -726,16 +726,16 @@ internal enum L10n {
     internal static let yourself = L10n.tr("Localizable", "conversation.yourself", fallback: "You")
   }
   internal enum CreateAccount {
-    /// Join Jami
-    internal static let createAccountFormTitle = L10n.tr("Localizable", "createAccount.createAccountFormTitle", fallback: "Join Jami")
+    /// Join Talk9
+    internal static let createAccountFormTitle = L10n.tr("Localizable", "createAccount.createAccountFormTitle", fallback: "Join Talk9")
     /// Creating account
     internal static let creatingAccount = L10n.tr("Localizable", "createAccount.creatingAccount", fallback: "Creating account")
     /// Customize
     internal static let customize = L10n.tr("Localizable", "createAccount.customize", fallback: "Customize")
     /// Password protect
     internal static let encrypt = L10n.tr("Localizable", "createAccount.encrypt", fallback: "Password protect")
-    /// A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.
-    internal static let encryptExplanation = L10n.tr("Localizable", "createAccount.encryptExplanation", fallback: "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.")
+    /// A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.
+    internal static let encryptExplanation = L10n.tr("Localizable", "createAccount.encryptExplanation", fallback: "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.")
     /// Password protection enabled
     internal static let encryptionEnabled = L10n.tr("Localizable", "createAccount.encryptionEnabled", fallback: "Password protection enabled")
     /// Password protect account
@@ -744,8 +744,8 @@ internal enum L10n {
     internal static let invalidUsername = L10n.tr("Localizable", "createAccount.invalidUsername", fallback: "Invalid username. Please enter the correct username.")
     /// Checking username availability…
     internal static let lookingForUsernameAvailability = L10n.tr("Localizable", "createAccount.lookingForUsernameAvailability", fallback: "Checking username availability…")
-    /// You can choose a username to help others more easily find and reach you on Jami.
-    internal static let nameExplanation = L10n.tr("Localizable", "createAccount.nameExplanation", fallback: "You can choose a username to help others more easily find and reach you on Jami.")
+    /// You can choose a username to help others more easily find and reach you on Talk9.
+    internal static let nameExplanation = L10n.tr("Localizable", "createAccount.nameExplanation", fallback: "You can choose a username to help others more easily find and reach you on Talk9.")
     /// New account
     internal static let newAccount = L10n.tr("Localizable", "createAccount.newAccount", fallback: "New account")
     /// Configure existing SIP account
@@ -960,8 +960,8 @@ internal enum L10n {
     internal static let search = L10n.tr("Localizable", "global.search", fallback: "Searching…")
     /// Share
     internal static let share = L10n.tr("Localizable", "global.share", fallback: "Share")
-    /// Support Jami project
-    internal static let supportJami = L10n.tr("Localizable", "global.supportJami", fallback: "Support Jami project")
+    /// Support Talk9 project
+    internal static let supportJami = L10n.tr("Localizable", "global.supportJami", fallback: "Support Talk9 project")
     /// Time
     internal static let time = L10n.tr("Localizable", "global.time", fallback: "Time")
     /// Username
@@ -972,8 +972,8 @@ internal enum L10n {
   internal enum ImportFromArchive {
     /// Import
     internal static let buttonTitle = L10n.tr("Localizable", "importFromArchive.buttonTitle", fallback: "Import")
-    /// Import Jami account from local archive file.
-    internal static let explanation = L10n.tr("Localizable", "importFromArchive.explanation", fallback: "Import Jami account from local archive file.")
+    /// Import Talk9 account from local archive file.
+    internal static let explanation = L10n.tr("Localizable", "importFromArchive.explanation", fallback: "Import Talk9 account from local archive file.")
     /// If the account is password protected, please fill the following field.
     internal static let passwordExplanation = L10n.tr("Localizable", "importFromArchive.passwordExplanation", fallback: "If the account is password protected, please fill the following field.")
     /// Select archive file
@@ -1169,8 +1169,8 @@ internal enum L10n {
     }
   }
   internal enum Smartlist {
-    /// About Jami
-    internal static let aboutJami = L10n.tr("Localizable", "smartlist.aboutJami", fallback: "About Jami")
+    /// About Talk9
+    internal static let aboutJami = L10n.tr("Localizable", "smartlist.aboutJami", fallback: "About Talk9")
     /// Account list
     internal static let accounts = L10n.tr("Localizable", "smartlist.accounts", fallback: "Account list")
     /// Accounts
@@ -1183,8 +1183,8 @@ internal enum L10n {
     internal static let conversations = L10n.tr("Localizable", "smartlist.conversations", fallback: "Conversations")
     /// Not now
     internal static let disableDonation = L10n.tr("Localizable", "smartlist.disableDonation", fallback: "Not now")
-    /// If you enjoy using Jami and believe in our mission, do you want to make a donation?
-    internal static let donationExplanation = L10n.tr("Localizable", "smartlist.donationExplanation", fallback: "If you enjoy using Jami and believe in our mission, do you want to make a donation?")
+    /// If you enjoy using Talk9 and believe in our mission, do you want to make a donation?
+    internal static let donationExplanation = L10n.tr("Localizable", "smartlist.donationExplanation", fallback: "If you enjoy using Talk9 and believe in our mission, do you want to make a donation?")
     /// conversation in synchronization
     internal static let inSynchronization = L10n.tr("Localizable", "smartlist.inSynchronization", fallback: "conversation in synchronization")
     /// Invitations received
@@ -1313,9 +1313,9 @@ internal enum L10n {
     internal static let settings = L10n.tr("Localizable", "swarm.settings", fallback: "Settings")
     /// Share contact information
     internal static let shareContactInfo = L10n.tr("Localizable", "swarm.shareContactInfo", fallback: "Share contact information")
-    /// You can add this contact, %1@, on the Jami distributed communication platform: https://jami.net
+    /// You can add this contact, %1@, on the Talk9 distributed communication platform: https://jami.net
     internal static func shareContactMessage(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "swarm.shareContactMessage", String(describing: p1), fallback: "You can add this contact, %1@, on the Jami distributed communication platform: https://jami.net")
+      return L10n.tr("Localizable", "swarm.shareContactMessage", String(describing: p1), fallback: "You can add this contact, %1@, on the Talk9 distributed communication platform: https://jami.net")
     }
     /// Show contact QR code
     internal static let showContactQRCode = L10n.tr("Localizable", "swarm.showContactQRCode", fallback: "Show contact QR code")
@@ -1367,20 +1367,20 @@ internal enum L10n {
     internal static let searchBar = L10n.tr("Localizable", "swarmcreation.searchBar", fallback: "Search for contact…")
   }
   internal enum Welcome {
-    /// Connect to a management server
-    internal static let connectToJAMS = L10n.tr("Localizable", "welcome.connectToJAMS", fallback: "Connect to a management server")
-    /// Create Jami account
-    internal static let createAccount = L10n.tr("Localizable", "welcome.createAccount", fallback: "Create Jami account")
+    /// Login an Account
+    internal static let connectToJAMS = L10n.tr("Localizable", "welcome.connectToJAMS", fallback: "Login an Account")
+    /// Create Talk9 account
+    internal static let createAccount = L10n.tr("Localizable", "welcome.createAccount", fallback: "Create Talk9 account")
     /// I already have an account
     internal static let haveAccount = L10n.tr("Localizable", "welcome.haveAccount", fallback: "I already have an account")
     /// Import from archive backup
     internal static let linkBackup = L10n.tr("Localizable", "welcome.linkBackup", fallback: "Import from archive backup")
     /// Import from another device
     internal static let linkDevice = L10n.tr("Localizable", "welcome.linkDevice", fallback: "Import from another device")
-    /// Jami is a free and universal communication platform which preserves the users' privacy and freedoms
-    internal static let text = L10n.tr("Localizable", "welcome.text", fallback: "Jami is a free and universal communication platform which preserves the users' privacy and freedoms")
-    /// Share, freely and privately with Jami
-    internal static let title = L10n.tr("Localizable", "welcome.title", fallback: "Share, freely and privately with Jami")
+    /// Talk9 is a free and universal communication platform which preserves the users' privacy and freedoms
+    internal static let text = L10n.tr("Localizable", "welcome.text", fallback: "Talk9 is a free and universal communication platform which preserves the users' privacy and freedoms")
+    /// Share, freely and privately with Talk9
+    internal static let title = L10n.tr("Localizable", "welcome.title", fallback: "Share, freely and privately with Talk9")
   }
 }
 // swiftlint:enable explicit_type_interface function_parameter_count identifier_name line_length

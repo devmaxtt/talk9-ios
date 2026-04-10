@@ -86,19 +86,36 @@ class WelcomeVM: ViewModel, ObservableObject {
         }))
     }
 
+    func loginWithJAMS(username: String, password: String, stateHandler: StatePublisher<WalkthroughState>) {
+        connectToAccountManager(userName: username,
+                                password: password,
+                                server: "app.talk9.co",
+                                stateHandler: stateHandler,
+                                responseLog: { _ in })
+    }
+
     func openJAMS(stateHandler: StatePublisher<WalkthroughState>) {
-        stateHandler.emitState(WalkthroughState.connectJAMS(connectAction: { [weak self, weak stateHandler] username, password, server in
+        stateHandler.emitState(WalkthroughState.connectJAMS(connectAction: { [weak self, weak stateHandler] username, password, server, responseLog in
             guard let self = self,
                   let stateHandler = stateHandler else { return }
             self.connectToAccountManager(userName: username,
                                          password: password,
                                          server: server,
-                                         stateHandler: stateHandler)
+                                         stateHandler: stateHandler,
+                                         responseLog: responseLog)
         }))
     }
 
     func openAboutJami(stateHandler: StatePublisher<WalkthroughState>) {
         stateHandler.emitState(WalkthroughState.aboutJami)
+    }
+
+    func openRegister(stateHandler: StatePublisher<WalkthroughState>) {
+        stateHandler.emitState(WalkthroughState.register)
+    }
+
+    func openResetPassword(stateHandler: StatePublisher<WalkthroughState>) {
+        stateHandler.emitState(WalkthroughState.resetPassword)
     }
 
     func openSIP(stateHandler: StatePublisher<WalkthroughState>) {
@@ -319,18 +336,22 @@ extension WelcomeVM {
     func connectToAccountManager(userName: String,
                                  password: String,
                                  server: String,
-                                 stateHandler: StatePublisher<WalkthroughState>) {
+                                 stateHandler: StatePublisher<WalkthroughState>,
+                                 responseLog: @escaping (String) -> Void) {
         self.creationState = .started
         self.accountService
             .connectToAccountManager(username: userName,
                                      password: password,
                                      serverUri: server)
-            .subscribe(onNext: { [weak self, weak stateHandler] (_) in
+            .subscribe(onNext: { [weak self, weak stateHandler] accountId in
                 guard let self = self,
                       let stateHandler = stateHandler else { return }
+                responseLog("Status: SUCCESS\nAccount ID: \(accountId)")
                 self.enablePushNotifications()
                 self.accountCreated(stateHandler: stateHandler)
             }, onError: { [weak self] (error) in
+                let message = (error as? AccountCreationError)?.errorDescription ?? error.localizedDescription
+                responseLog("Status: ERROR\nMessage: \(message)")
                 self?.handleAccountCreationError(error)
             })
             .disposed(by: self.disposeBag)

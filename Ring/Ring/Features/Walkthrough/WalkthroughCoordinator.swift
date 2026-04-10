@@ -28,9 +28,11 @@ public enum WalkthroughState: State {
     case accountCreation(createAction: (String, String, String, UIImage?) -> Void)
     case linkDevice(linkAction: () -> Void)
     case importArchive(importAction: (_ url: URL, _ password: String) -> Void)
-    case connectJAMS(connectAction: (_ username: String, _ password: String, _ server: String) -> Void)
+    case connectJAMS(connectAction: (_ username: String, _ password: String, _ server: String, _ responseLog: @escaping (String) -> Void) -> Void)
     case connectSIP(connectAction: (_ username: String, _ password: String, _ server: String) -> Void)
     case aboutJami
+    case register
+    case resetPassword
     case completed
 }
 
@@ -73,6 +75,10 @@ class WalkthroughCoordinator: Coordinator, StateableResponsive {
                     showConnectSIP(connectAction: connectAction)
                 case .aboutJami:
                     showAboutJami()
+                case .register:
+                    showRegister()
+                case .resetPassword:
+                    showResetPassword()
                 }
             })
             .disposed(by: self.disposeBag)
@@ -97,7 +103,7 @@ class WalkthroughCoordinator: Coordinator, StateableResponsive {
         self.present(viewController: viewController, withStyle: .formModal, withAnimation: true, disposeBag: self.disposeBag)
     }
 
-    func showConnectJAMS(connectAction: @escaping (_ username: String, _ password: String, _ server: String) -> Void) {
+    func showConnectJAMS(connectAction: @escaping (_ username: String, _ password: String, _ server: String, _ responseLog: @escaping (String) -> Void) -> Void) {
         let accountView = JamsConnectView(injectionBag: self.injectionBag, connectAction: connectAction)
         let viewController = createDismissableVC(accountView, dismissible: accountView.dismissHandler)
         self.present(viewController: viewController, withStyle: .formModal, withAnimation: true, disposeBag: self.disposeBag)
@@ -112,6 +118,18 @@ class WalkthroughCoordinator: Coordinator, StateableResponsive {
     func showAboutJami() {
         let aboutView = AboutSwiftUIView()
         let viewController = createDismissableVC(aboutView, dismissible: aboutView.dismissHandler)
+        self.present(viewController: viewController, withStyle: .formModal, withAnimation: true, disposeBag: self.disposeBag)
+    }
+
+    func showRegister() {
+        let registerView = RegisterView()
+        let viewController = createDismissableVC(registerView, dismissible: registerView.dismissHandler)
+        self.present(viewController: viewController, withStyle: .formModal, withAnimation: true, disposeBag: self.disposeBag)
+    }
+
+    func showResetPassword() {
+        let resetView = ResetPasswordView()
+        let viewController = createDismissableVC(resetView, dismissible: resetView.dismissHandler)
         self.present(viewController: viewController, withStyle: .formModal, withAnimation: true, disposeBag: self.disposeBag)
     }
 

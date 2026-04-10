@@ -39,6 +39,7 @@ struct WalkthroughTextEditView: View {
     @Binding var text: String
     var placeholder: String
     var identifier: String = ""
+    var backgroundColor: Color = Color(UIColor.secondarySystemGroupedBackground)
 
     var body: some View {
         TextField(placeholder, text: $text)
@@ -47,7 +48,8 @@ struct WalkthroughTextEditView: View {
             .autocorrectionDisabled(true)
             .autocapitalization(.none)
             .accessibilityIdentifier(identifier)
-            .background(Color(UIColor.secondarySystemGroupedBackground))
+            .foregroundColor(Color(UIColor.label))
+            .background(backgroundColor)
             .cornerRadius(10)
     }
 }

@@ -1,23 +1,23 @@
 {
   "images" : [
     {
+      "filename" : "imageedit_42_5374649878.png",
       "idiom" : "universal",
-      "filename" : "jami.png",
       "scale" : "1x"
     },
     {
+      "filename" : "imageedit_42_5374649878 1.png",
       "idiom" : "universal",
-      "filename" : "jami-1.png",
       "scale" : "2x"
     },
     {
+      "filename" : "imageedit_42_5374649878 2.png",
       "idiom" : "universal",
-      "filename" : "jami-2.png",
       "scale" : "3x"
     }
   ],
   "info" : {
-    "version" : 1,
-    "author" : "xcode"
+    "author" : "xcode",
+    "version" : 1
   }
 }

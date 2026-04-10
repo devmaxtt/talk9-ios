@@ -39,14 +39,14 @@ enum AddDeviceExportState {
 }
 
 class LinkDeviceVM: ObservableObject {
-    static let schema = "jami-auth://"
+    static let schema = "talk9-auth://"
     private static let validLengths: Set<Int> = [
         schema.count + 47,  // 59 - standard
         schema.count + 71   // 83 - long id
     ]
 
     @Published var exportState: AddDeviceExportState = .initial()
-    @Published var exportToken: String = "jami-auth://"
+    @Published var exportToken: String = "talk9-auth://"
     @Published var entryError: String?
     let account: AccountModel
     let accountService: AccountsService
