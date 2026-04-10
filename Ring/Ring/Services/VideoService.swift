@@ -405,6 +405,10 @@ class VideoService: FrameExtractorDelegate {
 
     let mutedCamera = "mutedCamera"
 
+    func cameraSourceURI(from source: String) -> String {
+        source.hasPrefix("camera://") ? source : "camera://" + source
+    }
+
     private let disposeBag = DisposeBag()
 
     private func updateCachedOrientation() {
@@ -454,7 +458,7 @@ class VideoService: FrameExtractorDelegate {
     }
 
     func getVideoSource() -> String {
-        return "camera://" + self.currentDeviceId
+        return cameraSourceURI(from: self.currentDeviceId)
     }
 
     func getCurrentVideoSource() -> String {
@@ -541,14 +545,12 @@ extension VideoService: VideoAdapterDelegate {
         for index in 0..<medias where mediaList[index][MediaAttributeKey.label.rawValue] == mediaLabel {
             mediaList[index][MediaAttributeKey.enabled.rawValue] = "true"
             let muted = mediaList[index][MediaAttributeKey.muted.rawValue]
-            // Use "muteSource" to represent a muted camera source.
-            // This variable name indicates that the camera is intentionally not real,
-            // while keeping the number of inputs consistent.
-            var device = source
-            if !source.hasPrefix("camera://") {
-                device = "camera://" + source
+            let isVideo = mediaList[index][MediaAttributeKey.mediaType.rawValue] == MediaAttributeValue.video.rawValue
+            if isVideo {
+                // Only swap source for video it triggers SDP re-invite
+                let device = cameraSourceURI(from: source)
+                mediaList[index][MediaAttributeKey.source.rawValue] = muted == "true" ? device : mutedCamera
             }
-            mediaList[index][MediaAttributeKey.source.rawValue] = muted == "true" ? device : mutedCamera
             mediaList[index][MediaAttributeKey.muted.rawValue] = muted == "true" ? "false" : "true"
             found = true
             break
@@ -602,7 +604,7 @@ extension VideoService: VideoAdapterDelegate {
                !supportHardware(codec: codec),
                self.camera.quality == AVCaptureSession.Preset.high {
                 self.videoAdapter.setDefaultDevice(camera.mediumCamera)
-                self.switchInput(toDevice: "camera://" + camera.mediumCamera, call: call)
+                self.switchInput(toDevice: cameraSourceURI(from: camera.mediumCamera), call: call)
             }
         }
         let hasListener = self.videoInputManager.hasListener(sinkId: sinkId)
@@ -664,14 +666,14 @@ extension VideoService: VideoAdapterDelegate {
     }
 
     func startMediumCamera() {
-        self.videoAdapter.openVideoInput("camera://" + self.camera.mediumCamera)
+        self.videoAdapter.openVideoInput(cameraSourceURI(from: self.camera.mediumCamera))
     }
 
     func videRecordingFinished() {
         if self.cameraPosition == .back {
             self.switchCamera()
         }
-        self.videoAdapter.closeVideoInput("camera://" + self.camera.mediumCamera)
+        self.videoAdapter.closeVideoInput(cameraSourceURI(from: self.camera.mediumCamera))
         self.stopAudioDevice()
     }
 
@@ -702,7 +704,7 @@ extension VideoService: VideoAdapterDelegate {
     }
 
     func startLocalRecorder(audioOnly: Bool, path: String) -> String? {
-        let device = audioOnly ? "" : "camera://" + camera.mediumCamera
+        let device = audioOnly ? "" : cameraSourceURI(from: camera.mediumCamera)
         self.currentDeviceId = camera.mediumCamera
         return self.videoAdapter.startLocalRecording(device, path: path)
     }
