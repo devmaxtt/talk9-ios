@@ -87,11 +87,14 @@ class WelcomeVM: ViewModel, ObservableObject {
     }
 
     func loginWithJAMS(username: String, password: String, stateHandler: StatePublisher<WalkthroughState>) {
+        print("[LOGIN] ▶️ loginWithJAMS called - username: \(username), server: app.talk9.co")
         connectToAccountManager(userName: username,
                                 password: password,
                                 server: "app.talk9.co",
                                 stateHandler: stateHandler,
-                                responseLog: { _ in })
+                                responseLog: { log in
+                                    print("[LOGIN] 📋 responseLog: \(log)")
+                                })
     }
 
     func openJAMS(stateHandler: StatePublisher<WalkthroughState>) {
@@ -232,8 +235,12 @@ extension WelcomeVM {
     }
 
     private func accountCreated(stateHandler: StatePublisher<WalkthroughState>) {
+        print("[LOGIN] 🏁 accountCreated - emitting WalkthroughState.completed")
         self.setState(state: .success)
         DispatchQueue.main.async {[weak stateHandler] in
+            if stateHandler == nil {
+                print("[LOGIN] ⚠️ accountCreated - stateHandler is nil, completed state NOT emitted!")
+            }
             stateHandler?.emitState(WalkthroughState.completed)
         }
     }
@@ -338,6 +345,7 @@ extension WelcomeVM {
                                  server: String,
                                  stateHandler: StatePublisher<WalkthroughState>,
                                  responseLog: @escaping (String) -> Void) {
+        print("[LOGIN] 🔄 connectToAccountManager - user: \(userName), server: \(server)")
         self.creationState = .started
         self.accountService
             .connectToAccountManager(username: userName,
@@ -345,12 +353,18 @@ extension WelcomeVM {
                                      serverUri: server)
             .subscribe(onNext: { [weak self, weak stateHandler] accountId in
                 guard let self = self,
-                      let stateHandler = stateHandler else { return }
+                      let stateHandler = stateHandler else {
+                    print("[LOGIN] ⚠️ self or stateHandler is nil after success")
+                    return
+                }
+                print("[LOGIN] ✅ connectToAccountManager SUCCESS - accountId: \(accountId)")
                 responseLog("Status: SUCCESS\nAccount ID: \(accountId)")
                 self.enablePushNotifications()
                 self.accountCreated(stateHandler: stateHandler)
             }, onError: { [weak self] (error) in
                 let message = (error as? AccountCreationError)?.errorDescription ?? error.localizedDescription
+                print("[LOGIN] ❌ connectToAccountManager ERROR - \(message)")
+                print("[LOGIN] ❌ Full error: \(error)")
                 responseLog("Status: ERROR\nMessage: \(message)")
                 self?.handleAccountCreationError(error)
             })

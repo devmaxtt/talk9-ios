@@ -139,12 +139,19 @@ final class AppCoordinator: Coordinator, StateableResponsive {
 
     private func checkAccounts() {
         let accountService = injectionBag.accountService
+        print("[APP] 🔍 checkAccounts - total accounts: \(accountService.accounts.count)")
         if accountService.accounts.isEmpty {
+            print("[APP] ➡️ No accounts found → showing Walkthrough (onboard)")
             self.stateSubject.onNext(AppState.needToOnboard(animated: true, isFirstAccount: true))
         } else {
             if let currentAcountId = accountService.currentAccount?.id, accountService.needAccountMigration(accountId: currentAcountId) {
+                print("[APP] ⚠️ Account needs migration → accountId: \(currentAcountId)")
                 self.stateSubject.onNext(AppState.needAccountMigration(accountId: currentAcountId))
             } else {
+                print("[APP] ✅ Accounts OK → showing Main Interface")
+                for acc in accountService.accounts {
+                    print("[APP]    Account: \(acc.id) | status: \(acc.status) | type: \(acc.type)")
+                }
                 self.stateSubject.onNext(AppState.allSet)
             }
         }

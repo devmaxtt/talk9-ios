@@ -141,6 +141,7 @@ class WalkthroughCoordinator: Coordinator, StateableResponsive {
     }
 
     func finish() {
+        print("[WALKTHROUGH] 🏁 finish() called - dismissing walkthrough")
         self.navigationController.setViewControllers([], animated: false)
         self.rootViewController.dismiss(animated: true)
     }
