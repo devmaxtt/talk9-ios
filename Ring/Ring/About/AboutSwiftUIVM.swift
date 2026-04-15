@@ -18,7 +18,7 @@ import Foundation
 import RxSwift
 
 class AboutSwiftUIVM {
-    let declarationText = L10n.AboutJami.declaration1 + " [jami.net](https://jami.net) " + L10n.AboutJami.declaration2
+    let declarationText = L10n.AboutJami.declaration1 + " [talk9.co](https://talk9.co) " + L10n.AboutJami.declaration2
     let noWarrantyText = L10n.AboutJami.noWarranty1 + " [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.html), " + L10n.AboutJami.noWarranty2
     let mainUrlText = "Copyright © 2015–2025 [Talk9 Inc.](https://talk9.co)"
     let fullVersion: String = Constants.fullVersion ?? ""

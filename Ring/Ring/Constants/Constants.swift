@@ -132,19 +132,19 @@ VeroJeanLuc
 """
 
 public class Constants: NSObject {
-    @objc public static let notificationReceived = "com.savoirfairelinux.notificationExtension.receivedNotification" as CFString
-    @objc public static let notificationAppIsActive = "com.savoirfairelinux.jami.appActive" as CFString
-    @objc public static let notificationShareExtensionIsActive = "com.savoirfairelinux.shareExtension.isActive" as CFString
-    @objc public static let notificationShareExtensionResponse = "com.savoirfairelinux.shareExtension.response" as CFString
-    @objc public static let notificationExtensionIsActive = "com.savoirfairelinux.notificationExtension.isActive" as CFString
-    @objc public static let notificationExtensionResponse = "com.savoirfairelinux.notificationExtension.accountActive" as CFString
+    @objc public static let notificationReceived = "m.talk.talk9.notificationExtension.receivedNotification" as CFString
+    @objc public static let notificationAppIsActive = "m.talk.talk9.appActive" as CFString
+    @objc public static let notificationShareExtensionIsActive = "m.talk.talk9.shareExtension.isActive" as CFString
+    @objc public static let notificationShareExtensionResponse = "m.talk.talk9.shareExtension.response" as CFString
+    @objc public static let notificationExtensionIsActive = "m.talk.talk9.notificationExtension.isActive" as CFString
+    @objc public static let notificationExtensionResponse = "m.talk.talk9.notificationExtension.accountActive" as CFString
     @objc public static let notificationData = "notificationData"
     @objc public static let updatedConversations = "updatedConversations"
     @objc public static let queriedAccountId = "queriedAccountId"
     @objc public static let shareExtensionActiveAccounts = "shareExtensionActiveAccounts"
     @objc public static let appGroupIdentifier = "group.m.talk.talk9"
     @objc public static let notificationsCount = "notificationsCount"
-    @objc public static let appIdentifier = "com.savoirfairelinux.jami"
+    @objc public static let appIdentifier = "m.talk.talk9"
 
     public static let selectedAccountID = "SELECTED_ACCOUNT_ID"
 

@@ -28,7 +28,14 @@
 	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSAppTransportSecurity</key>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>Used for UPnP port mapping and local peer discovery</string>
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_jami._tcp</string>
+        <string>_jami._udp</string>
+    </array>
+    <key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>

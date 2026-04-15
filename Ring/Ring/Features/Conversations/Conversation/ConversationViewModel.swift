@@ -276,12 +276,16 @@ class ConversationViewModel: Stateable, ViewModel, ObservableObject, Identifiabl
                     } else if self.userName.value.isEmpty {
                         self.userName.accept(filterParicipants.first?.jamiId ?? "")
                         self.subscribeUserServiceLookupStatus()
-                        self.nameService.lookupAddress(withAccount: self.conversation.accountId, nameserver: "", address: filterParicipants.first?.jamiId ?? "")
+                        if let jamiId = filterParicipants.first?.jamiId, !jamiId.isEmpty {
+                            self.nameService.lookupAddress(withAccount: self.conversation.accountId, nameserver: "", address: jamiId)
+                        }
                     }
                 } else {
                     self.userName.accept(filterParicipants.first?.jamiId ?? "")
                     self.subscribeUserServiceLookupStatus()
-                    self.nameService.lookupAddress(withAccount: self.conversation.accountId, nameserver: "", address: filterParicipants.first?.jamiId ?? "")
+                    if let jamiId = filterParicipants.first?.jamiId, !jamiId.isEmpty {
+                        self.nameService.lookupAddress(withAccount: self.conversation.accountId, nameserver: "", address: jamiId)
+                    }
                 }
                 /*
                  By default, a conversation is created as non-swarm. Upon receiving the conversationReady

@@ -470,7 +470,10 @@ extension ConversationsCoordinator {
                 }
             })
             .disposed(by: self.disposeBag)
-        self.nameService.lookupAddress(withAccount: account.id, nameserver: "", address: call.callUri.filterOutHost())
+        let callAddress = call.callUri.filterOutHost()
+        if !callAddress.isEmpty {
+            self.nameService.lookupAddress(withAccount: account.id, nameserver: "", address: callAddress)
+        }
     }
 
     func presentCallScreen(call: CallModel) {

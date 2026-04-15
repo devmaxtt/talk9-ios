@@ -75,6 +75,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
      */
     private var presentingCallScreen = false
 
+    // MARK: - Connection Retry Timer
+    // Fires every 30s to unblock stuck ICE re-clone attempts AND keep TURN relay alive
+    private var connectivityTimer: Timer?
+
     lazy var injectionBag: InjectionBag = {
         return InjectionBag(withDaemonService: self.daemonService,
                             withAccountService: self.accountService,
@@ -170,6 +174,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         // start monitoring for network changes
         self.networkService.monitorNetworkType()
+
+        // When any conversation finishes a sync attempt (synchronizing: true→false),
+        // immediately call connectivityChanged() to clear stale isConnecting flags.
+        // This enables the daemon's 40s re-clone timer to succeed on next fire
+        // instead of being blocked by the stale flag indefinitely.
+        // Debounced 1s to avoid spam when multiple conversations change state together.
+        self.subscribeConversationSyncRetry()
 
         self.interactionsManager = GeneratedInteractionsManager(accountService: self.accountService,
                                                                 requestsService: self.requestsService,
@@ -344,6 +355,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     func sceneWillEnterForeground() {
         self.updateNotificationAvailability()
+        self.daemonService.connectivityChanged()
         guard let account = self.accountService.currentAccount else { return }
         self.presenceService.subscribeBuddies(withAccount: account.id, withContacts: self.contactsService.contacts.value, subscribe: true)
     }
@@ -352,11 +364,101 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         self.clearBadgeNumber()
         guard let account = self.accountService.currentAccount else { return }
         self.presenceService.subscribeBuddies(withAccount: account.id, withContacts: self.contactsService.contacts.value, subscribe: true)
+        self.startConnectionTimers()
     }
 
     func sceneWillResignActive() {
         guard let account = self.accountService.currentAccount else { return }
         self.presenceService.subscribeBuddies(withAccount: account.id, withContacts: self.contactsService.contacts.value, subscribe: false)
+        self.stopConnectionTimers()
+    }
+
+    // MARK: - Connection Retry Helpers
+
+    // Tracks how many times we have re-registered due to stuck sync per session, to avoid infinite loop.
+    // Reset to 0 when a conversation successfully syncs (conversationReady fires).
+    private var syncRetryCount = 0
+    private let maxSyncRetries = 5
+
+    /// Subscribe to synchronizing state changes across all conversations.
+    ///
+    /// Root cause: `connectivityChanged()` only sends beacons to EXISTING connections.
+    /// The real fix for a stuck clone is account re-registration:
+    ///   disable + enable → daemon re-authenticates with JAMS → JAMS pushes
+    ///   "iOS is online" to Android → Android initiates a fresh ICE connection.
+    /// This is exactly what happens on app restart, but scoped to the account only.
+    private func subscribeConversationSyncRetry() {
+        // Reset retry counter when any conversation successfully syncs
+        self.conversationsService.conversationReady
+            .filter { !$0.isEmpty }
+            .subscribe(onNext: { [weak self] _ in
+                self?.syncRetryCount = 0
+            })
+            .disposed(by: self.disposeBag)
+
+        self.conversationsService.conversations
+            .flatMapLatest { conversations -> Observable<Void> in
+                // Detect true→false transitions (sync attempt just ended) for any conversation
+                let perConvObservables: [Observable<Void>] = conversations.map { conversation in
+                    conversation.synchronizing
+                        .asObservable()
+                        .scan((prev: false, curr: false)) { state, newValue in
+                            (prev: state.curr, curr: newValue)
+                        }
+                        .filter { $0.prev == true && $0.curr == false }
+                        .map { _ in () }
+                }
+                return perConvObservables.isEmpty
+                    ? Observable.empty()
+                    : Observable.merge(perConvObservables)
+            }
+            .debounce(.seconds(1), scheduler: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] in
+                guard let self = self else { return }
+                self.reRegisterAccountForSyncRetry()
+            })
+            .disposed(by: self.disposeBag)
+    }
+
+    /// Re-registers the current account by toggling enable state.
+    /// This triggers JAMS re-authentication and announces iOS as "newly online",
+    /// causing Android to initiate a fresh connection (same effect as app restart).
+    private func reRegisterAccountForSyncRetry() {
+        guard syncRetryCount < maxSyncRetries else {
+            log.warning("AppDelegate: sync retry limit reached (\(maxSyncRetries)), giving up")
+            return
+        }
+        guard let account = accountService.currentAccount else { return }
+        // Don't re-register if there is an active call — it would drop it
+        if callService.calls.value.values.contains(where: { $0.state == .current }) {
+            log.debug("AppDelegate: skipping sync re-register, active call in progress")
+            return
+        }
+        // Check that at least one conversation actually needs syncing (not yet cloned)
+        let needsSync = conversationsService.conversations.value.contains { $0.synchronizing.value }
+        guard needsSync else { return }
+
+        syncRetryCount += 1
+        log.debug("AppDelegate: re-registering account to unblock stuck conversation sync (attempt \(syncRetryCount))")
+        accountService.enableAccount(accountId: account.id, enable: false)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            self?.accountService.enableAccount(accountId: account.id, enable: true)
+        }
+    }
+
+    /// Start a 5-minute repeating timer to keep TURN relay allocations alive.
+    /// TURN relay allocations expire after ~10 minutes of inactivity.
+    private func startConnectionTimers() {
+        stopConnectionTimers()
+        connectivityTimer = Timer.scheduledTimer(withTimeInterval: 5 * 60, repeats: true) { [weak self] _ in
+            self?.log.debug("AppDelegate: periodic connectivityChanged (TURN keepalive)")
+            self?.daemonService.connectivityChanged()
+        }
+    }
+
+    private func stopConnectionTimers() {
+        connectivityTimer?.invalidate()
+        connectivityTimer = nil
     }
 
     func applicationWillTerminate(_ application: UIApplication) {

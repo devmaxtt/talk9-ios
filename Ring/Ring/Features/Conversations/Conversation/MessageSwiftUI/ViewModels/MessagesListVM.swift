@@ -337,6 +337,8 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
             .subscribe(onCompleted: { [weak self, weak conversation] in
                 guard let self = self,
                       let conversation = conversation else { return }
+                // Reset connection manager state so new ICE connections are not blocked by stale isConnecting flag
+                self.injectionBag.daemonService.connectivityChanged()
                 if conversation.isDialog() {
                     self.presenceService.subscribeBuddy(withAccountId: conversation.accountId,
                                                         withJamiId: jamiId,
@@ -1108,6 +1110,7 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
     }
 
     private func nameLookup(id: String) {
+        guard !id.isEmpty else { return }
         self.nameService.usernameLookupStatus
             .filter({ lookupNameResponse in
                 return lookupNameResponse.requestedName != nil &&
