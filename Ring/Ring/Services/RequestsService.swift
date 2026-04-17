@@ -300,12 +300,33 @@ class RequestsService {
                         payload = try VCardUtils.dataWithImageAndUUID(from: accountProfile)
                     }
                 }
+
+                // [TALK9-TRUST] ── send request diagnostics ──────────────────
+                self.log.debug("[TALK9-TRUST] ▶ sendTrustRequest called")
+                self.log.debug("[TALK9-TRUST]   to jamiId  : \(jamiId)")
+                self.log.debug("[TALK9-TRUST]   accountId  : \(accountId)")
+                self.log.debug("[TALK9-TRUST]   alias      : \(alias)")
+                if jamiId.isEmpty {
+                    self.log.error("[TALK9-TRUST]   ⚠️ jamiId is EMPTY — request will be dropped by daemon")
+                }
+                if let p = payload, let str = String(data: p, encoding: .utf8) {
+                    self.log.debug("[TALK9-TRUST]   payload    : \(p.count) bytes")
+                    self.log.debug("[TALK9-TRUST]   vCard      :\n\(str)")
+                } else {
+                    self.log.debug("[TALK9-TRUST]   payload    : EMPTY (no alias/photo on account profile)")
+                }
+                // ─────────────────────────────────────────────────────────────
+
                 self.requestsAdapter.sendTrustRequest(toContact: jamiId, payload: payload, withAccountId: accountId)
+                self.log.debug("[TALK9-TRUST] ✔ adapter called — DHT put dispatched (result comes in daemon log)")
+
                 let participantURI = JamiURI.init(schema: .ring, infoHash: jamiId)
                 let photo = avatar ?? ""
                 _ = self.createProfile(with: participantURI.uriString!, alias: alias, photo: photo, accountId: accountId)
                 completable(.completed)
+                self.log.debug("[TALK9-TRUST] ✔ sendContactRequest Swift side completed")
             } catch {
+                self.log.error("[TALK9-TRUST] ✖ sendContactRequest FAILED — vCard serialization error: \(error)")
                 completable(.error(ContactServiceError.vCardSerializationFailed))
             }
             return Disposables.create { }

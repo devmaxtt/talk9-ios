@@ -379,16 +379,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     // Reset to 0 when a conversation successfully syncs (conversationReady fires).
     private var syncRetryCount = 0
     private let maxSyncRetries = 5
+    // Conversation IDs already being watched for stuck sync (avoids duplicate subscriptions).
+    private var syncWatchedIds: Set<String> = []
 
-    /// Subscribe to synchronizing state changes across all conversations.
+    /// Subscribe to per-conversation synchronizing state AND to member-join events.
     ///
-    /// Root cause: `connectivityChanged()` only sends beacons to EXISTING connections.
-    /// The real fix for a stuck clone is account re-registration:
-    ///   disable + enable → daemon re-authenticates with JAMS → JAMS pushes
-    ///   "iOS is online" to Android → Android initiates a fresh ICE connection.
-    /// This is exactly what happens on app restart, but scoped to the account only.
+    /// Two triggers for account re-registration:
+    ///
+    /// 1. INVITEE path — conversation enters `synchronizing=true`:
+    ///    After 30 s still stuck → re-register.  The daemon's 40-second retry timer then
+    ///    sees a fresh account online and retries ICE, completing the git-clone.
+    ///
+    /// 2. INVITER path — peer accepts (conversationMemberEvent fires):
+    ///    Inviter already has the conversation (`synchronizing` stays false), but the
+    ///    new peer needs to clone it over ICE.  After 30 s → re-register so JAMS
+    ///    announces iOS is online, causing the peer to retry ICE from their side.
+    ///
+    /// `maxSyncRetries` caps total re-registrations per session to avoid loops.
     private func subscribeConversationSyncRetry() {
-        // Reset retry counter when any conversation successfully syncs
+        // Reset retry counter when any conversation successfully syncs.
         self.conversationsService.conversationReady
             .filter { !$0.isEmpty }
             .subscribe(onNext: { [weak self] _ in
@@ -396,28 +405,60 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             })
             .disposed(by: self.disposeBag)
 
+        // Trigger 1: watch every conversation exactly once.
         self.conversationsService.conversations
-            .flatMapLatest { conversations -> Observable<Void> in
-                // Detect true→false transitions (sync attempt just ended) for any conversation
-                let perConvObservables: [Observable<Void>] = conversations.map { conversation in
-                    conversation.synchronizing
-                        .asObservable()
-                        .scan((prev: false, curr: false)) { state, newValue in
-                            (prev: state.curr, curr: newValue)
-                        }
-                        .filter { $0.prev == true && $0.curr == false }
-                        .map { _ in () }
-                }
-                return perConvObservables.isEmpty
-                    ? Observable.empty()
-                    : Observable.merge(perConvObservables)
-            }
-            .debounce(.seconds(1), scheduler: MainScheduler.instance)
-            .subscribe(onNext: { [weak self] in
+            .subscribe(onNext: { [weak self] conversations in
                 guard let self = self else { return }
-                self.reRegisterAccountForSyncRetry()
+                for conv in conversations {
+                    guard self.syncWatchedIds.insert(conv.id).inserted else { continue }
+
+                    // 1a. INVITER path (startup/foreground): conversation already has
+                    //     non-local participants whose role is still .invited — they
+                    //     haven't cloned the conversation yet. Re-register after 10 s to
+                    //     give JAMS a chance to push "iOS is online" to the other side.
+                    let hasInvited = conv.getAllParticipants()
+                        .filter { !$0.isLocal }
+                        .contains { $0.role == .invited }
+                    if hasInvited {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 10) { [weak self] in
+                            self?.reRegisterAccountForSyncRetry()
+                        }
+                    }
+
+                    // 1b. INVITEE path: re-register if synchronizing stays true for 30 s.
+                    conv.synchronizing
+                        .asObservable()
+                        .filter { $0 }   // fires each time synchronizing becomes true
+                        .subscribe(onNext: { [weak self, weak conv] _ in
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 30) { [weak self, weak conv] in
+                                guard conv?.synchronizing.value == true else { return }
+                                self?.reRegisterAccountForSyncRetry()
+                            }
+                        })
+                        .disposed(by: self.disposeBag)
+                }
             })
             .disposed(by: self.disposeBag)
+
+        // Trigger 2: when a peer joins a conversation (INVITER path).
+        // Re-register 30 s after any member event so the peer (who just accepted)
+        // gets a JAMS nudge to retry ICE against iOS.
+        self.conversationsService.sharedResponseStream
+            .filter { $0.eventType == .conversationMemberEvent }
+            .subscribe(onNext: { [weak self] _ in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 30) { [weak self] in
+                    self?.reRegisterAccountForSyncRetry()
+                }
+            })
+            .disposed(by: self.disposeBag)
+
+        #if DEBUG
+        // Trigger 3 (DEBUG only): manual force button in the debug overlay.
+        NotificationCenter.default.addObserver(forName: .debugForceReRegister, object: nil, queue: .main) { [weak self] _ in
+            self?.syncRetryCount = 0      // reset limit so manual force always works
+            self?.reRegisterAccountForSyncRetry()
+        }
+        #endif
     }
 
     /// Re-registers the current account by toggling enable state.
@@ -430,16 +471,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
         guard let account = accountService.currentAccount else { return }
         // Don't re-register if there is an active call — it would drop it
-        if callService.calls.value.values.contains(where: { $0.state == .current }) {
+        if callService.calls.get().values.contains(where: { $0.state == .current }) {
             log.debug("AppDelegate: skipping sync re-register, active call in progress")
             return
         }
-        // Check that at least one conversation actually needs syncing (not yet cloned)
-        let needsSync = conversationsService.conversations.value.contains { $0.synchronizing.value }
-        guard needsSync else { return }
 
         syncRetryCount += 1
         log.debug("AppDelegate: re-registering account to unblock stuck conversation sync (attempt \(syncRetryCount))")
+        #if DEBUG
+        NotificationCenter.default.post(name: .debugReRegisterFired, object: nil)
+        #endif
         accountService.enableAccount(accountId: account.id, enable: false)
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
             self?.accountService.enableAccount(accountId: account.id, enable: true)
@@ -771,3 +812,10 @@ extension AppDelegate: PKPushRegistryDelegate {
         }
     }
 }
+
+#if DEBUG
+extension Notification.Name {
+    static let debugReRegisterFired  = Notification.Name("talk9.debug.reRegisterFired")
+    static let debugForceReRegister  = Notification.Name("talk9.debug.forceReRegister")
+}
+#endif

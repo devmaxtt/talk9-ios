@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2017-2025 Savoir-faire Linux Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "對話顏色選擇";
 "swarm.editTextHint" = "雙擊以編輯";
 "swarm.conversationHeader" = "对话";
-"swarm.shareContactMessage" = "你可以在 Jami 分散式通訊平臺 (https://jami.net) 上增加此聯絡人： %1@";
+"swarm.shareContactMessage" = "你可以在 Talk9 分散式通訊平臺 (https://talk9.co) 上增加此聯絡人： %1@";
 "swarm.oneToOne" = "私人";
 "swarm.adminInvitesOnly" = "私人群组(受限制邀请)";
 "swarm.invitesOnly" = "私密组";
@@ -355,8 +355,8 @@
 "accountPage.other" = "其他";
 "accountPage.removeAccountMessage" = "如果该帐户未备份或添加到其他设备，则该帐户和注册用户名将不可找回地丢失。";
 "accountPage.inviteFriends" = "邀請好友";
-"accountPage.contactMeOnJamiTitle" = "在 Jami 上联系我！";
-"accountPage.contactMeOnJamiContant" = "在 Jami 分散式通訊平臺 (https://jami.net) 上使用「%s」聯絡我";
+"accountPage.contactMeOnJamiTitle" = "在 Talk9 上联系我！";
+"accountPage.contactMeOnJamiContant" = "在 Talk9 分散式通訊平臺 (https://talk9.co) 上使用「%s」聯絡我";
 "accountPage.passwordPlaceholder" = "输入账户密码";
 "accountPage.usernamePlaceholder" = "输入想使用的用户名";
 "accountPage.registerNameErrorMessage" = "用户名不可用。";

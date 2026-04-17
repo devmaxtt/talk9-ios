@@ -256,6 +256,36 @@ class AccountsService: AccountAdapterDelegate {
         for account in accountList {
             self.updateAccountDetails(account: account)
         }
+        // ── Talk9: migrate existing accounts to our bootstrap / TURN ────────
+        // Runs once per app launch for every loaded account.
+        // Safe to call repeatedly — setAccountProperty is idempotent.
+        for account in accountList where account.type == .ring {
+            applyTalk9NetworkDefaults(accountId: account.id)
+        }
+        // ────────────────────────────────────────────────────────────────────
+    }
+
+    /// Force-applies Talk9's bootstrap and TURN settings for a Jami account.
+    /// Called both at load time (to migrate old accounts) and at creation time.
+    private func applyTalk9NetworkDefaults(accountId: String) {
+        let details = getAccountDetails(fromAccountId: accountId)
+        let currentBootstrap = details.get(withConfigKeyModel: ConfigKeyModel(withKey: .accountHostname))
+        let currentTurn      = details.get(withConfigKeyModel: ConfigKeyModel(withKey: .turnServer))
+        // Only write if values are still pointing to jami defaults (or empty)
+        let needsBootstrapFix = currentBootstrap.isEmpty || currentBootstrap.contains("jami.net")
+        let needsTurnFix      = currentTurn.isEmpty      || currentTurn.contains("jami.net")
+        guard needsBootstrapFix || needsTurnFix else { return }
+        log.debug("[Talk9] Migrating account \(accountId) bootstrap/proxy/TURN to Talk9 servers")
+        setAccountProperty(property: ConfigKeyModel(withKey: .accountHostname), value: "bootstrap.talk9.co",                  accountId: accountId)
+        setAccountProperty(property: ConfigKeyModel(withKey: .proxyEnabled),    value: "true",                                accountId: accountId)
+        setAccountProperty(property: ConfigKeyModel(withKey: .proxyServer),     value: "https://dht.talk9.co",                accountId: accountId)
+        setAccountProperty(property: ConfigKeyModel(withKey: .proxyListEnabled),value: "true",                                accountId: accountId)
+        setAccountProperty(property: ConfigKeyModel(withKey: .dhtProxyListUrl), value: "https://dht.talk9.co/proxyList",      accountId: accountId)
+        setAccountProperty(property: ConfigKeyModel(withKey: .turnEnable),      value: "true",                                accountId: accountId)
+        setAccountProperty(property: ConfigKeyModel(withKey: .turnServer),      value: "app.talk9.co",                        accountId: accountId)
+        setAccountProperty(property: ConfigKeyModel(withKey: .turnUsername),    value: "talk9",                               accountId: accountId)
+        setAccountProperty(property: ConfigKeyModel(withKey: .turnPassword),    value: "933843261b0b14a74befabb98c9ac017",    accountId: accountId)
+        setAccountProperty(property: ConfigKeyModel(withKey: .turnRealm),       value: "talk9",                               accountId: accountId)
     }
 
     func updateCurrentAccount(account: AccountModel) {
@@ -421,7 +451,19 @@ class AccountsService: AccountAdapterDelegate {
      */
     private func getJamiInitialAccountDetails() throws -> [String: String] {
         do {
-            let defaultDetails = try getInitialAccountDetails(accountType: AccountType.ring.rawValue)
+            var defaultDetails = try getInitialAccountDetails(accountType: AccountType.ring.rawValue)
+            // ── Talk9: force our own bootstrap / DHT proxy / TURN on every new account ──
+            defaultDetails[ConfigKey.accountHostname.rawValue]  = "bootstrap.talk9.co"
+            defaultDetails[ConfigKey.proxyEnabled.rawValue]     = "true"
+            defaultDetails[ConfigKey.proxyServer.rawValue]      = "https://dht.talk9.co"
+            defaultDetails[ConfigKey.proxyListEnabled.rawValue] = "true"
+            defaultDetails[ConfigKey.dhtProxyListUrl.rawValue]  = "https://dht.talk9.co/proxyList"
+            defaultDetails[ConfigKey.turnEnable.rawValue]       = "true"
+            defaultDetails[ConfigKey.turnServer.rawValue]       = "app.talk9.co"
+            defaultDetails[ConfigKey.turnUsername.rawValue]     = "talk9"
+            defaultDetails[ConfigKey.turnPassword.rawValue]     = "933843261b0b14a74befabb98c9ac017"
+            defaultDetails[ConfigKey.turnRealm.rawValue]        = "talk9"
+            // ─────────────────────────────────────────────────────────────────────
             return defaultDetails
         } catch {
             throw error

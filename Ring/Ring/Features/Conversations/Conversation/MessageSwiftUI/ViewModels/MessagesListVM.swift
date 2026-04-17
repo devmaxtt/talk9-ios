@@ -135,6 +135,78 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
     @Published var syncMessage = ""
     var messagePanelTopY: CGFloat = 0
     private let log = SwiftyBeaver.self
+
+#if DEBUG
+    // Debug-only: exposes live connection/sync status for the overlay panel.
+    // All properties are computed on demand — the overlay refreshes via a 1s timer.
+    // Removed automatically in Release builds — no manual cleanup needed.
+    @Published var debugPresenceStatus: PresenceStatus = .offline
+    @Published var debugReRegisterCount: Int = 0
+
+    var debugSyncState: String { isSyncing ? "Syncing" : "Idle" }
+
+    /// Account registration state: REGISTERED / TRYING / ERROR_NETWORK / etc.
+    var debugAccountState: String {
+        accountService.currentAccount?.status.rawValue ?? "unknown"
+    }
+
+    /// Color for account state row: green=registered, yellow=trying, red=error/unregistered.
+    var debugAccountStateColor: String {
+        let state = accountService.currentAccount?.status
+        switch state {
+        case .registered:                   return "green"
+        case .trying, .initializing:        return "yellow"
+        case .unregistered:                 return "orange"
+        default:                            return "red"   // all error* cases
+        }
+    }
+
+    /// Status of the most recently sent/received message.
+    var debugLastMessageStatus: String {
+        guard let first = messagesModels.first else { return "—" }
+        switch first.message.status {
+        case .unknown:   return "unknown"
+        case .sending:   return "sending"
+        case .sent:      return "sent"
+        case .displayed: return "displayed"
+        case .failure:   return "failure"
+        case .canceled:  return "canceled"
+        }
+    }
+
+    var debugParticipantRoles: String {
+        let all = conversation.getAllParticipants()
+        guard !all.isEmpty else { return "—" }
+        return all.map { p in
+            let id = p.jamiId.prefix(6)
+            let role = p.role.rawValue
+            return "\(id):\(role)"
+        }.joined(separator: "\n")
+    }
+
+    var debugInvitedCount: Int {
+        conversation.getAllParticipants().filter { $0.role == .invited }.count
+    }
+
+    var debugConversationId: String { String(conversation.id.prefix(8)) }
+
+    /// Called by ConversationViewModel whenever contactPresence changes.
+    func updateDebugPresence(_ status: PresenceStatus) {
+        DispatchQueue.main.async { self.debugPresenceStatus = status }
+    }
+
+    func debugForceReRegister() {
+        NotificationCenter.default.post(name: .debugForceReRegister, object: nil)
+    }
+
+    private func subscribeDebugNotifications() {
+        NotificationCenter.default.addObserver(forName: .debugReRegisterFired,
+                                               object: nil,
+                                               queue: .main) { [weak self] _ in
+            self?.debugReRegisterCount += 1
+        }
+    }
+#endif
     var contactAvatar: UIImage = UIImage()
     var currentAccountAvatar: UIImage = UIImage()
     var accountProfileName: String = ""
@@ -280,6 +352,9 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
         self.subscribeMessagesActions()
         self.subscribeContextMenu()
         self.subscribeToTypingStatus()
+#if DEBUG
+        self.subscribeDebugNotifications()
+#endif
     }
 
     func subscribeScreenTapped(screenTapped: Observable<Bool>) {

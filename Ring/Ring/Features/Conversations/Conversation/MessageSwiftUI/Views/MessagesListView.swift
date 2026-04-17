@@ -100,6 +100,10 @@ struct MessagesListView: View {
             if model.isConversationEnded {
                 endedConversationView()
             }
+
+#if DEBUG
+            DebugConnectionOverlay(model: model)
+#endif
         }
         .environment(\.avatarProviderFactory, model.makeAvatarFactory() as AvatarProviderFactory?)
         .onChange(of: model.screenTapped, perform: { _ in
@@ -476,3 +480,124 @@ func topVC() -> UIViewController? {
 
     return nil
 }
+
+// MARK: - Debug Overlay (DEBUG builds only)
+// Excluded from Release builds automatically — no manual removal needed.
+#if DEBUG
+private struct DebugConnectionOverlay: View {
+    @ObservedObject var model: MessagesListVM
+    @SwiftUI.State private var expanded = false
+    let refreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    @SwiftUI.State private var tick = 0
+
+    var presenceIcon: String {
+        switch model.debugPresenceStatus {
+        case .offline:   return "⚫"
+        case .available: return "🟡"
+        case .connected: return "🟢"
+        }
+    }
+    var presenceLabel: String {
+        switch model.debugPresenceStatus {
+        case .offline:   return "Offline"
+        case .available: return "Available"
+        case .connected: return "Connected"
+        }
+    }
+
+    var syncIcon: String { model.isSyncing ? "🔄" : "✅" }
+    var syncLabel: String { model.isSyncing ? "Syncing" : "Idle" }
+    var invitedCount: Int { model.debugInvitedCount }
+
+    var accountIcon: String {
+        switch model.debugAccountStateColor {
+        case "green":  return "🟢"
+        case "yellow": return "🟡"
+        case "orange": return "🟠"
+        default:       return "🔴"
+        }
+    }
+    var accountColor: Color {
+        switch model.debugAccountStateColor {
+        case "green":  return .green
+        case "yellow": return .yellow
+        case "orange": return .orange
+        default:       return .red
+        }
+    }
+
+    var msgIcon: String {
+        switch model.debugLastMessageStatus {
+        case "sending":  return "📤"
+        case "sent":     return "📨"
+        case "displayed":return "✅"
+        case "failure":  return "❌"
+        default:         return "💬"
+        }
+    }
+
+    // Summary icons shown in the collapsed pill
+    var pillText: String {
+        var parts = [syncIcon, presenceIcon, accountIcon]
+        if invitedCount > 0 { parts.append("⏳\(invitedCount)") }
+        return parts.joined(separator: "")
+    }
+
+    var body: some View {
+        VStack(alignment: .trailing, spacing: 4) {
+            // ── Collapsed pill ──
+            Button(action: { withAnimation(.easeInOut(duration: 0.2)) { expanded.toggle() } }) {
+                Text(pillText)
+                    .font(.system(size: 11))
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 3)
+                    .background(Color.black.opacity(0.65))
+                    .cornerRadius(12)
+            }
+
+            // ── Expanded detail panel ──
+            if expanded {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Conv: \(model.debugConversationId)")
+                        .font(.system(size: 9)).foregroundColor(.white.opacity(0.6))
+                    Divider().background(Color.white.opacity(0.3))
+
+                    row(icon: accountIcon, label: model.debugAccountState, color: accountColor)
+                    row(icon: syncIcon,    label: syncLabel)
+                    row(icon: presenceIcon,label: presenceLabel)
+                    row(icon: msgIcon,     label: "Msg: \(model.debugLastMessageStatus)")
+                    row(icon: invitedCount > 0 ? "⏳" : "✅",
+                        label: invitedCount > 0 ? "Invited: \(invitedCount)" : "All joined",
+                        color: invitedCount > 0 ? .yellow : .white)
+
+                    Button(action: { model.debugForceReRegister() }) {
+                        row(icon: "🔁", label: "ReReg: \(model.debugReRegisterCount)  [tap]",
+                            color: model.debugReRegisterCount > 0 ? Color(UIColor.systemTeal) : .white.opacity(0.6))
+                    }
+
+                    if model.debugParticipantRoles != "—" {
+                        Divider().background(Color.white.opacity(0.3))
+                        Text(model.debugParticipantRoles)
+                            .font(.system(size: 8)).foregroundColor(.white.opacity(0.7))
+                    }
+                }
+                .padding(8)
+                .background(Color.black.opacity(0.78))
+                .cornerRadius(10)
+                .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .topTrailing)))
+            }
+        }
+        .padding(.top, 8)
+        .padding(.trailing, 10)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+        .onReceive(refreshTimer) { _ in tick += 1 }
+    }
+
+    private func row(icon: String, label: String, color: Color = .white) -> some View {
+        HStack(spacing: 4) {
+            Text(icon).font(.system(size: 11))
+            Text(label).font(.system(size: 10, weight: .medium)).foregroundColor(color)
+        }
+    }
+}
+#endif

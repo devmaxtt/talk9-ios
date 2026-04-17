@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2017-2025 Savoir-faire Linux Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "Sélecteur de couleur pour la conversation";
 "swarm.editTextHint" = "Tapoter deux fois pour sélectionner ce compte";
 "swarm.conversationHeader" = "Conversation";
-"swarm.shareContactMessage" = "Vous pouvez ajouter ce contact, %1@, sur la plateforme de communication distribuée : https://jami.net";
+"swarm.shareContactMessage" = "Vous pouvez ajouter ce contact, %1@, sur la plateforme de communication distribuée : https://talk9.co";
 "swarm.oneToOne" = "Privé";
 "swarm.adminInvitesOnly" = "Groupe privé (sur invitation)";
 "swarm.invitesOnly" = "Groupe privé";
@@ -356,7 +356,7 @@
 "accountPage.removeAccountMessage" = "Si votre compte n'a pas été sauvegardé ou ajouté à un autre appareil, votre compte et votre nom d'utilisateur enregistré seront IRRÉVOCABLEMENT PERDUS.";
 "accountPage.inviteFriends" = "Inviter des amis";
 "accountPage.contactMeOnJamiTitle" = "Contactez moi sur Jami!";
-"accountPage.contactMeOnJamiContant" = "Contactez-moi par l'identifiant : %s sur la plateforme distribuée de communication Jami. https://jami.net ";
+"accountPage.contactMeOnJamiContant" = "Contactez-moi par l'identifiant : %s sur la plateforme distribuée de communication Jami. https://talk9.co ";
 "accountPage.passwordPlaceholder" = "Entrer le mot de passe de votre compte";
 "accountPage.usernamePlaceholder" = "Entrez le nom d'utilisateur souhaité";
 "accountPage.registerNameErrorMessage" = "Ce nom d'utilisateur est indisponible.";

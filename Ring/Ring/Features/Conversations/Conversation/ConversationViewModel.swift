@@ -677,6 +677,9 @@ extension ConversationViewModel {
                 .subscribe(
                     onNext: { [weak self] presence in
                         self?.presence = presence
+#if DEBUG
+                        self?.swiftUIModel.updateDebugPresence(presence)
+#endif
                     },
                     onError: { error in
                         print("Error observing presence updates: \(error)")

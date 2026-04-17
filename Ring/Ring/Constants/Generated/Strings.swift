@@ -301,9 +301,9 @@ internal enum L10n {
     internal static let connectivityAndConfiguration = L10n.tr("Localizable", "accountPage.connectivityAndConfiguration", fallback: "Connectivity and configurations")
     /// Connectivity
     internal static let connectivityHeader = L10n.tr("Localizable", "accountPage.connectivityHeader", fallback: "Connectivity")
-    /// Contact me using “%s” on the Talk9 distributed communication platform: https://jami.net
+    /// Contact me using “%s” on the Talk9 distributed communication platform: https://talk9.co
     internal static func contactMeOnJamiContant(_ p1: UnsafePointer<CChar>) -> String {
-      return L10n.tr("Localizable", "accountPage.contactMeOnJamiContant", p1, fallback: "Contact me using “%s” on the Talk9 distributed communication platform: https://jami.net")
+      return L10n.tr("Localizable", "accountPage.contactMeOnJamiContant", p1, fallback: "Contact me using “%s” on the Talk9 distributed communication platform: https://talk9.co")
     }
     /// Contact me on Talk9!
     internal static let contactMeOnJamiTitle = L10n.tr("Localizable", "accountPage.contactMeOnJamiTitle", fallback: "Contact me on Talk9!")
@@ -1313,9 +1313,9 @@ internal enum L10n {
     internal static let settings = L10n.tr("Localizable", "swarm.settings", fallback: "Settings")
     /// Share contact information
     internal static let shareContactInfo = L10n.tr("Localizable", "swarm.shareContactInfo", fallback: "Share contact information")
-    /// You can add this contact, %1@, on the Talk9 distributed communication platform: https://jami.net
+    /// You can add this contact, %1@, on the Talk9 distributed communication platform: https://talk9.co
     internal static func shareContactMessage(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "swarm.shareContactMessage", String(describing: p1), fallback: "You can add this contact, %1@, on the Talk9 distributed communication platform: https://jami.net")
+      return L10n.tr("Localizable", "swarm.shareContactMessage", String(describing: p1), fallback: "You can add this contact, %1@, on the Talk9 distributed communication platform: https://talk9.co")
     }
     /// Show contact QR code
     internal static let showContactQRCode = L10n.tr("Localizable", "swarm.showContactQRCode", fallback: "Show contact QR code")

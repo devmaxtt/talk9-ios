@@ -50,7 +50,7 @@ class SharedActionsPresenter {
     }
 
     class func openDonationLink() {
-        if let url = URL(string: "https://jami.net/donate/") {
+        if let url = URL(string: "https://talk9.co/donate/") {
             if UIApplication.shared.canOpenURL(url) {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
             }

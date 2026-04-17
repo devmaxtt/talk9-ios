@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2017-2025 Savoir-faire Linux Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "Zgjedhës ngjyre bisede";
 "swarm.editTextHint" = "Që ta përpunoni, prekeni dy herë";
 "swarm.conversationHeader" = "Bisedë";
-"swarm.shareContactMessage" = "Mund ta shtoni këtë kontakt, %1@, te platforma e shpërndarë e komunikimeve Jami: https://jami.net";
+"swarm.shareContactMessage" = "Mund ta shtoni këtë kontakt, %1@, te platforma e shpërndarë e komunikimeve Jami: https://talk9.co";
 "swarm.oneToOne" = "Privat";
 "swarm.adminInvitesOnly" = "Grup privat (kufizim ftesash)";
 "swarm.invitesOnly" = "Grup privat";
@@ -356,7 +356,7 @@
 "accountPage.removeAccountMessage" = "Nëse llogaria s’është kopjeruajtur, apo shtuar te një pajisje tjetër, ajo dhe emri i përdoruesit regjistruar për të do të HUMBIN NË MËNYRË TË PAKTHYESHME.";
 "accountPage.inviteFriends" = "Ftoni shokë";
 "accountPage.contactMeOnJamiTitle" = "Lidhuni me mua në Jami!";
-"accountPage.contactMeOnJamiContant" = "Lidhuni me mua duke përdorur “%s” në platformën e komunikimeve të shpërndara Jami: https://jami.net";
+"accountPage.contactMeOnJamiContant" = "Lidhuni me mua duke përdorur “%s” në platformën e komunikimeve të shpërndara Jami: https://talk9.co";
 "accountPage.passwordPlaceholder" = "Jepni fjalëkalim llogarie";
 "accountPage.usernamePlaceholder" = "Jepni emrin e dëshiruar të përdoruesit";
 "accountPage.registerNameErrorMessage" = "Emri i përdoruesit s’mund të kihet.";
