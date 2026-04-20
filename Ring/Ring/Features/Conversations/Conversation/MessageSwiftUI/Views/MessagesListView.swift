@@ -563,6 +563,9 @@ private struct DebugConnectionOverlay: View {
                     Divider().background(Color.white.opacity(0.3))
 
                     row(icon: accountIcon, label: model.debugAccountState, color: accountColor)
+                    let turnOk = model.debugTurnServer.contains("talk9.co")
+                    row(icon: "🔀", label: "TURN:\(model.debugTurnServer)",
+                        color: turnOk ? .white : .red)
                     row(icon: syncIcon,    label: syncLabel)
                     row(icon: presenceIcon,label: presenceLabel)
                     row(icon: msgIcon,     label: "Msg: \(model.debugLastMessageStatus)")

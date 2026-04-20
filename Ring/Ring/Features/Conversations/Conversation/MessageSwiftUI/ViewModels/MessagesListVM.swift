@@ -145,6 +145,14 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
 
     var debugSyncState: String { isSyncing ? "Syncing" : "Idle" }
 
+    /// Actual TURN server the daemon is using for this account (read from live config).
+    var debugTurnServer: String {
+        guard let accountId = accountService.currentAccount?.id else { return "?" }
+        let details = accountService.getAccountDetails(fromAccountId: accountId)
+        let server = details.get(withConfigKeyModel: ConfigKeyModel(withKey: .turnServer))
+        return server.isEmpty ? "none" : server
+    }
+
     /// Account registration state: REGISTERED / TRYING / ERROR_NETWORK / etc.
     var debugAccountState: String {
         accountService.currentAccount?.status.rawValue ?? "unknown"

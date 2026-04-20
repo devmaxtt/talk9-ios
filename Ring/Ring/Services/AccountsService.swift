@@ -266,16 +266,10 @@ class AccountsService: AccountAdapterDelegate {
     }
 
     /// Force-applies Talk9's bootstrap and TURN settings for a Jami account.
-    /// Called both at load time (to migrate old accounts) and at creation time.
-    private func applyTalk9NetworkDefaults(accountId: String) {
-        let details = getAccountDetails(fromAccountId: accountId)
-        let currentBootstrap = details.get(withConfigKeyModel: ConfigKeyModel(withKey: .accountHostname))
-        let currentTurn      = details.get(withConfigKeyModel: ConfigKeyModel(withKey: .turnServer))
-        // Only write if values are still pointing to jami defaults (or empty)
-        let needsBootstrapFix = currentBootstrap.isEmpty || currentBootstrap.contains("jami.net")
-        let needsTurnFix      = currentTurn.isEmpty      || currentTurn.contains("jami.net")
-        guard needsBootstrapFix || needsTurnFix else { return }
-        log.debug("[Talk9] Migrating account \(accountId) bootstrap/proxy/TURN to Talk9 servers")
+    /// Called at load time, at creation time, and before every account re-registration
+    /// to prevent the daemon from silently reverting to Jami default servers.
+    func applyTalk9NetworkDefaults(accountId: String) {
+        log.debug("[Talk9] Applying bootstrap/proxy/TURN to Talk9 servers for account \(accountId)")
         setAccountProperty(property: ConfigKeyModel(withKey: .accountHostname), value: "bootstrap.talk9.co",                  accountId: accountId)
         setAccountProperty(property: ConfigKeyModel(withKey: .proxyEnabled),    value: "true",                                accountId: accountId)
         setAccountProperty(property: ConfigKeyModel(withKey: .proxyServer),     value: "https://dht.talk9.co",                accountId: accountId)

@@ -76,7 +76,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     private var presentingCallScreen = false
 
     // MARK: - Connection Retry Timer
-    // Fires every 30s to unblock stuck ICE re-clone attempts AND keep TURN relay alive
+    // Fires every 5 minutes to keep TURN relay allocations alive and re-bootstrap
+    // swarm peer connections that may have gone idle.
     private var connectivityTimer: Timer?
 
     lazy var injectionBag: InjectionBag = {
@@ -358,6 +359,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         self.daemonService.connectivityChanged()
         guard let account = self.accountService.currentAccount else { return }
         self.presenceService.subscribeBuddies(withAccount: account.id, withContacts: self.contactsService.contacts.value, subscribe: true)
+        // [TALK9] Also subscribe to presence for ALL conversation participants, not just contacts.
+        // The daemon's rotateTrackedMembers() has a bug where it permanently untracks a peer
+        // after ICE failure in a 2-person conversation. Maintaining a Swift-side presence
+        // subscription (refCount ≥ 1) prevents a full untrack, keeping the DHT listener alive
+        // so iOS receives the peer's next presence announcement and retries ICE.
+        self.subscribeAllConversationParticipants(accountId: account.id, subscribe: true)
     }
 
     func sceneDidBecomeActive() {
@@ -370,6 +377,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func sceneWillResignActive() {
         guard let account = self.accountService.currentAccount else { return }
         self.presenceService.subscribeBuddies(withAccount: account.id, withContacts: self.contactsService.contacts.value, subscribe: false)
+        self.subscribeAllConversationParticipants(accountId: account.id, subscribe: false)
         self.stopConnectionTimers()
     }
 
@@ -478,6 +486,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         syncRetryCount += 1
         log.debug("AppDelegate: re-registering account to unblock stuck conversation sync (attempt \(syncRetryCount))")
+        // Force-restore Talk9 TURN/bootstrap before disable — daemon can silently reset
+        // these to Jami defaults on account re-enable, which breaks ICE for all peers.
+        accountService.applyTalk9NetworkDefaults(accountId: account.id)
         #if DEBUG
         NotificationCenter.default.post(name: .debugReRegisterFired, object: nil)
         #endif
@@ -487,12 +498,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
     }
 
-    /// Start a 5-minute repeating timer to keep TURN relay allocations alive.
-    /// TURN relay allocations expire after ~10 minutes of inactivity.
+    /// Subscribe (or unsubscribe) presence for every non-local participant across all
+    /// conversations. This keeps a Swift-side DHT presence reference alive for peers that
+    /// are not yet in the contacts list (e.g. a newly invited user), preventing the
+    /// daemon's rotateTrackedMembers bug from fully untracking them after ICE failure.
+    private func subscribeAllConversationParticipants(accountId: String, subscribe: Bool) {
+        let localJamiId = accountService.currentAccount?.jamiId ?? ""
+        for conversation in conversationsService.conversations.value {
+            for participant in conversation.getAllParticipants() where !participant.isLocal {
+                let jamiId = participant.jamiId
+                guard !jamiId.isEmpty, jamiId != localJamiId else { continue }
+                presenceService.subscribeBuddy(withAccountId: accountId,
+                                               withJamiId: jamiId,
+                                               withFlag: subscribe)
+            }
+        }
+    }
+
     private func startConnectionTimers() {
         stopConnectionTimers()
         connectivityTimer = Timer.scheduledTimer(withTimeInterval: 5 * 60, repeats: true) { [weak self] _ in
-            self?.log.debug("AppDelegate: periodic connectivityChanged (TURN keepalive)")
+            self?.log.debug("AppDelegate: periodic connectivityChanged (TURN keepalive + bootstrap)")
             self?.daemonService.connectivityChanged()
         }
     }
