@@ -44,9 +44,9 @@ struct SettingsSummaryView: View {
                         SettingsRow(iconName: "server.rack", title: L10n.AccountPage.nameServer)
                     }
                 }
-                NavigationLink(destination: ConnectivitySettingsView(injectionBag: model.injectionBag, account: model.account)) {
-                    SettingsRow(iconName: "link", title: L10n.AccountPage.connectivityAndConfiguration)
-                }
+//                NavigationLink(destination: ConnectivitySettingsView(injectionBag: model.injectionBag, account: model.account)) {
+//                    SettingsRow(iconName: "link", title: L10n.AccountPage.connectivityAndConfiguration)
+//                }
             }
 
             Section(header: Text(L10n.AccountPage.appSettings), footer: Text(L10n.AccountPage.appSettingsExplanation)) {

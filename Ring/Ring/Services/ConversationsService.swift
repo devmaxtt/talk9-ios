@@ -925,6 +925,22 @@ class ConversationsService {
                 conversation.accountId == accountId
         }).first else { return }
         conversation.messageStatusUpdated(status: status, messageId: messageId, jamiId: jamiId)
+
+        // Notify AppDelegate's stuck-sending watchdog (Trigger 4).
+        // When a message enters "sending", the watchdog starts a timer; when it
+        // is delivered (sent/displayed/failure/canceled), the watchdog is cancelled.
+        switch status {
+        case .sending:
+            NotificationCenter.default.post(name: .messageStatusSending,
+                                            object: nil,
+                                            userInfo: ["messageId": messageId])
+        case .sent, .displayed, .failure, .canceled:
+            NotificationCenter.default.post(name: .messageStatusFinalized,
+                                            object: nil,
+                                            userInfo: ["messageId": messageId])
+        default:
+            break
+        }
     }
 
     func conversationProfileUpdated(conversationId: String, accountId: String, profile: [String: String]) {

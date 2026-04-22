@@ -142,6 +142,25 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
     // Removed automatically in Release builds — no manual cleanup needed.
     @Published var debugPresenceStatus: PresenceStatus = .offline
     @Published var debugReRegisterCount: Int = 0
+    private var debugSwarmPushTimer: Timer?
+    struct SwarmLogEntry: Identifiable {
+        let id = UUID()
+        let text: String
+    }
+
+    /// Last 8 swarm events in reverse-chronological order (newest first).
+    @Published var debugSwarmLog: [SwarmLogEntry] = []
+
+    private func appendSwarmLog(_ icon: String, _ text: String) {
+        let fmt = DateFormatter()
+        fmt.dateFormat = "HH:mm:ss"
+        let ts = fmt.string(from: Date())
+        let entry = SwarmLogEntry(text: "\(ts) \(icon) \(text)")
+        DispatchQueue.main.async {
+            self.debugSwarmLog.insert(entry, at: 0)
+            if self.debugSwarmLog.count > 8 { self.debugSwarmLog.removeLast() }
+        }
+    }
 
     var debugSyncState: String { isSyncing ? "Syncing" : "Idle" }
 
@@ -200,7 +219,22 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
 
     /// Called by ConversationViewModel whenever contactPresence changes.
     func updateDebugPresence(_ status: PresenceStatus) {
-        DispatchQueue.main.async { self.debugPresenceStatus = status }
+        DispatchQueue.main.async {
+            let prev = self.debugPresenceStatus
+            self.debugPresenceStatus = status
+            guard status != prev else { return }
+
+            switch status {
+            case .offline:
+                self.appendSwarmLog("⚫", "Presence→Offline (DHT unreachable)")
+            case .available:
+                self.appendSwarmLog("🟡", "Presence→Available (DHT online, no channel)")
+            case .connected:
+                // NOTE: this is the legacy MESSAGE channel, NOT the swarm channel.
+                // A message can still be stuck in "sending" even when this fires.
+                self.appendSwarmLog("🟢", "Presence→Connected (legacy MSG ch)")
+            }
+        }
     }
 
     func debugForceReRegister() {
@@ -211,7 +245,88 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
         NotificationCenter.default.addObserver(forName: .debugReRegisterFired,
                                                object: nil,
                                                queue: .main) { [weak self] _ in
-            self?.debugReRegisterCount += 1
+            guard let self = self else { return }
+            self.debugReRegisterCount += 1
+            self.appendSwarmLog("🔁", "ReReg #\(self.debugReRegisterCount)")
+        }
+        // Poll last message status every second and log transitions
+        // (Swarm messages bypass messageStatusChanged callback, so we poll instead)
+        Observable.interval(.seconds(1), scheduler: MainScheduler.instance)
+            .compactMap { [weak self] (_: Int) -> String? in self?.debugLastMessageStatus }
+            .distinctUntilChanged()
+            .skip(1)
+            .subscribe(onNext: { [weak self] status in
+                guard let self = self else { return }
+                let icon: String
+                switch status {
+                case "sending":  icon = "📤"
+                case "sent":     icon = "📨"
+                case "displayed":icon = "✅"
+                case "failure":  icon = "❌"
+                default:         icon = "💬"
+                }
+                self.appendSwarmLog(icon, "Msg→\(status)")
+                // Swarm push watchdog: if message stays in "sending" > 30s,
+                // the swarm channel (separate from MESSAGE presence channel) has failed.
+                if status == "sending" {
+                    self.debugSwarmPushTimer?.invalidate()
+                    self.debugSwarmPushTimer = Timer.scheduledTimer(withTimeInterval: 30, repeats: false) { [weak self] _ in
+                        guard let self = self, self.debugLastMessageStatus == "sending" else { return }
+                        self.appendSwarmLog("⏳", "Msg stuck 30s — waiting for ICE (daemon still trying)")
+                        self.debugSwarmPushTimer = nil
+                    }
+                } else {
+                    self.debugSwarmPushTimer?.invalidate()
+                    self.debugSwarmPushTimer = nil
+                }
+            })
+            .disposed(by: disposeBag)
+        // Track isSyncing changes by polling every second
+        Observable.interval(.seconds(1), scheduler: MainScheduler.instance)
+            .compactMap { [weak self] (_: Int) -> Bool? in self?.isSyncing }
+            .distinctUntilChanged()
+            .skip(1)
+            .subscribe(onNext: { [weak self] syncing in
+                self?.appendSwarmLog(syncing ? "🔄" : "✅", syncing ? "Sync start" : "Sync done")
+            })
+            .disposed(by: disposeBag)
+        // Track account registration state changes.
+        accountService.sharedResponseStream
+            .filter { $0.eventType == .registrationStateChanged }
+            .compactMap { event -> String? in event.getEventInput(.registrationState) }
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] state in
+                let icon: String
+                switch state {
+                case "REGISTERED":     icon = "🟢"
+                case "TRYING", "INITIALIZING": icon = "🟡"
+                default:               icon = "🔴"
+                }
+                self?.appendSwarmLog(icon, "Account→\(state)")
+            })
+            .disposed(by: disposeBag)
+        // Track deviceAnnounced changes — true means iOS is visible on DHT so peer can initiate ICE.
+        NotificationCenter.default.addObserver(forName: .debugDeviceAnnounced,
+                                               object: nil,
+                                               queue: .main) { [weak self] note in
+            guard let announced = note.userInfo?["announced"] as? String else { return }
+            let icon = announced == "true" ? "📡" : "🔕"
+            self?.appendSwarmLog(icon, "deviceAnnounced=\(announced)")
+        }
+        // Swarm bootstrap results + conversation errors from daemon.
+        // code 0 = SwarmConnected, code 1001 = SwarmBootstrapFailed (ICE/TURN exhausted).
+        // NOTE: this fires AFTER the daemon ICE timeout (~60-120s), NOT at the 30s UI timer.
+        NotificationCenter.default.addObserver(forName: .debugConversationError,
+                                               object: nil,
+                                               queue: .main) { [weak self] note in
+            guard let code = note.userInfo?["code"] as? Int,
+                  let msg  = note.userInfo?["message"] as? String else { return }
+            switch code {
+            case 0:    self?.appendSwarmLog("🔗", "Swarm connected ✓")
+            case 1001: self?.appendSwarmLog("❌", "ICE/TURN all failed → SwarmBootstrapFailed")
+            default:   self?.appendSwarmLog("⚠️", "ConvErr \(code): \(msg)")
+            }
         }
     }
 #endif

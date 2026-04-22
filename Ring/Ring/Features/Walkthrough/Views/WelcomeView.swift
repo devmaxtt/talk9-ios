@@ -177,7 +177,7 @@ struct PortraitView: View {
     let stateEmitter: StatePublisher<WalkthroughState>
     var body: some View {
         VStack {
-            Spacer(minLength: 80)
+            Spacer(minLength: 10)
             HeaderView()
             ScrollView(showsIndicators: false) {
                 ButtonsView(model: model,
@@ -193,7 +193,7 @@ struct HeaderView: View {
             Image("jami_gnupackage")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(height: 70)
+                .frame(height: 150)
                 .accessibilityHidden(true)
             Text("Welcome to Talk 9")
                 .font(.title2.bold())

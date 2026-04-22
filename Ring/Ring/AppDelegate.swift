@@ -80,6 +80,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     // swarm peer connections that may have gone idle.
     private var connectivityTimer: Timer?
 
+    // MARK: - Stuck-Sending Watchdog (Trigger 4)
+    // Keyed by messageId. If a message stays in "sending" for > 90 s, we auto-ReReg.
+    private var sendingWatchdogTimers: [String: Timer] = [:]
+
     lazy var injectionBag: InjectionBag = {
         return InjectionBag(withDaemonService: self.daemonService,
                             withAccountService: self.accountService,
@@ -154,11 +158,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         self.addListenerForNotification()
 
-        // starts the daemon
-        self.startDaemon()
-
-        self.setUpTestDataIfNeed()
-
         // requests permission to use the camera
         // will enumerate and add devices once permission has been granted
         self.videoService.setupInputs()
@@ -176,11 +175,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // start monitoring for network changes
         self.networkService.monitorNetworkType()
 
-        // When any conversation finishes a sync attempt (synchronizing: true→false),
-        // immediately call connectivityChanged() to clear stale isConnecting flags.
-        // This enables the daemon's 40s re-clone timer to succeed on next fire
-        // instead of being blocked by the stale flag indefinitely.
-        // Debounced 1s to avoid spam when multiple conversations change state together.
         self.subscribeConversationSyncRetry()
 
         self.interactionsManager = GeneratedInteractionsManager(accountService: self.accountService,
@@ -188,8 +182,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                                                                 conversationService: self.conversationsService,
                                                                 callService: self.callService)
 
-        // load accounts during splashscreen
-        // and ask the AppCoordinator to handle the first screen once loading is finished
         self.conversationManager = ConversationsManager(with: self.conversationsService,
                                                         accountsService: self.accountService,
                                                         nameService: self.nameService,
@@ -200,8 +192,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                                                         presenceService: self.presenceService)
         self.videoManager = VideoManager(with: self.callService, videoService: self.videoService)
 
-        prepareAccounts()
         self.voipRegistry.delegate = self
+
+        // Start the C++ daemon on a background thread so the main thread (and UI) stays
+        // responsive during the lengthy libjami::init() + start() calls (3-8 s on device).
+        // All follow-up work that needs the daemon is queued inside the completion block
+        // and dispatched back to the main thread once the daemon is ready.
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self = self else { return }
+            self.startDaemon()
+            self.setUpTestDataIfNeed()
+            DispatchQueue.main.async {
+                self.prepareAccounts()
+            }
+        }
         NotificationCenter.default.addObserver(self, selector: #selector(registerNotifications),
                                                name: NSNotification.Name(rawValue: NotificationName.enablePushNotifications.rawValue),
                                                object: nil)
@@ -345,6 +349,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             .prepareConversationsForAccount(accountId: account.id, accountURI: account.jamiId)
         self.contactsService.loadContacts(withAccount: account)
         self.presenceService.subscribeBuddies(withAccount: account.id, withContacts: self.contactsService.contacts.value, subscribe: true)
+        // On cold start or account switch, scan for messages that were left stuck in
+        // "sending" from a previous session.  Wait 20 s so conversations have time to
+        // load and the account has time to register before we make any judgements.
+        let accountId = account.id
+        DispatchQueue.main.asyncAfter(deadline: .now() + 20.0) { [weak self] in
+            self?.markStuckMessagesAsFailed(accountId: accountId)
+        }
     }
 
     // MARK: - Scene Lifecycle Methods
@@ -356,8 +367,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     func sceneWillEnterForeground() {
         self.updateNotificationAvailability()
+        guard let account = self.accountService.currentAccount else {
+            self.daemonService.connectivityChanged()
+            return
+        }
+        // Re-apply Talk9 TURN/bootstrap settings before triggering connectivity.
+        // The daemon can silently reset these to Jami defaults while the app is
+        // in the background, which breaks ICE for all subsequent connection attempts.
+        log.debug("[Talk9-Diag] 📲 sceneWillEnterForeground — re-applying TURN + connectivityChanged, resetting syncRetryCount")
+        accountService.applyTalk9NetworkDefaults(accountId: account.id)
         self.daemonService.connectivityChanged()
-        guard let account = self.accountService.currentAccount else { return }
+        // Reset the retry counter so the watchdog can fire again after the user
+        // brings the app back to the foreground.  Without this reset, after 5 failed
+        // attempts in one session the watchdog is permanently silenced until the
+        // app is killed and relaunched — even if connectivity later recovers.
+        syncRetryCount = 0
         self.presenceService.subscribeBuddies(withAccount: account.id, withContacts: self.contactsService.contacts.value, subscribe: true)
         // [TALK9] Also subscribe to presence for ALL conversation participants, not just contacts.
         // The daemon's rotateTrackedMembers() has a bug where it permanently untracks a peer
@@ -389,6 +413,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     private let maxSyncRetries = 5
     // Conversation IDs already being watched for stuck sync (avoids duplicate subscriptions).
     private var syncWatchedIds: Set<String> = []
+    // When true, the next REGISTERED event triggers swarm re-bootstrap.
+    // Set to true after enableAccount(true) in reRegisterAccountForSyncRetry.
+    private var pendingSwarmBootstrapOnRegistered = false
+    // Prevents Trigger6 (SwarmBootstrapFailed) from firing more than once per 60s.
+    private var lastSwarmBootstrapRetry: Date = .distantPast
 
     /// Subscribe to per-conversation synchronizing state AND to member-join events.
     ///
@@ -428,7 +457,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                         .filter { !$0.isLocal }
                         .contains { $0.role == .invited }
                     if hasInvited {
+                        let convId = String(conv.id.prefix(8))
+                        log.debug("[Talk9-ICE][Retry] Trigger1a — invited peer detected for conv=\(convId), will re-register in 10s")
                         DispatchQueue.main.asyncAfter(deadline: .now() + 10) { [weak self] in
+                            self?.log.debug("[Talk9-ICE][Retry] Trigger1a firing reRegister for conv=\(convId)")
                             self?.reRegisterAccountForSyncRetry()
                         }
                     }
@@ -438,8 +470,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                         .asObservable()
                         .filter { $0 }   // fires each time synchronizing becomes true
                         .subscribe(onNext: { [weak self, weak conv] _ in
+                            let convId = String(conv?.id.prefix(8) ?? "?")
+                            self?.log.debug("[Talk9-ICE][Retry] Trigger1b — conv=\(convId) synchronizing=true, will re-register in 30s if still stuck")
                             DispatchQueue.main.asyncAfter(deadline: .now() + 30) { [weak self, weak conv] in
                                 guard conv?.synchronizing.value == true else { return }
+                                self?.log.debug("[Talk9-ICE][Retry] Trigger1b firing reRegister — conv=\(convId) still synchronizing after 30s")
                                 self?.reRegisterAccountForSyncRetry()
                             }
                         })
@@ -454,7 +489,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         self.conversationsService.sharedResponseStream
             .filter { $0.eventType == .conversationMemberEvent }
             .subscribe(onNext: { [weak self] _ in
+                self?.log.debug("[Talk9-ICE][Retry] Trigger2 — memberEvent received, will re-register in 30s")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 30) { [weak self] in
+                    self?.log.debug("[Talk9-ICE][Retry] Trigger2 firing reRegister after memberEvent")
                     self?.reRegisterAccountForSyncRetry()
                 }
             })
@@ -467,6 +504,107 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             self?.reRegisterAccountForSyncRetry()
         }
         #endif
+
+        // Trigger: after re-register (enableAccount true), wait for REGISTERED state,
+        // then re-bootstrap swarm. Using REGISTERED event ensures TURN cache has been
+        // refreshed (turnCache_->refresh() is called in the daemon when REGISTERED fires)
+        // before we call loadConversations() → bootstrap() → maintainBuckets() → ICE.
+        self.accountService.sharedResponseStream
+            .filter { $0.eventType == .registrationStateChanged }
+            .compactMap { event -> String? in
+                guard let stateStr: String = event.getEventInput(.registrationState),
+                      let accountId: String = event.getEventInput(.accountId) else { return nil }
+                return stateStr == AccountState.registered.rawValue ? accountId : nil
+            }
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] accountId in
+                guard let self = self, self.pendingSwarmBootstrapOnRegistered else { return }
+                self.pendingSwarmBootstrapOnRegistered = false
+                self.log.debug("[Talk9-ICE][Retry] ✅ REGISTERED — re-bootstrap starting  retries=\(self.syncRetryCount)/\(self.maxSyncRetries)  account=\(accountId)")
+                // 0. Re-apply Talk9 TURN/bootstrap one final time now that the daemon is
+                //    REGISTERED.  The daemon refreshes its TURN cache at this exact moment
+                //    (turnCache_->refresh()), so settings applied here take effect immediately
+                //    for all subsequent ICE negotiations.
+                self.accountService.applyTalk9NetworkDefaults(accountId: accountId)
+                // 1. Force loadConversations() → bootstrap() → swarmManager.restart() + maintainBuckets()
+                self.conversationsService.reloadConversationsAndRequests(accountId: accountId)
+                // 2. Also trigger ICE candidate re-discovery and DHT re-bootstrap
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                    self?.daemonService.connectivityChanged()
+                }
+                // 3. After giving the reconnected channel time to drain naturally,
+                //    mark any messages that are still stuck as failed so the user
+                //    can see and manually retry them instead of waiting forever.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) { [weak self] in
+                    self?.markStuckMessagesAsFailed(accountId: accountId)
+                }
+            })
+            .disposed(by: self.disposeBag)
+
+        // Trigger 4: stuck-sending watchdog.
+        // When a message enters "sending" status, start a 90-second timer.
+        // If it is still "sending" after 90 s (peer never acknowledged), re-register
+        // to unblock the swarm connection (same mechanism as Triggers 1–2).
+        NotificationCenter.default.addObserver(forName: .messageStatusSending, object: nil, queue: .main) { [weak self] notification in
+            guard let self = self,
+                  let messageId = notification.userInfo?["messageId"] as? String else { return }
+            // Cancel any prior watchdog for this message
+            self.sendingWatchdogTimers[messageId]?.invalidate()
+            let timer = Timer.scheduledTimer(withTimeInterval: 90, repeats: false) { [weak self] _ in
+                guard let self = self else { return }
+                self.sendingWatchdogTimers.removeValue(forKey: messageId)
+                // Confirm the message is genuinely still in "sending"
+                let isStillSending = self.conversationsService.conversations.value.contains { conv in
+                    conv.messages.contains { msg in
+                        msg.id == messageId && msg.status == .sending
+                    }
+                }
+                guard isStillSending else { return }
+                self.log.debug("[Talk9-ICE][Retry] Trigger4 — message \(messageId) stuck 90s sending, firing reRegister")
+                self.reRegisterAccountForSyncRetry()
+            }
+            self.sendingWatchdogTimers[messageId] = timer
+        }
+
+        // Cancel watchdog when message is delivered or fails.
+        NotificationCenter.default.addObserver(forName: .messageStatusFinalized, object: nil, queue: .main) { [weak self] notification in
+            guard let messageId = notification.userInfo?["messageId"] as? String else { return }
+            self?.sendingWatchdogTimers[messageId]?.invalidate()
+            self?.sendingWatchdogTimers.removeValue(forKey: messageId)
+        }
+
+        // Trigger 6: daemon reported SwarmBootstrapFailed (all ICE/TURN candidates exhausted).
+        // Without this, after a failure there is no retry unless a message gets stuck 90s (Trigger4)
+        // or a member event fires (Trigger2) — both of which may never happen for new contacts.
+        NotificationCenter.default.addObserver(forName: .swarmBootstrapFailed, object: nil, queue: .main) { [weak self] notification in
+            guard let self = self else { return }
+            let convId = (notification.userInfo?["conversationId"] as? String).map { String($0.prefix(8)) } ?? "?"
+            // Debounce: don't retry more than once per 60s to avoid hammering the server.
+            let now = Date()
+            guard now.timeIntervalSince(self.lastSwarmBootstrapRetry) > 60 else {
+                self.log.debug("[Talk9-ICE][Retry] Trigger6 debounced for conv=\(convId) (last retry < 60s ago)")
+                return
+            }
+            self.lastSwarmBootstrapRetry = now
+            self.log.debug("[Talk9-ICE][Retry] Trigger6 — SwarmBootstrapFailed conv=\(convId), scheduling reRegister in 15s")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 15) { [weak self] in
+                self?.log.debug("[Talk9-ICE][Retry] Trigger6 firing reRegister for conv=\(convId)")
+                self?.syncRetryCount = 0
+                self?.reRegisterAccountForSyncRetry()
+            }
+        }
+
+        // Trigger 5: call ended with ICE failure (pjsipCode 480/503/404).
+        // The peer's device was untracked by the daemon after ICE failed, so the next
+        // call attempt will also fail unless we re-register to restart the swarm tracking.
+        NotificationCenter.default.addObserver(forName: .callFailedWithICEError, object: nil, queue: .main) { [weak self] notification in
+            guard let self = self else { return }
+            let code = notification.userInfo?["stateCode"] as? Int ?? 0
+            let callId = notification.userInfo?["callId"] as? String ?? "?"
+            self.log.debug("[Talk9-ICE][Retry] Trigger5 — call \(callId) failed pjsipCode=\(code), resetting retry counter + re-registering")
+            self.syncRetryCount = 0
+            self.reRegisterAccountForSyncRetry()
+        }
     }
 
     /// Re-registers the current account by toggling enable state.
@@ -474,18 +612,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     /// causing Android to initiate a fresh connection (same effect as app restart).
     private func reRegisterAccountForSyncRetry() {
         guard syncRetryCount < maxSyncRetries else {
-            log.warning("AppDelegate: sync retry limit reached (\(maxSyncRetries)), giving up")
+            log.warning("[Talk9-ICE][Retry] ❌ retry limit reached (\(maxSyncRetries)) — no more reconnect attempts this session")
             return
         }
         guard let account = accountService.currentAccount else { return }
         // Don't re-register if there is an active call — it would drop it
         if callService.calls.get().values.contains(where: { $0.state == .current }) {
-            log.debug("AppDelegate: skipping sync re-register, active call in progress")
+            log.debug("[Talk9-ICE][Retry] skipping — active call in progress")
             return
         }
 
         syncRetryCount += 1
-        log.debug("AppDelegate: re-registering account to unblock stuck conversation sync (attempt \(syncRetryCount))")
+        log.debug("[Talk9-ICE][Retry] 🔄 attempt \(syncRetryCount)/\(maxSyncRetries)  account=\(account.id)")
         // Force-restore Talk9 TURN/bootstrap before disable — daemon can silently reset
         // these to Jami defaults on account re-enable, which breaks ICE for all peers.
         accountService.applyTalk9NetworkDefaults(accountId: account.id)
@@ -494,7 +632,70 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         #endif
         accountService.enableAccount(accountId: account.id, enable: false)
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
-            self?.accountService.enableAccount(accountId: account.id, enable: true)
+            guard let self = self else { return }
+            // Re-apply Talk9 TURN/bootstrap AGAIN just before re-enabling the account.
+            // The daemon resets these settings to Jami defaults when an account is
+            // re-enabled, so applying them only before disable (above) is not enough —
+            // they must be set here, immediately before enableAccount(true), so the
+            // daemon picks up the correct Talk9 servers on its next registration attempt.
+            self.accountService.applyTalk9NetworkDefaults(accountId: account.id)
+            // Signal that we want a swarm re-bootstrap once REGISTERED is confirmed.
+            // `registrationStateChanged` observer in subscribeConversationSyncRetry()
+            // will call reloadConversationsAndRequests + connectivityChanged at that point,
+            // ensuring the swarm managers are restarted AFTER the TURN cache is refreshed.
+            self.pendingSwarmBootstrapOnRegistered = true
+            self.accountService.enableAccount(accountId: account.id, enable: true)
+        }
+    }
+
+    /// Scans all conversations for outgoing messages that have been stuck in "sending"
+    /// for longer than `stuckThreshold` seconds and marks them as failed.
+    ///
+    /// This is called in two situations:
+    ///   1. After a reconnect (REGISTERED fires) — gives the newly restored connection
+    ///      10 s to drain any legitimately queued messages before declaring them dead.
+    ///   2. On cold start / account load — gives 20 s for conversations to load and
+    ///      the account to register before checking for leftover stuck messages from
+    ///      a previous session.
+    ///
+    /// Marking stuck messages as `.failure` lets the user see the real state and
+    /// manually retry, rather than watching a spinner forever.
+    private func markStuckMessagesAsFailed(accountId: String) {
+        // A message is "stuck" if it has been in sending state for more than this
+        // many seconds.  We use 90 s to match the existing Trigger 4 watchdog window,
+        // so we only act on messages that the watchdog already had a chance to retry.
+        let stuckThreshold: TimeInterval = 90
+        let now = Date()
+        let localJamiId = accountService.currentAccount?.jamiId ?? ""
+
+        for conversation in conversationsService.conversations.value
+                where conversation.accountId == accountId {
+
+            // Outgoing messages have an empty authorId (the local user is the author).
+            let stuckMessages = conversation.messages.filter { msg in
+                msg.status == .sending &&
+                msg.authorId.isEmpty &&
+                now.timeIntervalSince(msg.receivedDate) > stuckThreshold
+            }
+
+            guard !stuckMessages.isEmpty else { continue }
+
+            // For the status-change callback we need the remote peer's jamiId.
+            // In a 1-to-1 conversation this is the only non-local participant;
+            // for group conversations an empty string is acceptable.
+            let peerJamiId = conversation.getParticipants()
+                .first(where: { $0.jamiId != localJamiId })?.jamiId ?? ""
+
+            for msg in stuckMessages {
+                log.debug("AppDelegate: message \(msg.id) stuck in sending for >\(Int(stuckThreshold))s — marking as failed")
+                conversationsService.messageStatusChanged(
+                    .failure,
+                    for: msg.id,
+                    from: accountId,
+                    to: peerJamiId,
+                    in: conversation.id
+                )
+            }
         }
     }
 
@@ -839,9 +1040,22 @@ extension AppDelegate: PKPushRegistryDelegate {
     }
 }
 
+// Notification names for the stuck-sending watchdog (Trigger 4).
+// Posted by ConversationsService.messageStatusChanged(); consumed by AppDelegate.
+extension Notification.Name {
+    static let messageStatusSending   = Notification.Name("talk9.message.statusSending")
+    static let messageStatusFinalized = Notification.Name("talk9.message.statusFinalized")
+    // Posted by CallsService when a call terminates with a non-zero PJSIP error code (ICE/TURN failure).
+    static let callFailedWithICEError = Notification.Name("talk9.call.failedWithICEError")
+    // Posted by ConversationsManager when daemon emits SwarmBootstrapFailed (all ICE candidates exhausted).
+    static let swarmBootstrapFailed   = Notification.Name("talk9.swarm.bootstrapFailed")
+}
+
 #if DEBUG
 extension Notification.Name {
-    static let debugReRegisterFired  = Notification.Name("talk9.debug.reRegisterFired")
-    static let debugForceReRegister  = Notification.Name("talk9.debug.forceReRegister")
+    static let debugReRegisterFired    = Notification.Name("talk9.debug.reRegisterFired")
+    static let debugForceReRegister    = Notification.Name("talk9.debug.forceReRegister")
+    static let debugConversationError  = Notification.Name("talk9.debug.conversationError")
+    static let debugDeviceAnnounced    = Notification.Name("talk9.debug.deviceAnnounced")
 }
 #endif

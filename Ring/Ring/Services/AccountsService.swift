@@ -269,17 +269,38 @@ class AccountsService: AccountAdapterDelegate {
     /// Called at load time, at creation time, and before every account re-registration
     /// to prevent the daemon from silently reverting to Jami default servers.
     func applyTalk9NetworkDefaults(accountId: String) {
-        log.debug("[Talk9] Applying bootstrap/proxy/TURN to Talk9 servers for account \(accountId)")
+        log.debug("[Talk9-ICE][Config] Applying TURN=app.talk9.co:3478(TCP)  user=talk9  realm=talk9  for account=\(accountId)")
+        log.debug("[Talk9-Diag] >>> applyTalk9NetworkDefaults START for account \(accountId)")
         setAccountProperty(property: ConfigKeyModel(withKey: .accountHostname), value: "bootstrap.talk9.co",                  accountId: accountId)
         setAccountProperty(property: ConfigKeyModel(withKey: .proxyEnabled),    value: "true",                                accountId: accountId)
         setAccountProperty(property: ConfigKeyModel(withKey: .proxyServer),     value: "https://dht.talk9.co",                accountId: accountId)
         setAccountProperty(property: ConfigKeyModel(withKey: .proxyListEnabled),value: "true",                                accountId: accountId)
         setAccountProperty(property: ConfigKeyModel(withKey: .dhtProxyListUrl), value: "https://dht.talk9.co/proxyList",      accountId: accountId)
         setAccountProperty(property: ConfigKeyModel(withKey: .turnEnable),      value: "true",                                accountId: accountId)
-        setAccountProperty(property: ConfigKeyModel(withKey: .turnServer),      value: "app.talk9.co",                        accountId: accountId)
+        setAccountProperty(property: ConfigKeyModel(withKey: .turnServer),      value: "app.talk9.co:3478",                   accountId: accountId)
         setAccountProperty(property: ConfigKeyModel(withKey: .turnUsername),    value: "talk9",                               accountId: accountId)
         setAccountProperty(property: ConfigKeyModel(withKey: .turnPassword),    value: "933843261b0b14a74befabb98c9ac017",    accountId: accountId)
         setAccountProperty(property: ConfigKeyModel(withKey: .turnRealm),       value: "talk9",                               accountId: accountId)
+
+        // [Talk9-Diag] Read back the settings from the daemon immediately after writing
+        // to verify it actually accepted them (daemon may reset to Jami defaults silently).
+        if let details = accountAdapter.getAccountDetails(accountId) as? [String: String] {
+            let turnEnabled  = details["TURN.enable"]   ?? "missing"
+            let turnServer   = details["TURN.server"]   ?? "missing"
+            let bootstrap    = details["Account.hostname"] ?? "missing"
+            let proxyEnabled = details["Account.proxyEnabled"] ?? "missing"
+            let proxyServer  = details["Account.proxyServer"] ?? "missing"
+            log.debug("[Talk9-Diag] TURN.enable=\(turnEnabled) TURN.server=\(turnServer)")
+            log.debug("[Talk9-Diag] Account.hostname=\(bootstrap)")
+            log.debug("[Talk9-Diag] proxyEnabled=\(proxyEnabled) proxyServer=\(proxyServer)")
+            if turnServer != "app.talk9.co:3478" {
+                log.error("[Talk9-Diag] ⚠️ TURN server was NOT applied correctly! daemon has: \(turnServer)")
+            }
+            if bootstrap != "bootstrap.talk9.co" {
+                log.error("[Talk9-Diag] ⚠️ Bootstrap hostname was NOT applied correctly! daemon has: \(bootstrap)")
+            }
+        }
+        log.debug("[Talk9-Diag] <<< applyTalk9NetworkDefaults END")
     }
 
     func updateCurrentAccount(account: AccountModel) {
@@ -453,7 +474,7 @@ class AccountsService: AccountAdapterDelegate {
             defaultDetails[ConfigKey.proxyListEnabled.rawValue] = "true"
             defaultDetails[ConfigKey.dhtProxyListUrl.rawValue]  = "https://dht.talk9.co/proxyList"
             defaultDetails[ConfigKey.turnEnable.rawValue]       = "true"
-            defaultDetails[ConfigKey.turnServer.rawValue]       = "app.talk9.co"
+            defaultDetails[ConfigKey.turnServer.rawValue]       = "app.talk9.co:3478"
             defaultDetails[ConfigKey.turnUsername.rawValue]     = "talk9"
             defaultDetails[ConfigKey.turnPassword.rawValue]     = "933843261b0b14a74befabb98c9ac017"
             defaultDetails[ConfigKey.turnRealm.rawValue]        = "talk9"
@@ -572,6 +593,15 @@ class AccountsService: AccountAdapterDelegate {
     func accountVoaltileDetailsChanged(accountId: String, details: [String: String]) {
         guard let account = self.getAccount(fromAccountId: accountId) else { return }
         account.updateVolatileDetails(dictionary: details)
+        #if DEBUG
+        if let announced = details["Account.deviceAnnounced"] {
+            NotificationCenter.default.post(
+                name: .debugDeviceAnnounced,
+                object: nil,
+                userInfo: ["announced": announced, "accountId": accountId]
+            )
+        }
+        #endif
     }
 
     private let accountListLock = NSLock()
@@ -649,6 +679,7 @@ class AccountsService: AccountAdapterDelegate {
     }
 
     func registrationStateChanged(for accountId: String, state: String) {
+        log.debug("[Talk9-ICE][Swift] accountId=\(accountId)  state=\(state)")
         if let account = self.getAccount(fromAccountId: accountId) {
             /*
              Detect when a new account is generated and keys are ready.

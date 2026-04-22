@@ -38,6 +38,7 @@ struct SwarmCallRequest {
 /// Main service responsible for coordinating all call-related operations
 class CallsService: CallsAdapterDelegate {
     // Service instances
+    private let log = SwiftyBeaver.self
     private let callManagementService: CallManagementService
     private let conferenceManagementService: ConferenceManagementService
     private let mediaManagementService: MediaManagementService
@@ -130,6 +131,19 @@ class CallsService: CallsAdapterDelegate {
         let callState = CallState(rawValue: state) ?? CallState.unknown
 
         if callState.isFinished() {
+            // [Talk9-ICE] Log call termination with error code.
+            // stateCode 480 = ICE/connection timeout, 503 = TURN unreachable, 404 = peer not found, 0 = normal hang-up.
+            if stateCode != 0 {
+                log.warning("[Talk9-ICE][CallFail] callId=\(callId)  state=\(state)  pjsipCode=\(stateCode) — ICE/connection failure")
+                // Notify AppDelegate so swarm can be reset for next call attempt.
+                NotificationCenter.default.post(
+                    name: .callFailedWithICEError,
+                    object: nil,
+                    userInfo: ["callId": callId, "stateCode": stateCode, "accountId": accountId]
+                )
+            } else {
+                log.debug("[Talk9-ICE][CallState] callId=\(callId)  state=\(state)  (normal end)")
+            }
             handleCallTermination(callId: callId, callState: callState)
             return
         }

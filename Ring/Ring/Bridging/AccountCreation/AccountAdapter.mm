@@ -61,6 +61,21 @@ static id <AccountAdapterDelegate> _delegate;
 
     confHandlers.insert(exportable_callback<ConfigurationSignal::VolatileDetailsChanged>([&](const std::string& account_id,
                                                                                              const std::map<std::string, std::string>& details) {
+        // [Talk9-ICE] Log transport/registration status so changes are filterable.
+        const std::vector<std::string> iceKeys = {
+            "Account.registrationStatus",
+            "Account.transportStatus",
+            "Account.proxyServer",
+            "Account.registeredName",
+            "Account.deviceAnnounced"
+        };
+        for (const auto& key : iceKeys) {
+            auto it = details.find(key);
+            if (it != details.end()) {
+                NSLog(@"[Talk9-ICE][Transport] account=%s  %s = %s",
+                      account_id.c_str(), key.c_str(), it->second.c_str());
+            }
+        }
         if (AccountAdapter.delegate) {
             auto accountId = [NSString stringWithUTF8String:account_id.c_str()];
             NSMutableDictionary* detailsDict = [Utils mapToDictionary: details];
@@ -69,6 +84,10 @@ static id <AccountAdapterDelegate> _delegate;
     }));
 
     confHandlers.insert(exportable_callback<ConfigurationSignal::RegistrationStateChanged>([&](const std::string& account_id, const std::string& state, int detailsCode, const std::string& detailsStr) {
+        // [Talk9-ICE] Registration state is the final outcome of ICE/TURN negotiation.
+        // code 0 = success; non-zero = failure reason (SIP response code or internal code).
+        NSLog(@"[Talk9-ICE][RegState] account=%s  state=%s  code=%d  msg=%s",
+              account_id.c_str(), state.c_str(), detailsCode, detailsStr.c_str());
         if (AccountAdapter.delegate) {
             auto accountId = [NSString stringWithUTF8String:account_id.c_str()];
             auto stateStr = [NSString stringWithUTF8String:state.c_str()];

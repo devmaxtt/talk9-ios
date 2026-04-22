@@ -39,4 +39,5 @@
     func reactionRemoved(conversationId: String, accountId: String, messageId: String, reactionId: String)
     func messageUpdated(conversationId: String, accountId: String, message: SwarmMessageWrap)
     func activeCallsChanged(conversationId: String, accountId: String, calls: [[String: String]])
+    @objc optional func conversationError(_ conversationId: String, accountId: String, code: Int, message: String)
 }

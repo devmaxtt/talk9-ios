@@ -234,6 +234,7 @@ public final class Talk9APIService {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue(Locale.preferredLanguages.first ?? "en", forHTTPHeaderField: "Accept-Language")
         do {
             request.httpBody = try encoder.encode(body)
         } catch {
@@ -264,16 +265,25 @@ public final class Talk9APIService {
     }
 
     private func performRequest(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
-        try await withCheckedThrowingContinuation { continuation in
+        let urlStr = request.url?.absoluteString ?? "?"
+        NSLog("[Talk9-HTTP] --> %@ %@", request.httpMethod ?? "?", urlStr)
+        return try await withCheckedThrowingContinuation { continuation in
             let task = session.dataTask(with: request) { data, response, error in
                 if let error = error {
+                    let nsErr = error as NSError
+                    // NSURLErrorTimedOut = -1001, NSURLErrorNotConnectedToInternet = -1009, etc.
+                    NSLog("[Talk9-HTTP] <-- ERROR %@ | code=%d | %@",
+                          urlStr, nsErr.code, nsErr.localizedDescription)
                     continuation.resume(throwing: Talk9APIError.network(error.localizedDescription))
                     return
                 }
                 guard let http = response as? HTTPURLResponse else {
+                    NSLog("[Talk9-HTTP] <-- INVALID_RESPONSE %@", urlStr)
                     continuation.resume(throwing: Talk9APIError.network("Invalid response"))
                     return
                 }
+                let emoji = (200..<300).contains(http.statusCode) ? "OK" : "FAIL"
+                NSLog("[Talk9-HTTP] <-- %d %@ | %@", http.statusCode, emoji, urlStr)
                 continuation.resume(returning: (data ?? Data(), http))
             }
             task.resume()

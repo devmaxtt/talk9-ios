@@ -31,16 +31,7 @@
 using namespace libjami;
 
 - (BOOL)initDaemon {
-    if (![[NSThread currentThread] isMainThread]) {
-        __block bool success;
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            success = [self initDaemonInternal];
-        });
-        return success;
-    }
-    else {
-        return [self initDaemonInternal];
-    }
+    return [self initDaemonInternal];
 }
 
 - (BOOL) initDaemonInternal {
@@ -53,16 +44,7 @@ using namespace libjami;
 }
 
 - (BOOL)startDaemon {
-    if (![[NSThread currentThread] isMainThread]) {
-        __block bool success;
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            success = [self startDaemonInternal];
-        });
-        return success;
-    }
-    else {
-        return [self startDaemonInternal];
-    }
+    return [self startDaemonInternal];
 }
 
 - (BOOL)startDaemonInternal {

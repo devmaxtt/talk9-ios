@@ -50,6 +50,19 @@ static id <CallsAdapterDelegate> _delegate;
     callHandlers.insert(exportable_callback<CallSignal::StateChange>([&](const std::string& accountId, const std::string& callId,
                                                                          const std::string& state,
                                                                          int errorCode) {
+        // [Talk9-ICE] Log every call state transition. When ICE fails the state becomes
+        // FAILURE and errorCode carries a PJSIP status:
+        //   480 = Temporarily Unavailable (ICE/connection timeout)
+        //   503 = Service Unavailable (TURN unreachable)
+        //   404 = Not Found (peer not on DHT)
+        //   0   = normal hang-up / no error
+        if (errorCode != 0) {
+            NSLog(@"[Talk9-ICE][CallFail] callId=%s  account=%s  state=%s  pjsipCode=%d",
+                  callId.c_str(), accountId.c_str(), state.c_str(), errorCode);
+        } else {
+            NSLog(@"[Talk9-ICE][CallState] callId=%s  account=%s  state=%s",
+                  callId.c_str(), accountId.c_str(), state.c_str());
+        }
         if (CallsAdapter.delegate) {
             NSString* callIdString = [NSString stringWithUTF8String:callId.c_str()];
             NSString* stateString = [NSString stringWithUTF8String:state.c_str()];
@@ -97,6 +110,10 @@ static id <CallsAdapterDelegate> _delegate;
     callHandlers.insert(exportable_callback<CallSignal::MediaNegotiationStatus>([&](const std::string& callId,
                                                                                    const std::string& event,
                                                                                    const std::vector<std::map<std::string, std::string>>& media) {
+        // [Talk9-ICE] Media negotiation events show the ICE/SDP exchange outcome.
+        // event values: "negotiating", "succeeded", "failed"
+        NSLog(@"[Talk9-ICE][MediaNeg] callId=%s  event=%s",
+              callId.c_str(), event.c_str());
         if (CallsAdapter.delegate) {
             NSString* eventString = [NSString stringWithUTF8String:event.c_str()];
             NSString* callIdString = [NSString stringWithUTF8String:callId.c_str()];

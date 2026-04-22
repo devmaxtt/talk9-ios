@@ -101,9 +101,9 @@ struct MessagesListView: View {
                 endedConversationView()
             }
 
-#if DEBUG
-            DebugConnectionOverlay(model: model)
-#endif
+// #if DEBUG
+//             DebugConnectionOverlay(model: model)
+// #endif
         }
         .environment(\.avatarProviderFactory, model.makeAvatarFactory() as AvatarProviderFactory?)
         .onChange(of: model.screenTapped, perform: { _ in
@@ -582,6 +582,19 @@ private struct DebugConnectionOverlay: View {
                         Divider().background(Color.white.opacity(0.3))
                         Text(model.debugParticipantRoles)
                             .font(.system(size: 8)).foregroundColor(.white.opacity(0.7))
+                    }
+
+                    // ── Swarm event log ──
+                    if !model.debugSwarmLog.isEmpty {
+                        Divider().background(Color.white.opacity(0.3))
+                        Text("── Event Log ──")
+                            .font(.system(size: 8)).foregroundColor(.white.opacity(0.45))
+                        ForEach(model.debugSwarmLog) { entry in
+                            Text(entry.text)
+                                .font(.system(size: 8, design: .monospaced))
+                                .foregroundColor(.white.opacity(0.75))
+                                .lineLimit(1)
+                        }
                     }
                 }
                 .padding(8)

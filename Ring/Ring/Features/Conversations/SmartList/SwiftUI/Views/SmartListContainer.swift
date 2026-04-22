@@ -184,6 +184,7 @@ struct SmartListView: View, StateEmittingView {
 
     private var bookButton: some View {
         Button(action: {
+            if showAccountList { toggleAccountList() }
             showingPicker.toggle()
         }, label: {
             if let uiImage = UIImage(asset: Asset.phoneBook) {
@@ -219,10 +220,14 @@ struct SmartListView: View, StateEmittingView {
                 .foregroundColor(Color.jamiColor)
                 .accessibility(identifier: SmartListAccessibilityIdentifiers.openMenuInSmartList)
         }
+        .simultaneousGesture(TapGesture().onEnded {
+            if showAccountList { toggleAccountList() }
+        })
     }
 
     private var composeButton: some View {
         Button(action: { [weak stateEmitter] in
+            if showAccountList { toggleAccountList() }
             guard let stateEmitter = stateEmitter else { return }
             stateEmitter.openNewMessagesWindow()
         }, label: {
@@ -261,6 +266,7 @@ struct SmartListView: View, StateEmittingView {
 
     private var settingsButton: some View {
         Button(action: {[weak model, weak stateEmitter] in
+            if showAccountList { toggleAccountList() }
             guard let model = model,
                   let stateEmitter = stateEmitter else { return }
             model.showAccount(publisher: stateEmitter)

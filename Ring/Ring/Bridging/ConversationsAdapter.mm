@@ -188,7 +188,21 @@ static id <MessagesAdapterDelegate> _messagesDelegate;
     }));
 
     confHandlers.insert(exportable_callback<ConversationSignal::OnConversationError>([&](const std::string& accountId, const std::string& conversationId, int code, const std::string& what) {
+        // [Talk9-ICE] code 0 = SwarmConnected, code 1001 = SwarmBootstrapFailed (all ICE candidates exhausted).
+        // SwarmBootstrapFailed means the peer was untracked — connection will stay stuck
+        // until re-registration triggers startTracking() again.
+        if (code == 0) {
+            NSLog(@"[Talk9-ICE][Swarm] ✅ SwarmConnected  conv=%s  account=%s",
+                  conversationId.c_str(), accountId.c_str());
+        } else {
+            NSLog(@"[Talk9-ICE][Swarm] ❌ SwarmBootstrapFailed  code=%d  reason=%s  conv=%s  account=%s",
+                  code, what.c_str(), conversationId.c_str(), accountId.c_str());
+        }
         if (ConversationsAdapter.messagesDelegate) {
+            NSString* convId  = [NSString stringWithUTF8String:conversationId.c_str()];
+            NSString* account = [NSString stringWithUTF8String:accountId.c_str()];
+            NSString* msg     = [NSString stringWithUTF8String:what.c_str()];
+            [(id)ConversationsAdapter.messagesDelegate conversationError:convId accountId:account code:code message:msg];
         }
     }));
 

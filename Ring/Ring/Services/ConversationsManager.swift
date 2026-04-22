@@ -686,6 +686,31 @@ extension  ConversationsManager: MessagesAdapterDelegate {
         }
         self.callService.activeCallsChanged(conversationId: conversationId, calls: calls, account: account)
     }
+
+    func conversationError(_ conversationId: String, accountId: String, code: Int, message: String) {
+        let shortConv = String(conversationId.prefix(8))
+        if code == 0 {
+            log.debug("[Talk9-ICE][Swarm] ✅ SwarmConnected  conv=\(shortConv)")
+        } else {
+            log.warning("[Talk9-ICE][Swarm] ❌ SwarmBootstrapFailed  code=\(code)  reason=\(message)  conv=\(shortConv)")
+            // Trigger 6: SwarmBootstrapFailed means all ICE candidates exhausted.
+            // The peer is now untracked — schedule a re-register to restart tracking.
+            // Without this, no retry fires after failure unless a message is sent (Trigger4)
+            // or a member event occurs (Trigger2).
+            NotificationCenter.default.post(
+                name: .swarmBootstrapFailed,
+                object: nil,
+                userInfo: ["conversationId": conversationId, "accountId": accountId]
+            )
+        }
+        #if DEBUG
+        NotificationCenter.default.post(
+            name: .debugConversationError,
+            object: nil,
+            userInfo: ["code": code, "message": message, "conversationId": shortConv]
+        )
+        #endif
+    }
 }
 
 extension  ConversationsManager: RequestsAdapterDelegate {
