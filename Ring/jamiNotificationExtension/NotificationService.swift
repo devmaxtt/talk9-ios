@@ -91,8 +91,10 @@ struct NotificationConfig {
 }
 
 // A local log helper that prints an easy to see log with the thread info
+private let notifLogger = OSLog(subsystem: "m.talk.talk9.jamiNotificationExtension", category: "Talk9-Notif")
 func log(_ messages: String...) {
     let message = messages.joined(separator: " ")
+    os_log("%{public}@", log: notifLogger, type: .error, message)
     print("------ [\(Unmanaged.passUnretained(Thread.current).toOpaque())] \(message)")
 }
 
@@ -243,6 +245,18 @@ class NotificationService: UNNotificationServiceExtension {
     private var syncCompleted = false
     private var waitForCloning = false
 
+    // Set to true the first time a local notification is successfully scheduled,
+    // so finish() knows to suppress the APNs placeholder duplicate.
+    private var didPresentLocalNotification = false
+
+    // Sender info extracted from decrypt, used as fallback when daemon sync times out
+    private var pendingSenderId: String = ""
+    private var pendingConvId: String = ""
+    private var pendingSenderName: String = ""
+
+    // When app is in background memory (appIsActive=true), skip daemon sync but still run DHT decrypt
+    private var skipDaemonSync = false
+
     // A queue of pending local notifications, waiting for a name lookup
     private let notificationQueue = DispatchQueue(label: Constants.appIdentifier + ".Notification.queue")
     private var pendingLocalNotifications = [String: [LocalNotification]]() // local notification waiting for name lookup
@@ -259,7 +273,10 @@ class NotificationService: UNNotificationServiceExtension {
     // Entry point for processing incoming notification requests.
     override func didReceive(_ request: UNNotificationRequest, withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
         self.contentHandler = contentHandler
+        // Initialize from request so iOS always has valid fallback content
+        self.bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent) ?? UNMutableNotificationContent()
         setupNotificationExtensionQueryListener()
+        log("didReceive called — userInfo keys: \(request.content.userInfo.keys.map { String(describing: $0) })")
 
         Task {
             self.processNotificationRequest(request)
@@ -271,17 +288,19 @@ class NotificationService: UNNotificationServiceExtension {
     // Handles the initial processing of the notification request.
     private func processNotificationRequest(_ request: UNNotificationRequest) {
         let requestData = requestToDictionary(request: request)
+        log("requestData keys: \(requestData.keys.sorted()), to=\(requestData["to"] ?? "NIL")")
         guard !requestData.isEmpty,
               let accountId = requestData[NotificationField.accountId.rawValue] else {
-            log("There was an error processing the notification request")
+            log("FAIL: requestData empty or 'to' field missing")
             return
         }
 
         // Save notification data so that if the main app or share extension is active, the extension can let them handle notification
         saveDataIfNeeded(data: requestData)
-        guard !appIsActive() else {
-            log("App is in foreground")
-            return
+        if appIsActive() {
+            // App is in background memory — still run DHT decrypt to get sender info, but skip daemon sync
+            log("[Talk9-Notif] App is in background memory — running DHT decrypt only, skipping daemon")
+            self.skipDaemonSync = true
         }
 
         guard !shareExtensionHasAccountActive(accountId: accountId) else {
@@ -303,10 +322,29 @@ class NotificationService: UNNotificationServiceExtension {
 
     // Prepares for and starts the data stream based on notification data.
     private func prepareAndStartStreaming(for request: UNNotificationRequest, with requestData: [String: String]) {
-        guard let keyURL = getKeyURL(data: requestData),
-              let treatedMessagesURL = getTreatedMessagesURL(data: requestData),
-              let proxyURL = getProxyCaches(data: requestData),
-              let url = getRequestURL(data: requestData, path: proxyURL) else {
+        guard let keyURL = getKeyURL(data: requestData) else {
+            log("[Talk9-Notif] FAIL: keyURL is nil — ring_device.key missing for account \(requestData["to"] ?? "?")")
+            return
+        }
+        let keyExists = FileManager.default.fileExists(atPath: keyURL.path)
+        log("[Talk9-Notif] ring_device.key exists=\(keyExists) path=\(keyURL.path)")
+        guard let treatedMessagesURL = getTreatedMessagesURL(data: requestData) else {
+            log("[Talk9-Notif] FAIL: treatedMessagesURL is nil")
+            return
+        }
+        guard let proxyURL = getProxyCaches(data: requestData) else {
+            log("[Talk9-Notif] FAIL: proxyURL is nil — cachesPath or accountId missing")
+            return
+        }
+        let url: URL
+        if let cachedURL = getRequestURL(data: requestData, path: proxyURL) {
+            url = cachedURL
+            log("[Talk9-Notif] streaming from dhtproxy cache: \(url)")
+        } else if let fallbackURL = getFallbackRequestURL(data: requestData) {
+            url = fallbackURL
+            log("[Talk9-Notif] dhtproxy cache missing, using fallback: \(url)")
+        } else {
+            log("[Talk9-Notif] FAIL: no proxy URL available (cache missing and no fallback)")
             return
         }
 
@@ -328,9 +366,10 @@ class NotificationService: UNNotificationServiceExtension {
             .subscribe(onNext: { [weak self] line in
                 self?.processStreamLine(line, with: request, keyURL: keyURL, treatedMessagesURL: treatedMessagesURL)
             }, onError: { [weak self] error in
-                log("Error streaming data: \(error)")
+                log("[Talk9-Notif] stream error: \(error)")
                 self?.autoDispatchGroup.leave(id: taskId)
             }, onCompleted: { [weak self] in
+                log("[Talk9-Notif] stream completed, pendingSenderId=\(self?.pendingSenderId.prefix(8) ?? "nil")")
                 self?.autoDispatchGroup.leave(id: taskId)
             })
             .disposed(by: disposeBag)
@@ -365,6 +404,7 @@ class NotificationService: UNNotificationServiceExtension {
     }
 
     private func processMap(map: [String: Any], keyURL: URL, treatedMessagesURL: URL, userInfo: [AnyHashable: Any]) {
+        log("[Talk9-Notif] decrypt: keyPath=\(keyURL.path) accountId=\(self.accountId) keyExists=\(FileManager.default.fileExists(atPath: keyURL.path))")
         let result = adapterService.decrypt(keyPath: keyURL.path, accountId: self.accountId, messagesPath: treatedMessagesURL.path, value: map)
         log("Notification type: \(result)")
         switch result {
@@ -397,7 +437,21 @@ class NotificationService: UNNotificationServiceExtension {
                 }
             })(peerId, "\(hasVideo)")
             return
-        case .gitMessage(let convId):
+        case .gitMessage(let convId, let peerId):
+            // Store sender ID so finish() can show a fallback notification if daemon sync times out
+            self.pendingSenderId = peerId
+            self.pendingConvId = convId
+            // Immediately update bestAttemptContent so even a timeout shows meaningful content
+            if !peerId.isEmpty {
+                // 1. Try local vCard first (fast, sync)
+                let localName = self.contactProfileName(accountId: self.accountId, contactId: peerId)
+                let displayName = localName ?? String(peerId.prefix(16))
+                self.bestAttemptContent.title = displayName
+                self.bestAttemptContent.body = "New message"
+                log("[Talk9-Notif] bestAttemptContent set: '\(displayName)' vCard=\(localName != nil)")
+                // 2. Try name server lookup (async, may find registered username)
+                self.lookupSenderName(peerId: peerId)
+            }
             self.handleGitMessage(convId: convId, loadAll: convId.isEmpty) // async
         case .clone:
             // Should start daemon and wait until clone completed
@@ -428,23 +482,29 @@ class NotificationService: UNNotificationServiceExtension {
     }
 
     private func handleGitMessage(convId: String, loadAll: Bool) {
+        // If app is in background memory, we already have the sender ID from decrypt — no daemon needed
+        if self.skipDaemonSync {
+            log("[Talk9-Notif] handleGitMessage: skipDaemonSync=true, sender=\(pendingSenderId.prefix(16))")
+            // autoDispatchGroup has no outstanding jami task, so finish() will be called after streaming completes
+            return
+        }
+
         // If the account is already active, return, otherwise we set it to active and continue
         if self.accountIsActive.compareExchange(expected: false, desired: true, ordering: .relaxed).original {
             return
         }
 
-        if !self.originalNotificationData.isEmpty {
-            self.adapterService.pushNotificationReceived(accountId: self.accountId, data: self.originalNotificationData)
-        }
-
         let accountJamiId = self.adapterService.getAccountJamiId(accountId: self.accountId)
 
+        log("[Talk9-Notif] handleGitMessage: starting daemon for convId=\(convId) accountId=\(self.accountId)")
         jamiTaskId = UUID().uuidString
         self.autoDispatchGroup.enter(id: jamiTaskId)
+        // Start daemon first, then notify it of the push — daemon must be initialized before pushNotificationReceived
         self.adapterService.startAccountsWithListener(accountId: self.accountId, convId: convId, loadAll: loadAll) { [weak self] event, eventData in
             guard let self = self else {
                 return
             }
+            log("[Talk9-Notif] daemon event=\(event) jamiId=\(eventData.jamiId) convId=\(eventData.conversationId) body=\(eventData.content.prefix(50))")
 
             var notifConfig = NotificationConfig(from: eventData.jamiId, url: nil, body: eventData.content,
                                                  conversationId: eventData.conversationId, groupTitle: eventData.groupTitle)
@@ -501,6 +561,11 @@ class NotificationService: UNNotificationServiceExtension {
                 self.configureAndPresentCallNotification(config: notifConfig, calls: calls, accountId: eventData.accountId)
             }
         }
+        // Daemon is now initialized — send push notification signal so it knows which conversation to sync
+        if !self.originalNotificationData.isEmpty {
+            log("[Talk9-Notif] calling pushNotificationReceived after daemon start")
+            self.adapterService.pushNotificationReceived(accountId: self.accountId, data: self.originalNotificationData)
+        }
     }
 
     private func verifyTasksStatus() {
@@ -543,6 +608,15 @@ class NotificationService: UNNotificationServiceExtension {
         }
         self.httpStreamHandler.cancelStreaming()
         if let contentHandler = contentHandler {
+            if didPresentLocalNotification {
+                // Real notification already shown via UNUserNotificationCenter — suppress APNs duplicate
+                bestAttemptContent.title = ""
+                bestAttemptContent.body = ""
+                log("[Talk9-Notif] finish: local notif shown, suppressing APNs duplicate")
+            } else {
+                // bestAttemptContent was already updated in processMap (decrypt) and lookupSenderName
+                log("[Talk9-Notif] finish: title=\(bestAttemptContent.title) body=\(bestAttemptContent.body.prefix(40))")
+            }
             contentHandler(self.bestAttemptContent)
         }
         log("Finished handling notification")
@@ -768,6 +842,48 @@ extension NotificationService {
         return cachesPath.appendingPathComponent(accountId).appendingPathComponent("dhtproxy")
     }
 
+    private func lookupSenderName(peerId: String) {
+        let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier)
+        let nameServer = defaults?.string(forKey: "nameServer_\(self.accountId)") ?? "https://app.talk9.co"
+        let urlString = (nameServer.hasPrefix("http") ? nameServer : "https://" + nameServer) + "/addr/" + peerId
+        guard let url = URL(string: urlString) else { return }
+        log("[Talk9-Notif] name lookup URL: \(urlString)")
+        let taskId = "senderName_\(peerId)"
+        self.autoDispatchGroup.enter(id: taskId)
+        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+            defer { self?.autoDispatchGroup.leave(id: taskId) }
+            if let error = error {
+                log("[Talk9-Notif] name lookup error: \(error)")
+                return
+            }
+            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
+            let rawBody = data.flatMap { String(data: $0, encoding: .utf8) } ?? "nil"
+            log("[Talk9-Notif] name lookup status=\(statusCode) body=\(rawBody)")
+            guard let self = self,
+                  let data = data,
+                  let map = try? JSONSerialization.jsonObject(with: data) as? [String: String],
+                  let name = map["name"], !name.isEmpty else {
+                return
+            }
+            log("[Talk9-Notif] resolved sender name: \(name)")
+            self.names[peerId] = name
+            self.pendingSenderName = name
+            // Update bestAttemptContent immediately so it shows the real name
+            self.bestAttemptContent.title = name
+        }.resume()
+    }
+
+    private func getFallbackRequestURL(data: [String: String]) -> URL? {
+        guard let key = data[NotificationField.key.rawValue],
+              let accountId = data[NotificationField.accountId.rawValue] else {
+            return nil
+        }
+        let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier)
+        let proxyServer = defaults?.string(forKey: "proxyServer_\(accountId)") ?? "https://dht.talk9.co"
+        let urlString = proxyServer.hasPrefix("http") ? proxyServer : "https://" + proxyServer
+        return URL(string: urlString)?.appendingPathComponent(key)
+    }
+
     private func contactProfileName(accountId: String, contactId: String) -> String? {
         guard let documents = Constants.documentsPath else { return nil }
         let uri = "ring:" + contactId
@@ -943,6 +1059,14 @@ extension NotificationService {
 
     private func presentLocalNotification(notification: LocalNotification) {
         let content = notification.content
+        // Keep bestAttemptContent in sync so the contentHandler fallback also shows
+        // the real sender name and message instead of the APNs placeholder "hello".
+        self.bestAttemptContent.title = content.title
+        self.bestAttemptContent.body = content.body
+        if let attachment = content.attachments.first {
+            self.bestAttemptContent.attachments = [attachment]
+        }
+        self.didPresentLocalNotification = true
         setNotificationCount(notification: content)
         let notificationTrigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.01, repeats: false)
         let notificationRequest = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: notificationTrigger)

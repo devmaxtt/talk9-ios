@@ -300,6 +300,11 @@ class AccountsService: AccountAdapterDelegate {
                 log.error("[Talk9-Diag] ⚠️ Bootstrap hostname was NOT applied correctly! daemon has: \(bootstrap)")
             }
         }
+        // Persist proxy URL and name server to App Group so the notification extension can use them
+        if let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) {
+            defaults.set("https://dht.talk9.co", forKey: "proxyServer_\(accountId)")
+            defaults.set("https://app.talk9.co", forKey: "nameServer_\(accountId)")
+        }
         log.debug("[Talk9-Diag] <<< applyTalk9NetworkDefaults END")
     }
 

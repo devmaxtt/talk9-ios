@@ -77,7 +77,7 @@ class AdapterService {
 
     enum PeerConnectionRequestType {
         case call(peerId: String, isVideo: Bool)
-        case gitMessage(convId: String)
+        case gitMessage(convId: String, peerId: String)
         case clone
         case unknown
     }
@@ -121,10 +121,10 @@ class AdapterService {
         if type.contains("application/im-gitmessage-id") {
             let components = type.components(separatedBy: "/")
             if let last = components.last, components.count > 2 {
-                return PeerConnectionRequestType.gitMessage(convId: last)
+                return PeerConnectionRequestType.gitMessage(convId: last, peerId: peerId)
             }
             // TODO: In the future, when all platforms send the convId, we can simply ignore cases where the convId is not set.
-            return PeerConnectionRequestType.gitMessage(convId: "")
+            return PeerConnectionRequestType.gitMessage(convId: "", peerId: peerId)
         }
         switch type {
         case "videoCall":

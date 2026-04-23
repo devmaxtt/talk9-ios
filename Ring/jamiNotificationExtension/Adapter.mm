@@ -281,6 +281,7 @@ std::map<std::string, std::string> nameServers;
     dht::Value dhtValue(jsonValue);
 
     if (!dhtValue.isEncrypted()) {
+        NSLog(@"[Talk9-Decrypt] value is NOT encrypted");
         return {};
     }
     try {
@@ -291,6 +292,10 @@ std::map<std::string, std::string> nameServers;
             // this value is not a PeerConnectionRequest
             // check if it a TrustRequest
             auto conversationRequest = unpacked.get().as<dht::TrustRequest>();
+            NSLog(@"[Talk9-Decrypt] TrustRequest confirm=%d convId=%s service=%s",
+                  conversationRequest.confirm,
+                  conversationRequest.conversationId.c_str(),
+                  conversationRequest.service.c_str());
             if (conversationRequest.confirm) {
                 // request confirmation. We need to wait for conversation to clone
                 return @{@"": @"application/clone"};
@@ -301,9 +306,12 @@ std::map<std::string, std::string> nameServers;
                     return @{@"": @"application/im-gitmessage-id"};
                 }
             }
+            NSLog(@"[Talk9-Decrypt] TrustRequest no match, returning unknown");
             return {};
         }
+        NSLog(@"[Talk9-Decrypt] PeerConnectionRequest connType=%s id=%llu", peerCR.connType.c_str(), peerCR.id);
         if (isMessageTreated(peerCR.id, [treatedMessagesPath UTF8String])) {
+            NSLog(@"[Talk9-Decrypt] message already treated");
             return {};
         }
 
@@ -316,9 +324,25 @@ std::map<std::string, std::string> nameServers;
                                certPath,
                                crlPath,
                                ocspPath);
+        } else {
+            // For git messages, use getPeerId (same as calls) to get the account ID
+            // decrypted->owner is PublicKey (device key); getPeerId loads the cert from disk
+            // and returns the issuer (account cert) ID = real Jami ID registered on name server
+            try {
+                if (decrypted && decrypted->owner) {
+                    std::string deviceId = decrypted->owner->getId().toString();
+                    auto certPath = [[[Constants documentsPath] URLByAppendingPathComponent:accountId] URLByAppendingPathComponent:certificates].path.UTF8String;
+                    auto crlPath = [[[Constants documentsPath] URLByAppendingPathComponent:accountId] URLByAppendingPathComponent:crls].path.UTF8String;
+                    auto ocspPath = [[[Constants documentsPath] URLByAppendingPathComponent:accountId] URLByAppendingPathComponent:ocsp].path.UTF8String;
+                    peerId = getPeerId(deviceId, certPath, crlPath, ocspPath);
+                    if (peerId.empty()) peerId = deviceId; // fallback if cert not cached locally
+                    NSLog(@"[Talk9-Decrypt] git sender deviceId=%s accountId=%s", deviceId.c_str(), peerId.c_str());
+                }
+            } catch (...) {}
         }
         return @{@(peerId.c_str()): @(peerCR.connType.c_str())};
     } catch (std::runtime_error error) {
+        NSLog(@"[Talk9-Decrypt] runtime_error: %s", error.what());
     }
     return {};
 }
