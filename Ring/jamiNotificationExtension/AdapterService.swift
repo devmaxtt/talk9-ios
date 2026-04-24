@@ -106,6 +106,10 @@ class AdapterService {
         self.adapter.pushNotificationReceived(accountId, message: data)
     }
 
+    func schedulePushNotificationAfterRegistration(accountId: String, data: [String: String]) {
+        self.adapter.schedulePushNotification(afterRegistration: accountId, data: data)
+    }
+
     func decrypt(keyPath: String, accountId: String, messagesPath: String, value: [String: Any]) -> PeerConnectionRequestType {
         if self.adapter == nil {
             return .unknown

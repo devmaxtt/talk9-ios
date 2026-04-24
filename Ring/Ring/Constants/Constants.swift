@@ -147,6 +147,7 @@ public class Constants: NSObject {
     @objc public static let appIdentifier = "m.talk.talk9"
 
     public static let selectedAccountID = "SELECTED_ACCOUNT_ID"
+    public static let talk9RegisteredPhonePrefix = "talk9_registered_phone_"
 
     @objc public static let documentsPath: URL? = {
         return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier)?.appendingPathComponent("Documents")

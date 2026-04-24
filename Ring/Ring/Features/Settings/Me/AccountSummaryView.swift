@@ -115,6 +115,16 @@ struct AccountSummaryView: View {
         Section {
             usernameView()
                 .listRowBackground(Color(UIColor.secondarySystemGroupedBackground))
+            if !model.registeredPhone.isEmpty {
+                HStack {
+                    Image(systemName: "phone.fill")
+                        .foregroundColor(.secondary)
+                        .frame(width: 18)
+                    Text(model.registeredPhone)
+                        .conditionalTextSelection()
+                }
+                .listRowBackground(Color(UIColor.secondarySystemGroupedBackground))
+            }
             HStack {
                 Text(model.jamiId)
                     .conditionalTextSelection()

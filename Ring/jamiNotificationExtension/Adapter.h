@@ -30,6 +30,7 @@
 - (void)stopForAccountId:(NSString*)accountId;
 - (BOOL)start:(NSString*)accountId convId:(NSString*)convId loadAll:(BOOL)loadAll;
 - (void)pushNotificationReceived:(NSString*)from message:(NSDictionary*)data;
+- (void)schedulePushNotificationAfterRegistration:(NSString*)accountId data:(NSDictionary*)data;
 - (bool)downloadFileWithFileId:(NSString*)fileId
                      accountId:(NSString*)accountId
                 conversationId:(NSString*)conversationId

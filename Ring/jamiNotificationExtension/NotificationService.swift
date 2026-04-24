@@ -305,11 +305,13 @@ class NotificationService: UNNotificationServiceExtension {
 
         guard !shareExtensionHasAccountActive(accountId: accountId) else {
             log("Share extension has this account active")
+            bestAttemptContent = UNMutableNotificationContent()
             return
         }
 
         guard !isResubscribe(accountId: accountId, data: requestData) else {
             log("This is a resubscribe notification")
+            bestAttemptContent = UNMutableNotificationContent()
             return
         }
 
@@ -561,10 +563,19 @@ class NotificationService: UNNotificationServiceExtension {
                 self.configureAndPresentCallNotification(config: notifConfig, calls: calls, accountId: eventData.accountId)
             }
         }
-        // Daemon is now initialized — send push notification signal so it knows which conversation to sync
+        // Push notification data contains "s" (old session ID from main app).
+        // Extension daemon has a new session, so the check in DhtProxyClient would fail.
+        // Strip "s" to bypass the session check, and delay 3s for account to register+subscribe.
         if !self.originalNotificationData.isEmpty {
-            log("[Talk9-Notif] calling pushNotificationReceived after daemon start")
-            self.adapterService.pushNotificationReceived(accountId: self.accountId, data: self.originalNotificationData)
+            var dataWithoutSession = self.originalNotificationData
+            dataWithoutSession.removeValue(forKey: "s")
+            log("[Talk9-Notif] scheduling pushNotification in 3s (stripped session ID)")
+            let accountId = self.accountId
+            DispatchQueue.global().asyncAfter(deadline: .now() + 3.0) { [weak self] in
+                guard let self = self else { return }
+                log("[Talk9-Notif] calling pushNotificationReceived (delayed, no session)")
+                self.adapterService.pushNotificationReceived(accountId: accountId, data: dataWithoutSession)
+            }
         }
     }
 

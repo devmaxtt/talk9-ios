@@ -182,11 +182,15 @@ final class RegisterVM: ObservableObject {
         let name: String? = displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             ? nil
             : displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let savedUsername = username.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        let savedPhone = "+\(country.dialCode)\(phone.trimmingCharacters(in: .whitespaces))"
         setLoading(true)
         Task { [weak self] in
             guard let self = self else { return }
             do {
                 _ = try await self.api.setDisplayName(registerToken: token, displayName: name)
+                UserDefaults.standard.set(savedPhone,
+                                          forKey: Constants.talk9RegisteredPhonePrefix + savedUsername)
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
                     self.isLoading = false

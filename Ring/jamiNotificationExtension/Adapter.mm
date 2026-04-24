@@ -84,10 +84,33 @@ constexpr auto ID_TIMEOUT = std::chrono::hours(24);
 std::map<std::string, std::shared_ptr<CallbackWrapperBase>> confHandlers;
 std::map<std::string, std::pair<std::string, std::string>> cachedNames;
 std::map<std::string, std::string> nameServers;
+// Pending push notification data to be sent after account registration
+static NSString* pendingPushAccountId = nil;
+static NSDictionary* pendingPushData = nil;
 
 #pragma mark Callbacks registration
 - (void)registerSignals
 {
+    confHandlers.insert(exportable_callback<ConfigurationSignal::RegistrationStateChanged>(
+        [](const std::string& accountId, const std::string& state, int /*code*/, const std::string& /*detail*/) {
+            NSLog(@"[Talk9-Daemon] RegistrationStateChanged account=%s state=%s", accountId.c_str(), state.c_str());
+            if (state == "REGISTERED") {
+                NSString* accId = [NSString stringWithUTF8String:accountId.c_str()];
+                NSDictionary* data = nil;
+                @synchronized([Adapter class]) {
+                    if (pendingPushAccountId && [pendingPushAccountId isEqualToString:accId]) {
+                        data = pendingPushData;
+                        pendingPushAccountId = nil;
+                        pendingPushData = nil;
+                    }
+                }
+                if (data) {
+                    NSLog(@"[Talk9-Daemon] account REGISTERED — calling pushNotificationReceived");
+                    pushNotificationReceived(std::string([accId UTF8String]), [Utils dictionaryToMap:data]);
+                }
+            }
+        }));
+
     confHandlers.insert(exportable_callback<ConfigurationSignal::GetAppDataPath>(
                                                                                  [](const std::string& name, std::vector<std::string>* ret) {
                                                                                      if (name == "cache") {
@@ -198,11 +221,15 @@ std::map<std::string, std::string> nameServers;
 
 - (BOOL)start:(NSString*)accountId convId:(NSString*)convId loadAll:(BOOL)loadAll
 {
-    [self registerSignals];
     if (initialized() == true) {
+        // Re-register signals so the new AdapterService delegate receives callbacks
+        unregisterSignalHandlers();
+        confHandlers.clear();
+        [self registerSignals];
         loadAccountAndConversation(std::string([accountId UTF8String]), loadAll, std::string([convId UTF8String]));
         return true;
     }
+    [self registerSignals];
     int flag = LIBJAMI_FLAG_IOS_EXTENSION | LIBJAMI_FLAG_NO_AUTOSYNC | LIBJAMI_FLAG_NO_LOCAL_AUDIO | LIBJAMI_FLAG_NO_AUTOLOAD;
 #if DEBUG
     flag |= LIBJAMI_FLAG_CONSOLE_LOG | LIBJAMI_FLAG_DEBUG;
@@ -248,6 +275,14 @@ std::map<std::string, std::string> nameServers;
 
 - (void)pushNotificationReceived:(NSString*)from message:(NSDictionary*)data {
     pushNotificationReceived(std::string([from UTF8String]), [Utils dictionaryToMap:data]);
+}
+
+- (void)schedulePushNotificationAfterRegistration:(NSString*)accountId data:(NSDictionary*)data {
+    @synchronized([Adapter class]) {
+        pendingPushAccountId = accountId;
+        pendingPushData = data;
+    }
+    NSLog(@"[Talk9-Daemon] schedulePushNotification queued for account=%@", accountId);
 }
 
 - (NSMutableDictionary<NSString*,NSString*>*)getConversationInfoForAccount:(NSString*) accountId conversationId:(NSString*) conversationId {

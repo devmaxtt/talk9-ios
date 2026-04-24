@@ -45,6 +45,7 @@ class AccountSummaryVM: AvatarProvider, AccountProfileObserver {
     // account status
     @Published var accountStatus: String = ""
     @Published var accountEnabled: Bool
+    @Published var registeredPhone: String = ""
 
     let avatarSize: CGFloat = 100
 
@@ -78,6 +79,8 @@ class AccountSummaryVM: AvatarProvider, AccountProfileObserver {
         self.subscribeStatus()
         self.updateProfileDetails(account: account)
         self.registeredName = resolveAccountName(from: self.account)
+        let phoneKey = Constants.talk9RegisteredPhonePrefix + self.registeredName
+        self.registeredPhone = UserDefaults.standard.string(forKey: phoneKey) ?? ""
     }
 
     var accountInfoToShare: String {
