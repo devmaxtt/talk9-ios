@@ -573,6 +573,7 @@ extension  ConversationsManager: MessagesAdapterDelegate {
             return
         }
         if let content = message[textPlainMIMEType] {
+            cacheMessageForNotification(accountId: receiverAccountId, conversationId: "direct_\(senderAccount)", authorId: senderAccount, body: content)
             self.handleNewMessage(from: senderAccount,
                                   to: receiverAccountId,
                                   messageId: messageId,
@@ -651,6 +652,9 @@ extension  ConversationsManager: MessagesAdapterDelegate {
     func newInteraction(conversationId: String, accountId: String, message: SwarmMessageWrap) {
         guard let account = self.accountsService.getAccount(fromAccountId: accountId) else { return }
         let newMessage = MessageModel(with: message, localJamiId: account.jamiId)
+        if newMessage.incoming && newMessage.type == .text && !newMessage.content.isEmpty {
+            cacheMessageForNotification(accountId: accountId, conversationId: conversationId, authorId: newMessage.authorId, body: newMessage.content)
+        }
         if newMessage.type == .fileTransfer {
             newMessage.transferStatus = newMessage.incoming ? .awaiting : .success
         }
@@ -732,6 +736,18 @@ extension  ConversationsManager: RequestsAdapterDelegate {
         }
         self.requestService.conversationRequestReceived(conversationId: conversationId, accountId: accountId, metadata: metadata)
 
+    }
+}
+
+extension ConversationsManager {
+    private func cacheMessageForNotification(accountId: String, conversationId: String, authorId: String, body: String) {
+        guard let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
+        // Key by conversation — used when the extension knows the convId
+        let convKey = Constants.talk9LastMessageKeyPrefix + accountId + "_" + conversationId
+        defaults.set(["body": body, "authorId": authorId], forKey: convKey)
+        // Key by sender — fallback when extension doesn't receive a convId in the push payload
+        let senderKey = Constants.talk9LastMessageKeyPrefix + "sender_" + accountId + "_" + authorId
+        defaults.set(body, forKey: senderKey)
     }
 }
 

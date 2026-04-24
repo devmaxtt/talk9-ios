@@ -64,6 +64,9 @@ struct SmartListContentView: View {
                     }
                     .padding(.horizontal, 15)
                 }
+                .refreshableIfAvailable {
+                    await model.refresh()
+                }
                 .transition(.identity)
                 .animation(nil, value: isSearchBarActive)
             }
@@ -298,6 +301,17 @@ struct SmartListContentView: View {
         VStack(alignment: .leading) {
             Text(model.searchStatus.toString())
                 .font(.callout)
+        }
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func refreshableIfAvailable(action: @escaping () async -> Void) -> some View {
+        if #available(iOS 15, *) {
+            self.refreshable(action: action)
+        } else {
+            self
         }
     }
 }

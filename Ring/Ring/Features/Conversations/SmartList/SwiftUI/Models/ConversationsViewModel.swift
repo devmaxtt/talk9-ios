@@ -470,5 +470,14 @@ class ConversationsViewModel: ObservableObject {
             conversationModel.closeAllPlayers()
         }
     }
+
+    // MARK: - Pull-to-refresh
+
+    func refresh() async {
+        guard let accountId = accountsService.currentAccount?.id else { return }
+        conversationsService.reloadConversationsAndRequests(accountId: accountId)
+        // Wait for the daemon to push back the refreshed conversation data
+        try? await Task.sleep(nanoseconds: 1_500_000_000)
+    }
 }
 // swiftlint:enable type_body_length

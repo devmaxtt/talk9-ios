@@ -484,10 +484,43 @@ class NotificationService: UNNotificationServiceExtension {
     }
 
     private func handleGitMessage(convId: String, loadAll: Bool) {
-        // If app is in background memory, we already have the sender ID from decrypt — no daemon needed
+        // If app is in background memory, we already have the sender ID from decrypt — no daemon needed.
+        // Try to read the actual message body from the shared cache written by the main app.
         if self.skipDaemonSync {
-            log("[Talk9-Notif] handleGitMessage: skipDaemonSync=true, sender=\(pendingSenderId.prefix(16))")
-            // autoDispatchGroup has no outstanding jami task, so finish() will be called after streaming completes
+            log("[Talk9-Notif] handleGitMessage: skipDaemonSync=true, convId='\(pendingConvId)' sender=\(pendingSenderId.prefix(16))")
+            // Delay reading the cache so the main app's daemon has time to receive
+            // and store the message before we check shared storage.
+            let waitId = UUID().uuidString
+            autoDispatchGroup.enter(id: waitId)
+            DispatchQueue.global().asyncAfter(deadline: .now() + 2.0) { [weak self] in
+                guard let self = self else { return }
+                defer { self.autoDispatchGroup.leave(id: waitId) }
+                guard !self.pendingSenderId.isEmpty,
+                      let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
+                var cachedBody: String?
+                // 1. Try per-conversation key (convId present in push payload)
+                if !self.pendingConvId.isEmpty {
+                    let convKey = Constants.talk9LastMessageKeyPrefix + self.accountId + "_" + self.pendingConvId
+                    if let entry = defaults.dictionary(forKey: convKey) as? [String: String],
+                       let body = entry["body"], !body.isEmpty {
+                        cachedBody = body
+                        log("[Talk9-Notif] skipDaemonSync: hit conv key '\(body.prefix(40))'")
+                    }
+                }
+                // 2. Fall back to per-sender key (convId empty or conv key missed)
+                if cachedBody == nil {
+                    let senderKey = Constants.talk9LastMessageKeyPrefix + "sender_" + self.accountId + "_" + self.pendingSenderId
+                    cachedBody = defaults.string(forKey: senderKey)
+                    if let body = cachedBody {
+                        log("[Talk9-Notif] skipDaemonSync: hit sender key '\(body.prefix(40))'")
+                    }
+                }
+                if let body = cachedBody, !body.isEmpty {
+                    self.bestAttemptContent.body = body
+                } else {
+                    log("[Talk9-Notif] skipDaemonSync: cache miss after 2s wait")
+                }
+            }
             return
         }
 
