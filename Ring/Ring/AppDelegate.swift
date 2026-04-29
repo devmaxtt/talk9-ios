@@ -267,7 +267,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         self.accountService.initialAccountsLoading()
             .subscribe(onCompleted: {
                 DispatchQueue.main.async {
+                    // processPendingNotification must run BEFORE initialLoadingCompleted so
+                    // that conversationsCoordinator does not exist yet when openConversation
+                    // is called.  If the coordinator already exists, openConversation bypasses
+                    // pendingNavigation and calls openConversationFromNotification immediately —
+                    // before reloadDataFor has had a chance to populate the conversation list.
+                    // Running it first causes openConversation to save to pendingNavigation;
+                    // processPendingNavigation then fires 0.5 s after showMainInterface(), giving
+                    // the DB load a head start before the retry loop begins.
+                    self.processPendingNotification()
                     self.appCoordinator.initialLoadingCompleted()
+                    self.recoverFromInterruptedReregister()
                 }
                 // set selected account if exists
                 if !self.accountService.hasAccounts() {
@@ -406,6 +416,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
 
     // MARK: - Connection Retry Helpers
+
+    // UserDefaults key that marks an in-progress re-register cycle.
+    // Written before enableAccount(false), cleared after enableAccount(true).
+    // If the app is killed in the 1.5 s gap, this key survives and lets us
+    // re-enable the account on next startup instead of showing Offline.
+    private let talk9ReenablePendingKey = "talk9_reenable_pending"
+
+    // Notification tap that arrived before accounts were loaded (cold-start deep link).
+    // Replayed in processPendingNotification() once initialAccountsLoading completes.
+    private var pendingNotificationData: [AnyHashable: Any]?
+    private var pendingNotificationActionId: String = UNNotificationDefaultActionIdentifier
 
     // Tracks how many times we have re-registered due to stuck sync per session, to avoid infinite loop.
     // Reset to 0 when a conversation successfully syncs (conversationReady fires).
@@ -630,9 +651,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         #if DEBUG
         NotificationCenter.default.post(name: .debugReRegisterFired, object: nil)
         #endif
+        // Mark that we are mid-cycle BEFORE disabling. If the app is killed during the
+        // 1.5 s gap, this key survives to disk and lets startup re-enable the account.
+        UserDefaults.standard.set(account.id, forKey: talk9ReenablePendingKey)
         accountService.enableAccount(accountId: account.id, enable: false)
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
             guard let self = self else { return }
+            // Clear the flag first — re-enable is about to happen normally.
+            UserDefaults.standard.removeObject(forKey: self.talk9ReenablePendingKey)
             // Re-apply Talk9 TURN/bootstrap AGAIN just before re-enabling the account.
             // The daemon resets these settings to Jami defaults when an account is
             // re-enabled, so applying them only before disable (above) is not enough —
@@ -645,6 +671,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             // ensuring the swarm managers are restarted AFTER the TURN cache is refreshed.
             self.pendingSwarmBootstrapOnRegistered = true
             self.accountService.enableAccount(accountId: account.id, enable: true)
+        }
+    }
+
+    /// Called once on startup. If the app was killed during the 1.5 s disable→enable
+    /// window of a re-register cycle, the account is still disabled on disk. This method
+    /// detects that situation via the UserDefaults flag and re-enables the account.
+    private func recoverFromInterruptedReregister() {
+        guard let accountId = UserDefaults.standard.string(forKey: talk9ReenablePendingKey) else { return }
+        UserDefaults.standard.removeObject(forKey: talk9ReenablePendingKey)
+        guard accountService.getAccount(fromAccountId: accountId) != nil else { return }
+        log.debug("[Talk9-ICE] Recovering interrupted re-register — re-enabling account \(accountId)")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            self.accountService.applyTalk9NetworkDefaults(accountId: accountId)
+            self.accountService.enableAccount(accountId: accountId, enable: true)
         }
     }
 
@@ -860,8 +901,14 @@ extension AppDelegate {
     }
 
     func handleNotificationActions(data: [AnyHashable: Any], actionIdentifier: String) {
-        guard let accountId = data[Constants.NotificationUserInfoKeys.accountID.rawValue] as? String,
-              let account = self.accountService.getAccount(fromAccountId: accountId) else { return }
+        guard let accountId = data[Constants.NotificationUserInfoKeys.accountID.rawValue] as? String else { return }
+
+        guard let account = self.accountService.getAccount(fromAccountId: accountId) else {
+            // Accounts not loaded yet (cold start). Save and replay after startup.
+            pendingNotificationData = data
+            pendingNotificationActionId = actionIdentifier
+            return
+        }
 
         self.accountService.updateCurrentAccount(account: account)
 
@@ -870,6 +917,14 @@ extension AppDelegate {
         } else {
             handleConversationNotification(data: data, accountId: accountId)
         }
+    }
+
+    private func processPendingNotification() {
+        guard let data = pendingNotificationData else { return }
+        let action = pendingNotificationActionId
+        pendingNotificationData = nil
+        pendingNotificationActionId = UNNotificationDefaultActionIdentifier
+        handleNotificationActions(data: data, actionIdentifier: action)
     }
 
     private func isCallNotification(data: [AnyHashable: Any]) -> Bool {
@@ -905,10 +960,83 @@ extension AppDelegate {
     }
 
     private func handleConversationNotification(data: [AnyHashable: Any], accountId: String) {
-        if let conversationId = data[Constants.NotificationUserInfoKeys.conversationID.rawValue] as? String {
+        let conversationId = data[Constants.NotificationUserInfoKeys.conversationID.rawValue] as? String ?? ""
+        let participantID  = data[Constants.NotificationUserInfoKeys.participantID.rawValue]  as? String ?? ""
+
+        // Process pending push data ONLY AFTER the target conversation is present in
+        // conversationsService.conversations.  On a cold start (app was killed), the
+        // conversation list is cleared and reloaded asynchronously by reloadDataFor().
+        // Calling pushNotificationReceived() before the conversation exists causes
+        // SwarmMessageReceived → newInteraction → insertMessages() to silently drop the
+        // message because it can't find the conversation model.
+        processPendingPushDataWhenReady(conversationId: conversationId, accountId: accountId)
+
+        if !conversationId.isEmpty {
             self.appCoordinator.openConversation(conversationId: conversationId, accountId: accountId)
-        } else if let participantID = data[Constants.NotificationUserInfoKeys.participantID.rawValue] as? String {
+        } else if !participantID.isEmpty {
             self.appCoordinator.openConversation(participantID: participantID, accountId: accountId)
+        }
+    }
+
+    private func processPendingPushDataWhenReady(conversationId: String, accountId: String) {
+        // Check if the conversation is already available (warm start).
+        let alreadyLoaded: Bool
+        if conversationId.isEmpty {
+            alreadyLoaded = !conversationsService.conversations.value.filter { $0.accountId == accountId }.isEmpty
+        } else {
+            alreadyLoaded = conversationsService.conversations.value.contains { $0.id == conversationId && $0.accountId == accountId }
+        }
+
+        if alreadyLoaded {
+            processPendingPushData()
+            return
+        }
+
+        // Cold start: wait for the conversation to appear in the conversations list
+        // before calling pushNotificationReceived, then give it a moment to process.
+        let filterBlock: ([ConversationModel]) -> Bool = { conversations in
+            if conversationId.isEmpty {
+                return !conversations.filter { $0.accountId == accountId }.isEmpty
+            }
+            return conversations.contains { $0.id == conversationId && $0.accountId == accountId }
+        }
+
+        conversationsService.conversations
+            .filter(filterBlock)
+            .take(1)
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] _ in
+                self?.processPendingPushData()
+            }, onError: { [weak self] _ in
+                self?.processPendingPushData()
+            })
+            .disposed(by: disposeBag)
+    }
+
+    private func processPendingPushData() {
+        guard let userDefaults = UserDefaults(suiteName: Constants.appGroupIdentifier),
+              let notificationData = userDefaults.object(forKey: Constants.notificationData) as? [[String: String]],
+              !notificationData.isEmpty else { return }
+        userDefaults.set([[String: String]](), forKey: Constants.notificationData)
+
+        var accountIds = Set<String>()
+        for data in notificationData {
+            self.accountService.pushNotificationReceived(data: data)
+            if let accountId = data["to"], !accountId.isEmpty {
+                accountIds.insert(accountId)
+            }
+        }
+
+        // Safety-net: reload conversations so any message already in local git
+        // (from prior peer syncs) is surfaced immediately via conversationLoaded.
+        // 1 s is enough — messages in local git arrive almost instantly; messages
+        // that still need a DHT proxy fetch will arrive via newInteraction on their
+        // own, independently of this timer.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            for accountId in accountIds {
+                self.conversationsService.reloadConversationsAndRequests(accountId: accountId)
+            }
         }
     }
 

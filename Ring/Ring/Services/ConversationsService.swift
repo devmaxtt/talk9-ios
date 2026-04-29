@@ -155,6 +155,19 @@ class ConversationsService {
 
     func updateConversationMessages(conversationId: String) {
         for conversation in self.conversations.value where conversation.id == conversationId {
+            // If messages are already loaded into memory, skip the forced reload entirely.
+            //
+            // Calling loadConversationMessages when messages exist causes insertMessages() to
+            // receive a batch of duplicates (all already in conversation.messages), which
+            // triggers the "fromLoaded && filtered.isEmpty" branch and paginates backwards
+            // into history — loading older and older messages while the newest (from the push
+            // notification) never appears, because DHT sync hasn't completed yet.
+            //
+            // When messages are already in memory, the new message will arrive on its own via
+            // SwarmMessageReceived → ConversationsManager.newInteraction → insertMessages
+            // (fromLoaded: false), which fires newMessages.accept and the MessagesListVM
+            // subscription appends it to the view automatically.
+            guard conversation.messages.isEmpty else { continue }
             conversation.clearMessages()
             self.conversationsAdapter.loadConversationMessages(conversation.accountId, conversationId: conversationId, from: "", size: 40)
         }
@@ -315,6 +328,15 @@ class ConversationsService {
             }
 
             if fromLoaded && filtered.isEmpty {
+                // If the batch's first message (newest in batch, since daemon returns newest-first)
+                // is the same as our current newest, this was a "load latest" reload (from: "")
+                // that found no new messages.  Do NOT paginate backwards — doing so would
+                // progressively load older and older history with no benefit.
+                // Only paginate when loading history (from: someId) where the batch is older.
+                if messages.first?.id == conversation.messages.first?.id {
+                    result = false
+                    return
+                }
                 if let lastMessage = messages.last?.id {
                     self.loadConversationMessages(conversationId: conversationId, accountId: accountId, from: lastMessage)
                 }
@@ -333,7 +355,18 @@ class ConversationsService {
             }
 
             if fromLoaded {
-                conversation.messages.append(contentsOf: newMessages)
+                // If the incoming batch contains messages NEWER than the current newest,
+                // insert them at the front so they appear at the visual bottom (newest area).
+                // This fixes the case where reloadConversationsAndRequests delivers the
+                // notification message via conversationLoaded instead of SwarmMessageReceived.
+                let insertAtFront = newMessages.first.map { newest in
+                    conversation.messages.first.map { newest.receivedDate > $0.receivedDate } ?? true
+                } ?? false
+                if insertAtFront {
+                    conversation.messages.insert(contentsOf: newMessages, at: 0)
+                } else {
+                    conversation.messages.append(contentsOf: newMessages)
+                }
             } else {
                 conversation.messages.insert(contentsOf: newMessages, at: 0)
             }

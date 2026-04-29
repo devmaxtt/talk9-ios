@@ -65,11 +65,19 @@ using namespace libjami;
 - (void)connectivityChanged {
     if (![[NSThread currentThread] isMainThread]) {
         dispatch_sync(dispatch_get_main_queue(), ^{
-            connectivityChanged();
+            try {
+                connectivityChanged();
+            } catch (const std::exception& e) {
+                NSLog(@"[Talk9] connectivityChanged exception (ignored): %s", e.what());
+            }
         });
     }
     else {
-        connectivityChanged();
+        try {
+            connectivityChanged();
+        } catch (const std::exception& e) {
+            NSLog(@"[Talk9] connectivityChanged exception (ignored): %s", e.what());
+        }
     }
 }
 

@@ -249,6 +249,11 @@ class NotificationService: UNNotificationServiceExtension {
     // so finish() knows to suppress the APNs placeholder duplicate.
     private var didPresentLocalNotification = false
 
+    // Set to true when the daemon is started for this notification.
+    // If daemon ran but didPresentLocalNotification is still false, it means the
+    // message was already treated (processed by another extension instance) — suppress.
+    private var didStartDaemon = false
+
     // Sender info extracted from decrypt, used as fallback when daemon sync times out
     private var pendingSenderId: String = ""
     private var pendingConvId: String = ""
@@ -256,6 +261,9 @@ class NotificationService: UNNotificationServiceExtension {
 
     // When app is in background memory (appIsActive=true), skip daemon sync but still run DHT decrypt
     private var skipDaemonSync = false
+
+    // Timestamp when this extension instance was created (used to reject stale cache entries)
+    private let extensionStartTime = Date().timeIntervalSince1970
 
     // A queue of pending local notifications, waiting for a name lookup
     private let notificationQueue = DispatchQueue(label: Constants.appIdentifier + ".Notification.queue")
@@ -273,8 +281,9 @@ class NotificationService: UNNotificationServiceExtension {
     // Entry point for processing incoming notification requests.
     override func didReceive(_ request: UNNotificationRequest, withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
         self.contentHandler = contentHandler
-        // Initialize from request so iOS always has valid fallback content
-        self.bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent) ?? UNMutableNotificationContent()
+        // Default to empty content so any crash or timeout shows nothing instead of the
+        // raw APNs placeholder "hello". Real content is filled in by processMap / presentLocalNotification.
+        self.bestAttemptContent = UNMutableNotificationContent()
         setupNotificationExtensionQueryListener()
         log("didReceive called — userInfo keys: \(request.content.userInfo.keys.map { String(describing: $0) })")
 
@@ -295,23 +304,24 @@ class NotificationService: UNNotificationServiceExtension {
             return
         }
 
-        // Save notification data so that if the main app or share extension is active, the extension can let them handle notification
+        // Save notification data so the main app can call pushNotificationReceived when it wakes.
         saveDataIfNeeded(data: requestData)
+
         if appIsActive() {
-            // App is in background memory — still run DHT decrypt to get sender info, but skip daemon sync
-            log("[Talk9-Notif] App is in background memory — running DHT decrypt only, skipping daemon")
-            self.skipDaemonSync = true
+            // App is in foreground — it will handle this push via handleNotification() /
+            // pushNotificationReceived().  Extension must NOT show a banner here; doing so
+            // would duplicate the in-app message delivery and create notification spam.
+            log("[Talk9-Notif] App is active — deferring to main app, suppressing banner")
+            return
         }
 
         guard !shareExtensionHasAccountActive(accountId: accountId) else {
             log("Share extension has this account active")
-            bestAttemptContent = UNMutableNotificationContent()
             return
         }
 
         guard !isResubscribe(accountId: accountId, data: requestData) else {
             log("This is a resubscribe notification")
-            bestAttemptContent = UNMutableNotificationContent()
             return
         }
 
@@ -443,13 +453,24 @@ class NotificationService: UNNotificationServiceExtension {
             // Store sender ID so finish() can show a fallback notification if daemon sync times out
             self.pendingSenderId = peerId
             self.pendingConvId = convId
+            // Populate userInfo with the keys AppDelegate expects so a tap on this
+            // banner can navigate to the conversation. Without these keys the very
+            // first guard in handleNotificationActions fails (accountID is nil) and
+            // the app opens without navigating anywhere.
+            self.bestAttemptContent.userInfo = [
+                Constants.NotificationUserInfoKeys.accountID.rawValue: self.accountId,
+                Constants.NotificationUserInfoKeys.participantID.rawValue: peerId,
+                Constants.NotificationUserInfoKeys.conversationID.rawValue: convId
+            ]
+            // Always set a baseline body so contentHandler never delivers empty content
+            // (empty content on some iOS versions causes fallback to the raw APNs "hello" payload).
+            self.bestAttemptContent.body = "New message"
             // Immediately update bestAttemptContent so even a timeout shows meaningful content
             if !peerId.isEmpty {
                 // 1. Try local vCard first (fast, sync)
                 let localName = self.contactProfileName(accountId: self.accountId, contactId: peerId)
                 let displayName = localName ?? String(peerId.prefix(16))
                 self.bestAttemptContent.title = displayName
-                self.bestAttemptContent.body = "New message"
                 log("[Talk9-Notif] bestAttemptContent set: '\(displayName)' vCard=\(localName != nil)")
                 // 2. Try name server lookup (async, may find registered username)
                 self.lookupSenderName(peerId: peerId)
@@ -470,146 +491,73 @@ class NotificationService: UNNotificationServiceExtension {
     }
 
     private func isResubscribe(accountId: String, data: [String: String]) -> Bool {
-        let isResubscribe = data["timeout"] != nil && data["timeout"] != "<null>"
-        if !isResubscribe {
-            return false
-        }
-        self.accountIsActive.store(true, ordering: .relaxed)
-        self.adapterService.startAccount(accountId: accountId, convId: "", loadAll: false)
-        self.adapterService.pushNotificationReceived(accountId: accountId, data: data)
-        // TODO: comment this a bit more
-        // wait to proceed pushNotificationReceived
-        sleep(5)
-        return true
+        // A resubscribe push keeps the DHT subscription alive.
+        // Do NOT start the daemon here — doing so triggers TURN allocation which
+        // crashes the extension process (EXC_BAD_ACCESS), causing iOS to fall back
+        // to the raw APNs placeholder "hello". The main app's daemon handles DHT
+        // resubscription when the app is alive; if the app is dead, DHT reconnects
+        // automatically on next launch.
+        return data["timeout"] != nil && data["timeout"] != "<null>"
     }
 
     private func handleGitMessage(convId: String, loadAll: Bool) {
-        // If app is in background memory, we already have the sender ID from decrypt — no daemon needed.
-        // Try to read the actual message body from the shared cache written by the main app.
-        if self.skipDaemonSync {
-            log("[Talk9-Notif] handleGitMessage: skipDaemonSync=true, convId='\(pendingConvId)' sender=\(pendingSenderId.prefix(16))")
-            // Delay reading the cache so the main app's daemon has time to receive
-            // and store the message before we check shared storage.
-            let waitId = UUID().uuidString
-            autoDispatchGroup.enter(id: waitId)
-            DispatchQueue.global().asyncAfter(deadline: .now() + 2.0) { [weak self] in
-                guard let self = self else { return }
-                defer { self.autoDispatchGroup.leave(id: waitId) }
-                guard !self.pendingSenderId.isEmpty,
-                      let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
-                var cachedBody: String?
-                // 1. Try per-conversation key (convId present in push payload)
-                if !self.pendingConvId.isEmpty {
-                    let convKey = Constants.talk9LastMessageKeyPrefix + self.accountId + "_" + self.pendingConvId
-                    if let entry = defaults.dictionary(forKey: convKey) as? [String: String],
-                       let body = entry["body"], !body.isEmpty {
-                        cachedBody = body
-                        log("[Talk9-Notif] skipDaemonSync: hit conv key '\(body.prefix(40))'")
-                    }
-                }
-                // 2. Fall back to per-sender key (convId empty or conv key missed)
-                if cachedBody == nil {
-                    let senderKey = Constants.talk9LastMessageKeyPrefix + "sender_" + self.accountId + "_" + self.pendingSenderId
-                    cachedBody = defaults.string(forKey: senderKey)
-                    if let body = cachedBody {
-                        log("[Talk9-Notif] skipDaemonSync: hit sender key '\(body.prefix(40))'")
-                    }
-                }
-                if let body = cachedBody, !body.isEmpty {
-                    self.bestAttemptContent.body = body
-                } else {
-                    log("[Talk9-Notif] skipDaemonSync: cache miss after 2s wait")
+        // Never start the daemon inside the notification extension.
+        // Starting the daemon (libjami::start) during extension init triggers SSL/TURN
+        // connections that crash the extension process (EXC_BAD_ACCESS). When the
+        // extension process crashes iOS falls back to the raw APNs "hello" placeholder.
+        // Instead, always read from the shared cache written by the main app daemon.
+        log("[Talk9-Notif] handleGitMessage: using cache (no daemon), convId='\(pendingConvId)' sender=\(pendingSenderId.prefix(16))")
+        let waitId = UUID().uuidString
+        // Capture the group directly so defer always runs even if self is deallocated.
+        // If self were nil at the asyncAfter closure, the old guard-before-defer pattern
+        // would skip the leave(), leaking the group entry and causing a 25-second timeout
+        // — after which iOS would fall back to showing the raw APNs "hello" placeholder.
+        let group = autoDispatchGroup
+        autoDispatchGroup.enter(id: waitId)
+        DispatchQueue.global().asyncAfter(deadline: .now() + 2.0) { [weak self] in
+            defer { group.leave(id: waitId) }
+            guard let self = self else { return }
+            guard !self.pendingSenderId.isEmpty,
+                  let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
+            // Only accept cache entries written within 2 seconds before this extension
+            // instance started (covers clock skew / daemon-faster-than-extension races).
+            // The old 10s grace was too large: it would pick up already-read messages if
+            // the user received one within the preceding 10s and then a new push arrived.
+            let freshThreshold = self.extensionStartTime - 2.0
+            var cachedBody: String?
+
+            func freshBody(from entry: [AnyHashable: Any]?) -> String? {
+                guard let entry = entry,
+                      let body = entry["body"] as? String, !body.isEmpty,
+                      let ts = entry["ts"] as? TimeInterval,
+                      ts >= freshThreshold else { return nil }
+                return body
+            }
+
+            // 1. Try per-conversation key (convId present in push payload)
+            if !self.pendingConvId.isEmpty {
+                let convKey = Constants.talk9LastMessageKeyPrefix + self.accountId + "_" + self.pendingConvId
+                if let body = freshBody(from: defaults.dictionary(forKey: convKey)) {
+                    cachedBody = body
+                    log("[Talk9-Notif] cache: fresh conv key '\(body.prefix(40))'")
                 }
             }
-            return
-        }
-
-        // If the account is already active, return, otherwise we set it to active and continue
-        if self.accountIsActive.compareExchange(expected: false, desired: true, ordering: .relaxed).original {
-            return
-        }
-
-        let accountJamiId = self.adapterService.getAccountJamiId(accountId: self.accountId)
-
-        log("[Talk9-Notif] handleGitMessage: starting daemon for convId=\(convId) accountId=\(self.accountId)")
-        jamiTaskId = UUID().uuidString
-        self.autoDispatchGroup.enter(id: jamiTaskId)
-        // Start daemon first, then notify it of the push — daemon must be initialized before pushNotificationReceived
-        self.adapterService.startAccountsWithListener(accountId: self.accountId, convId: convId, loadAll: loadAll) { [weak self] event, eventData in
-            guard let self = self else {
-                return
+            // 2. Fall back to per-sender key (convId empty or conv key missed)
+            if cachedBody == nil {
+                let senderKey = Constants.talk9LastMessageKeyPrefix + "sender_" + self.accountId + "_" + self.pendingSenderId
+                if let body = freshBody(from: defaults.dictionary(forKey: senderKey)) {
+                    cachedBody = body
+                    log("[Talk9-Notif] cache: fresh sender key '\(body.prefix(40))'")
+                }
             }
-            log("[Talk9-Notif] daemon event=\(event) jamiId=\(eventData.jamiId) convId=\(eventData.conversationId) body=\(eventData.content.prefix(50))")
-
-            var notifConfig = NotificationConfig(from: eventData.jamiId, url: nil, body: eventData.content,
-                                                 conversationId: eventData.conversationId, groupTitle: eventData.groupTitle)
-
-            switch event {
-            case .message:
-                CommonHelpers.setUpdatedConversations(accountId: self.accountId, conversationId: eventData.conversationId)
-                if accountJamiId == eventData.jamiId {
-                    return
-                }
-                self.taskPropertyQueue.sync { self.itemsToPresent += 1 }
-                self.configureAndPresentNotification(config: notifConfig, type: LocalNotificationType.message)
-            case .fileTransferDone:
-                CommonHelpers.setUpdatedConversations(accountId: self.accountId, conversationId: eventData.conversationId)
-                if accountJamiId == eventData.jamiId {
-                    self.verifyTasksStatus()
-                    return
-                }
-                // If the content is a URL then we have already downloaded the file and can present the notification,
-                // otherwise we need to download the file first, so add it to the items to present
-                if let url = URL(string: eventData.content) {
-                    notifConfig.url = url
-                    self.configureAndPresentNotification(config: notifConfig, type: LocalNotificationType.file)
-                } else {
-                    self.taskPropertyQueue.sync { self.itemsToPresent -= 1 }
-                    self.verifyTasksStatus()
-                }
-            case .syncCompleted:
-                self.taskPropertyQueue.sync { self.syncCompleted = true }
-                self.verifyTasksStatus()
-            case .fileTransferInProgress:
-                if accountJamiId == eventData.jamiId {
-                    return
-                }
-                self.taskPropertyQueue.sync { self.itemsToPresent += 1 }
-            case .invitation:
-                CommonHelpers.setUpdatedConversations(accountId: self.accountId, conversationId: eventData.conversationId)
-                self.taskPropertyQueue.sync {
-                    self.syncCompleted = true
-                    if accountJamiId != eventData.jamiId {
-                        self.itemsToPresent += 1
-                    }
-                }
-                if accountJamiId != eventData.jamiId {
-                    self.configureAndPresentNotification(config: notifConfig, type: LocalNotificationType.message)
-                }
-            case .conversationCloned:
-                self.taskPropertyQueue.sync { self.waitForCloning = false }
-                self.verifyTasksStatus()
-            case .activeCall:
-                guard let calls = eventData.calls, !calls.isEmpty else { return }
-                CommonHelpers.setUpdatedConversations(accountId: self.accountId, conversationId: eventData.conversationId)
-                self.taskPropertyQueue.sync { self.itemsToPresent += 1 }
-                self.configureAndPresentCallNotification(config: notifConfig, calls: calls, accountId: eventData.accountId)
+            if let body = cachedBody {
+                self.bestAttemptContent.body = body
+            } else {
+                log("[Talk9-Notif] cache: miss or stale after 2s — showing 'New message'")
             }
         }
-        // Push notification data contains "s" (old session ID from main app).
-        // Extension daemon has a new session, so the check in DhtProxyClient would fail.
-        // Strip "s" to bypass the session check, and delay 3s for account to register+subscribe.
-        if !self.originalNotificationData.isEmpty {
-            var dataWithoutSession = self.originalNotificationData
-            dataWithoutSession.removeValue(forKey: "s")
-            log("[Talk9-Notif] scheduling pushNotification in 3s (stripped session ID)")
-            let accountId = self.accountId
-            DispatchQueue.global().asyncAfter(deadline: .now() + 3.0) { [weak self] in
-                guard let self = self else { return }
-                log("[Talk9-Notif] calling pushNotificationReceived (delayed, no session)")
-                self.adapterService.pushNotificationReceived(accountId: accountId, data: dataWithoutSession)
-            }
-        }
+        return
+
     }
 
     private func verifyTasksStatus() {
@@ -657,6 +605,23 @@ class NotificationService: UNNotificationServiceExtension {
                 bestAttemptContent.title = ""
                 bestAttemptContent.body = ""
                 log("[Talk9-Notif] finish: local notif shown, suppressing APNs duplicate")
+            } else if didStartDaemon {
+                // Daemon ran but showed nothing — message was already treated by another
+                // extension instance. Suppress to prevent a duplicate "New message" banner.
+                bestAttemptContent.title = ""
+                bestAttemptContent.body = ""
+                log("[Talk9-Notif] finish: daemon ran but no notification shown — suppressing duplicate")
+            } else if bestAttemptContent.body.isEmpty {
+                // No content was produced (resubscribe, failed URL lookups, unknown decrypt type, etc.).
+                // iOS only falls back to the raw APNs "hello" when the extension CRASHES or TIMES OUT
+                // without calling contentHandler.  When we call contentHandler ourselves — even with
+                // completely empty title + body — iOS uses our empty content and shows nothing
+                // (no banner, no sound).  Using a space here was wrong: it caused iOS to display a
+                // silent "Talk9" banner with an invisible body.  Leave both empty so iOS suppresses
+                // the banner entirely.
+                bestAttemptContent.title = ""
+                bestAttemptContent.body = ""
+                log("[Talk9-Notif] finish: suppressing — no content (resubscribe / unknown decrypt)")
             } else {
                 // bestAttemptContent was already updated in processMap (decrypt) and lookupSenderName
                 log("[Talk9-Notif] finish: title=\(bestAttemptContent.title) body=\(bestAttemptContent.body.prefix(40))")
@@ -893,9 +858,13 @@ extension NotificationService {
         guard let url = URL(string: urlString) else { return }
         log("[Talk9-Notif] name lookup URL: \(urlString)")
         let taskId = "senderName_\(peerId)"
+        // Capture the group directly so defer always fires even if self is deallocated
+        // (same reason as in handleGitMessage — prevents a stuck dispatch group entry
+        // that would cause the 25-second timeout and iOS "hello" fallback).
+        let group = self.autoDispatchGroup
         self.autoDispatchGroup.enter(id: taskId)
         URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
-            defer { self?.autoDispatchGroup.leave(id: taskId) }
+            defer { group.leave(id: taskId) }
             if let error = error {
                 log("[Talk9-Notif] name lookup error: \(error)")
                 return

@@ -333,20 +333,30 @@ extension ConversationsCoordinator {
 
 // MARK: - Open conversation
 extension ConversationsCoordinator {
-    func openConversationFromNotificationFor(participantId: String, accountId: String) {
-        self.popToSmartList()
-        guard let uriString = JamiURI(schema: URIType.ring, infoHash: participantId).uriString else {
-            return
-        }
+    func openConversationFromNotificationFor(participantId: String, accountId: String, retryCount: Int = 0) {
+        guard let uriString = JamiURI(schema: URIType.ring, infoHash: participantId).uriString else { return }
         if let model = getConversationViewModelForParticipant(jamiId: uriString) {
-            reloadAndShowConversation(model)
+            self.popToSmartList()
+            // Use showConversation directly — do NOT call cleanMessages() here.
+            // cleanMessages() wipes messagesModels immediately, then the VC appears empty
+            // while the async DB reload is in flight.  On a second tap the DB has already
+            // loaded so messages show; skipping the wipe makes the first tap behave the same.
+            self.showConversation(withConversationViewModel: model, withAnimation: false)
+        } else if retryCount < 25 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+                self?.openConversationFromNotificationFor(participantId: participantId, accountId: accountId, retryCount: retryCount + 1)
+            }
         }
     }
 
-    func openConversationFromNotification(conversationId: String, accountId: String) {
-        self.popToSmartList()
+    func openConversationFromNotification(conversationId: String, accountId: String, retryCount: Int = 0) {
         if let model = getConversationViewModelForId(conversationId: conversationId) {
-            reloadAndShowConversation(model)
+            self.popToSmartList()
+            self.showConversation(withConversationViewModel: model, withAnimation: false)
+        } else if retryCount < 25 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+                self?.openConversationFromNotification(conversationId: conversationId, accountId: accountId, retryCount: retryCount + 1)
+            }
         }
     }
 

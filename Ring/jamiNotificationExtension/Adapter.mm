@@ -307,19 +307,24 @@ static NSDictionary* pendingPushData = nil;
         return {};
     }
 
-    // Build the key using the key path argument
-    NSData* data = [[NSFileManager defaultManager] contentsAtPath:keyPath];
-    const uint8_t* bytes = (const uint8_t*) [data bytes];
-    dht::crypto::PrivateKey dhtKey(bytes, [data length], "");
-
-    Json::Value jsonValue = toJson(value);
-    dht::Value dhtValue(jsonValue);
-
-    if (!dhtValue.isEncrypted()) {
-        NSLog(@"[Talk9-Decrypt] value is NOT encrypted");
-        return {};
-    }
     try {
+        // Build the key — can throw if the key file is corrupted or in an unexpected format.
+        NSData* data = [[NSFileManager defaultManager] contentsAtPath:keyPath];
+        if (!data || [data length] == 0) {
+            NSLog(@"[Talk9-Decrypt] key file empty or unreadable");
+            return {};
+        }
+        const uint8_t* bytes = (const uint8_t*) [data bytes];
+        dht::crypto::PrivateKey dhtKey(bytes, [data length], "");
+
+        Json::Value jsonValue = toJson(value);
+        dht::Value dhtValue(jsonValue);
+
+        if (!dhtValue.isEncrypted()) {
+            NSLog(@"[Talk9-Decrypt] value is NOT encrypted");
+            return {};
+        }
+
         dht::Sp<dht::Value> decrypted = dhtValue.decrypt(dhtKey);
         auto unpacked = msgpack::unpack((const char*) decrypted->data.data(), decrypted->data.size());
         auto peerCR = unpacked.get().as<PeerConnectionRequest>();
@@ -376,8 +381,10 @@ static NSDictionary* pendingPushData = nil;
             } catch (...) {}
         }
         return @{@(peerId.c_str()): @(peerCR.connType.c_str())};
-    } catch (std::runtime_error error) {
-        NSLog(@"[Talk9-Decrypt] runtime_error: %s", error.what());
+    } catch (const std::exception& e) {
+        NSLog(@"[Talk9-Decrypt] exception: %s", e.what());
+    } catch (...) {
+        NSLog(@"[Talk9-Decrypt] unknown exception");
     }
     return {};
 }

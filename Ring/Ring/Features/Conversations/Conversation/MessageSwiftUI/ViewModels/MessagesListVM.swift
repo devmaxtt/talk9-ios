@@ -716,11 +716,27 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
                 if insertionCount == 0 {
                     return
                 }
+                // Capture whether the newest message changed before computing sequencing.
+                // After insert(), messagesModels[0] is the newest.  If it differs from
+                // the pre-insert newest, messages were inserted at the front (visual bottom)
+                // and we should scroll there if the user was already at the bottom.
+                let newestIdAfterInsert = self.messagesModels.first?.id
+                let isRealTimeMessage = !messages.fromHistory
                 self.computeSequencing()
                 self.updateNumberOfNewMessages()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                     guard let self = self else {return }
                     self.loading = false
+                    // Scroll to bottom when the inserted messages landed at the front
+                    // (newest position) — covers both SwarmMessageReceived (fromHistory=false)
+                    // and reload-delivered new messages (fromHistory=true but newer).
+                    // For real-time messages (fromHistory=false), always scroll so the
+                    // notification-triggered message is shown even if a concurrent reload
+                    // batch already moved messagesModels.first to a newer position.
+                    let insertedAtFront = self.messagesModels.first?.id == newestIdAfterInsert
+                    if (insertedAtFront && self.atTheBottom) || isRealTimeMessage {
+                        self.scrollToTheBottom()
+                    }
                     // check if we have reply target to scroll to.
                     if let tempTarget = self.temporaryReplyTarget,
                        self.getMessage(messageId: tempTarget) != nil {
@@ -806,10 +822,27 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
             return container
         }
 
+        // Determine insertion point by comparing dates rather than relying solely on the
+        // fromHistory flag.  When reloadConversationsAndRequests delivers a batch that
+        // includes messages NEWER than what is already in messagesModels, those messages
+        // must go to index 0 (visual bottom in the flipped view) even though the batch
+        // arrived via the conversationLoaded (fromHistory=true) path.
+        let insertAtFront: Bool
         if fromHistory {
-            self.messagesModels.append(contentsOf: newContainers)
+            if let newNewest = newContainers.first?.message,
+               let currentNewest = self.messagesModels.first?.message {
+                insertAtFront = newNewest.receivedDate > currentNewest.receivedDate
+            } else {
+                insertAtFront = self.messagesModels.isEmpty  // empty list: prepend = append
+            }
         } else {
+            insertAtFront = true
+        }
+
+        if insertAtFront {
             self.messagesModels.insert(contentsOf: newContainers, at: 0)
+        } else {
+            self.messagesModels.append(contentsOf: newContainers)
         }
 
         updateLastMessageIfNeeded(fromHistory: fromHistory,

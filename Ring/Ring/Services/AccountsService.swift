@@ -662,6 +662,17 @@ class AccountsService: AccountAdapterDelegate {
     private func updateAccountDetails(account: AccountModel) {
         account.details = self.getAccountDetails(fromAccountId: account.id)
         account.volatileDetails = self.getVolatileAccountDetails(fromAccountId: account.id)
+        // Persist the registered name to UserDefaults.standard[registeredNamesKey] so the UI
+        // shows the real name immediately on the next cold start — before the daemon has had
+        // time to re-register with the name server (5–30 s).  resolveAccountName() reads this
+        // same key as its fallback between account.registeredName and account.jamiId.
+        if !account.registeredName.isEmpty {
+            var names = UserDefaults.standard.dictionary(forKey: registeredNamesKey) as? [String: String] ?? [:]
+            if names[account.id] != account.registeredName {
+                names[account.id] = account.registeredName
+                UserDefaults.standard.set(names, forKey: registeredNamesKey)
+            }
+        }
         account.devices = getKnownRingDevices(fromAccountId: account.id)
         do {
             let credentialDetails = try self.getAccountCredentials(fromAccountId: account.id)
@@ -699,6 +710,14 @@ class AccountsService: AccountAdapterDelegate {
                         event.addEventInput(.accountId, value: account.id)
                         self.responseStream.onNext(event)
                     }
+                } else if newState == .registered {
+                    // Fetch the latest volatile details so registeredName is persisted to
+                    // UserDefaults immediately (via updateAccountDetails).  Do NOT fire
+                    // currentAccountChanged here — doing so triggers reloadDataFor() which
+                    // calls conversations.accept([]) and clears the in-memory conversation
+                    // list, causing any in-flight messages to be silently dropped because
+                    // insertMessages() can no longer find the conversation model.
+                    self.updateAccountDetails(account: account)
                 }
             }
         }
@@ -783,7 +802,11 @@ class AccountsService: AccountAdapterDelegate {
                 notificationData[keyString] = valueString
             }
         }
-        self.accountAdapter.pushNotificationReceived("", message: notificationData)
+        // The raw push payload stores the target account ID under the "to" key.
+        // Passing the correct account ID lets the daemon find the right private key
+        // to decrypt the DHT value; passing "" may cause silent failures.
+        let accountId = notificationData["to"] ?? ""
+        self.accountAdapter.pushNotificationReceived(accountId, message: notificationData)
     }
 
     func setAccountsActive(active: Bool) {

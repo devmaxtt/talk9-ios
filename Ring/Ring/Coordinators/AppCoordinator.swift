@@ -73,6 +73,14 @@ final class AppCoordinator: Coordinator, StateableResponsive {
 
     private var initialState: InitialState = .notStarted
 
+    // Holds a notification-tap navigation that arrived before the main interface was ready.
+    private struct PendingNavigation {
+        let conversationId: String?
+        let participantId: String?
+        let accountId: String
+    }
+    private var pendingNavigation: PendingNavigation?
+
     init(injectionBag: InjectionBag) {
         self.injectionBag = injectionBag
         self.stateSubject
@@ -198,12 +206,28 @@ final class AppCoordinator: Coordinator, StateableResponsive {
     /// Presents the main interface
     private func showMainInterface () {
         if self.isConversationsPresented() {
+            processPendingNavigation()
             return
         }
         let conversationsCoordinator = ConversationsCoordinator(navigationController: self.navigationController, injectionBag: self.injectionBag)
         conversationsCoordinator.parentCoordinator = self
         self.addChildCoordinator(childCoordinator: conversationsCoordinator)
         conversationsCoordinator.start()
+        // Give the conversation list a moment to load from local storage before navigating.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            self?.processPendingNavigation()
+        }
+    }
+
+    private func processPendingNavigation() {
+        guard let pending = pendingNavigation,
+              let coordinator = conversationsCoordinator else { return }
+        pendingNavigation = nil
+        if let convId = pending.conversationId {
+            coordinator.openConversationFromNotification(conversationId: convId, accountId: pending.accountId)
+        } else if let participantId = pending.participantId {
+            coordinator.openConversationFromNotificationFor(participantId: participantId, accountId: pending.accountId)
+        }
     }
 
     private func isConversationsPresented() -> Bool {
@@ -222,6 +246,7 @@ extension AppCoordinator {
 
     func openConversation(participantID: String, accountId: String) {
         guard let conversationCoordinator = conversationsCoordinator else {
+            pendingNavigation = PendingNavigation(conversationId: nil, participantId: participantID, accountId: accountId)
             return
         }
         conversationCoordinator.openConversationFromNotificationFor(participantId: participantID, accountId: accountId)
@@ -236,6 +261,7 @@ extension AppCoordinator {
 
     func openConversation(conversationId: String, accountId: String) {
         guard let conversationCoordinator = conversationsCoordinator else {
+            pendingNavigation = PendingNavigation(conversationId: conversationId, participantId: nil, accountId: accountId)
             return
         }
         conversationCoordinator.openConversationFromNotification(conversationId: conversationId, accountId: accountId)

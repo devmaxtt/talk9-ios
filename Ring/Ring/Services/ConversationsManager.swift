@@ -742,12 +742,13 @@ extension  ConversationsManager: RequestsAdapterDelegate {
 extension ConversationsManager {
     private func cacheMessageForNotification(accountId: String, conversationId: String, authorId: String, body: String) {
         guard let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
+        let timestamp = Date().timeIntervalSince1970
         // Key by conversation — used when the extension knows the convId
         let convKey = Constants.talk9LastMessageKeyPrefix + accountId + "_" + conversationId
-        defaults.set(["body": body, "authorId": authorId], forKey: convKey)
+        defaults.set(["body": body, "authorId": authorId, "ts": timestamp], forKey: convKey)
         // Key by sender — fallback when extension doesn't receive a convId in the push payload
         let senderKey = Constants.talk9LastMessageKeyPrefix + "sender_" + accountId + "_" + authorId
-        defaults.set(body, forKey: senderKey)
+        defaults.set(["body": body, "ts": timestamp], forKey: senderKey)
     }
 }
 
