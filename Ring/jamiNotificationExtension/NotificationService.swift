@@ -450,6 +450,12 @@ class NotificationService: UNNotificationServiceExtension {
             })(peerId, "\(hasVideo)")
             return
         case .gitMessage(let convId, let peerId):
+            // No sender ID — nothing useful to show, suppress immediately.
+            guard !peerId.trimmingCharacters(in: .whitespaces).isEmpty else {
+                log("[Talk9-Notif] gitMessage: peerId is empty — suppressing notification")
+                finish()
+                return
+            }
             // Store sender ID so finish() can show a fallback notification if daemon sync times out
             self.pendingSenderId = peerId
             self.pendingConvId = convId
@@ -469,12 +475,16 @@ class NotificationService: UNNotificationServiceExtension {
             if !peerId.isEmpty {
                 // 1. Try local vCard first (fast, sync)
                 let localName = self.contactProfileName(accountId: self.accountId, contactId: peerId)
-                let displayName = localName ?? String(peerId.prefix(16))
-                self.bestAttemptContent.title = displayName
-                log("[Talk9-Notif] bestAttemptContent set: '\(displayName)' vCard=\(localName != nil)")
+                // Only set title if a real name exists — do NOT fall back to peerId hash.
+                // If title stays empty, finish() will suppress the notification entirely.
+                if let realName = localName {
+                    self.bestAttemptContent.title = realName
+                }
+                log("[Talk9-Notif] vCard name: \(localName ?? "none — waiting for nameserver")")
                 // 2. Try name server lookup (async, may find registered username)
                 self.lookupSenderName(peerId: peerId)
             }
+            // peerId empty → title stays empty → finish() suppresses
             self.handleGitMessage(convId: convId, loadAll: convId.isEmpty) // async
         case .clone:
             // Should start daemon and wait until clone completed
@@ -622,6 +632,12 @@ class NotificationService: UNNotificationServiceExtension {
                 bestAttemptContent.title = ""
                 bestAttemptContent.body = ""
                 log("[Talk9-Notif] finish: suppressing — no content (resubscribe / unknown decrypt)")
+            } else if bestAttemptContent.title.trimmingCharacters(in: .whitespaces).isEmpty {
+                // Body exists but title is empty — sender name couldn't be resolved.
+                // Suppress to avoid showing a notification with no sender name.
+                bestAttemptContent.title = ""
+                bestAttemptContent.body = ""
+                log("[Talk9-Notif] finish: suppressing — empty title (sender unresolved)")
             } else {
                 // bestAttemptContent was already updated in processMap (decrypt) and lookupSenderName
                 log("[Talk9-Notif] finish: title=\(bestAttemptContent.title) body=\(bestAttemptContent.body.prefix(40))")
@@ -792,9 +808,11 @@ extension NotificationService {
             for pending in pendingLocalNotifications where pending.key == address {
                 let notifications = pending.value
                 for notification in notifications {
-                    if let name = name {
-                        notification.content.title = name
+                    guard let name = name, !name.trimmingCharacters(in: .whitespaces).isEmpty else {
+                        log("[Talk9-Notif] lookupCompleted: no name resolved for \(address.prefix(8)) — suppressing")
+                        continue
                     }
+                    notification.content.title = name
                     presentLocalNotification(notification: notification)
                 }
                 pendingLocalNotifications.removeValue(forKey: address)
@@ -1054,9 +1072,8 @@ extension NotificationService {
         } else {
             content.title = self.bestName(accountId: self.accountId, contactId: config.from)
         }
-        if content.title.isEmpty {
-            content.title = config.from
-        }
+        // Do NOT fall back to config.from (peerId hash) — leave title empty so
+        // presentLocalNotification's guard suppresses it until a real name is resolved.
         return (content, type)
     }
 
@@ -1072,6 +1089,13 @@ extension NotificationService {
 
     private func presentLocalNotification(notification: LocalNotification) {
         let content = notification.content
+        // No title means we couldn't resolve the sender — suppress the notification.
+        guard !content.title.trimmingCharacters(in: .whitespaces).isEmpty else {
+            log("[Talk9-Notif] presentLocalNotification: suppressing — empty title")
+            self.taskPropertyQueue.sync { self.itemsToPresent -= 1 }
+            self.verifyTasksStatus()
+            return
+        }
         // Keep bestAttemptContent in sync so the contentHandler fallback also shows
         // the real sender name and message instead of the APNs placeholder "hello".
         self.bestAttemptContent.title = content.title

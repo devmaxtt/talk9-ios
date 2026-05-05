@@ -198,7 +198,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // responsive during the lengthy libjami::init() + start() calls (3-8 s on device).
         // All follow-up work that needs the daemon is queued inside the completion block
         // and dispatched back to the main thread once the daemon is ready.
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        // A 1-second delay lets the network stack settle (IPv4/IPv6 interface selection)
+        // before libjami begins TLS handshakes, preventing a use-after-free crash in
+        // ASIO's tls13_send_alert when IPv6 drops immediately after init.
+        DispatchQueue.global(qos: .userInitiated).asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
             self.startDaemon()
             self.setUpTestDataIfNeed()

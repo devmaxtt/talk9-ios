@@ -119,7 +119,9 @@ final class AppCoordinator: Coordinator, StateableResponsive {
         let view = AccountMigrationView(accountId: accountId,
                                         accountService: injectionBag.accountService,
                                         profileService: injectionBag.profileService,
-                                        onCompletion: nil)
+                                        onCompletion: { [weak self] _ in
+                                            self?.checkAccounts()
+                                        })
         let viewController = createHostingVC(view)
         self.present(viewController: viewController, withStyle: .replaceNavigationStack, withAnimation: true, withStateable: view.stateEmitter)
     }

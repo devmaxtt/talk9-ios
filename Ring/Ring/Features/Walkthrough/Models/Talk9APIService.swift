@@ -124,7 +124,7 @@ public final class Talk9APIService {
     public static let shared = Talk9APIService()
 
     /// Root of the Talk9 backend. Endpoints defined in API.md are appended to this.
-    public var baseURL: URL = URL(string: "https://talk9.co/")!
+    public var baseURL: URL = URL(string: "https://app.talk9.co/")!
 
     private let session: URLSession
     private let decoder: JSONDecoder
