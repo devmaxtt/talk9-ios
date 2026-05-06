@@ -460,16 +460,16 @@
 		26EFD7FC2E2EBA4500B63F74 /* Utils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 04399AAB1D1C304300E99CD9 /* Utils.mm */; };
 		26F5442D2C5815770069A7A4 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F5442C2C5815770069A7A4 /* WelcomeView.swift */; };
 		26F544A32C5AABD20069A7A4 /* CreateAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F544A22C5AABD20069A7A4 /* CreateAccountView.swift */; };
-		2AF9000000000000000000B1 /* Talk9APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF9000000000000000000A1 /* Talk9APIService.swift */; };
-		2AF9000000000000000000B2 /* RegisterVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF9000000000000000000A2 /* RegisterVM.swift */; };
-		2AF9000000000000000000B3 /* ResetPasswordVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF9000000000000000000A3 /* ResetPasswordVM.swift */; };
-		2AF9000000000000000000B4 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF9000000000000000000A4 /* RegisterView.swift */; };
-		2AF9000000000000000000B5 /* ResetPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF9000000000000000000A5 /* ResetPasswordView.swift */; };
 		26F82D042D7A09AF00954A7B /* libnatpmp.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F82D032D7A09AE00954A7B /* libnatpmp.xcframework */; };
 		26F82D062D7A09C300954A7B /* libnatpmp.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26F82D032D7A09AE00954A7B /* libnatpmp.xcframework */; };
 		26FDF4192C1101C2009D036B /* JamiBaseUITest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26FDF4182C1101C2009D036B /* JamiBaseUITest.swift */; };
 		26FDF43D2C1353A9009D036B /* AccountSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26FDF43C2C1353A9009D036B /* AccountSummaryView.swift */; };
 		26FDF43F2C1353BA009D036B /* AccountSummaryVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26FDF43E2C1353BA009D036B /* AccountSummaryVM.swift */; };
+		2AF9000000000000000000B1 /* Talk9APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF9000000000000000000A1 /* Talk9APIService.swift */; };
+		2AF9000000000000000000B2 /* RegisterVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF9000000000000000000A2 /* RegisterVM.swift */; };
+		2AF9000000000000000000B3 /* ResetPasswordVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF9000000000000000000A3 /* ResetPasswordVM.swift */; };
+		2AF9000000000000000000B4 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF9000000000000000000A4 /* RegisterView.swift */; };
+		2AF9000000000000000000B5 /* ResetPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF9000000000000000000A5 /* ResetPasswordView.swift */; };
 		3D0E697A2DDCD9C80046FA3D /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0E69792DDCD9C80046FA3D /* ShareViewController.swift */; };
 		3D0E69812DDCD9C80046FA3D /* jamiShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 3D0E69772DDCD9C80046FA3D /* jamiShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3D0E69882DDCDBE70046FA3D /* ShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0E69872DDCDBE70046FA3D /* ShareView.swift */; };
@@ -592,6 +592,9 @@
 		6661C73A216D2EA300E48D94 /* Gif+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6661C739216D2EA300E48D94 /* Gif+Helpers.swift */; };
 		66ACB430214AE28C00A94162 /* ScanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66ACB42F214AE28C00A94162 /* ScanViewController.swift */; };
 		66F295DE2166A5930044ED6F /* Devices+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66F295DD2166A5930044ED6F /* Devices+Helpers.swift */; };
+		92E961142FA9A686008F2B54 /* BroadcastComposeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92E961102FA9A686008F2B54 /* BroadcastComposeView.swift */; };
+		92E961152FA9A686008F2B54 /* BroadcastViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92E961122FA9A686008F2B54 /* BroadcastViewModel.swift */; };
+		92E961162FA9A686008F2B54 /* BroadcastContactPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92E961112FA9A686008F2B54 /* BroadcastContactPickerView.swift */; };
 		AA0001020000000000000001 /* PhotoLibrarySaving.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0001010000000000000001 /* PhotoLibrarySaving.swift */; };
 		AA0002020000000000000002 /* MockPhotoLibrarySaver.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0002010000000000000002 /* MockPhotoLibrarySaver.swift */; };
 		AA0003020000000000000003 /* MediaPreviewModelSaveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0003010000000000000003 /* MediaPreviewModelSaveTests.swift */; };
@@ -1127,16 +1130,16 @@
 		26EFD8012E2ED72400B63F74 /* ObjcTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ObjcTypes.h; sourceTree = "<group>"; };
 		26F5442C2C5815770069A7A4 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		26F544A22C5AABD20069A7A4 /* CreateAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateAccountView.swift; sourceTree = "<group>"; };
-		2AF9000000000000000000A1 /* Talk9APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Talk9APIService.swift; sourceTree = "<group>"; };
-		2AF9000000000000000000A2 /* RegisterVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterVM.swift; sourceTree = "<group>"; };
-		2AF9000000000000000000A3 /* ResetPasswordVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetPasswordVM.swift; sourceTree = "<group>"; };
-		2AF9000000000000000000A4 /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
-		2AF9000000000000000000A5 /* ResetPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetPasswordView.swift; sourceTree = "<group>"; };
 		26F5E11A26F91D98001BECCE /* NotificationService-release.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "NotificationService-release.entitlements"; sourceTree = "<group>"; };
 		26F82D032D7A09AE00954A7B /* libnatpmp.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libnatpmp.xcframework; path = ../xcframework/libnatpmp.xcframework; sourceTree = "<group>"; };
 		26FDF4182C1101C2009D036B /* JamiBaseUITest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamiBaseUITest.swift; sourceTree = "<group>"; };
 		26FDF43C2C1353A9009D036B /* AccountSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSummaryView.swift; sourceTree = "<group>"; };
 		26FDF43E2C1353BA009D036B /* AccountSummaryVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSummaryVM.swift; sourceTree = "<group>"; };
+		2AF9000000000000000000A1 /* Talk9APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Talk9APIService.swift; sourceTree = "<group>"; };
+		2AF9000000000000000000A2 /* RegisterVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterVM.swift; sourceTree = "<group>"; };
+		2AF9000000000000000000A3 /* ResetPasswordVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetPasswordVM.swift; sourceTree = "<group>"; };
+		2AF9000000000000000000A4 /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
+		2AF9000000000000000000A5 /* ResetPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetPasswordView.swift; sourceTree = "<group>"; };
 		3D0E69772DDCD9C80046FA3D /* jamiShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = jamiShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D0E69792DDCD9C80046FA3D /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		3D0E697E2DDCD9C80046FA3D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1817,6 +1820,9 @@
 		6661C739216D2EA300E48D94 /* Gif+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Gif+Helpers.swift"; sourceTree = "<group>"; };
 		66ACB42F214AE28C00A94162 /* ScanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanViewController.swift; sourceTree = "<group>"; };
 		66F295DD2166A5930044ED6F /* Devices+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Devices+Helpers.swift"; sourceTree = "<group>"; };
+		92E961102FA9A686008F2B54 /* BroadcastComposeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BroadcastComposeView.swift; sourceTree = "<group>"; };
+		92E961112FA9A686008F2B54 /* BroadcastContactPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BroadcastContactPickerView.swift; sourceTree = "<group>"; };
+		92E961122FA9A686008F2B54 /* BroadcastViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BroadcastViewModel.swift; sourceTree = "<group>"; };
 		AA0001010000000000000001 /* PhotoLibrarySaving.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibrarySaving.swift; sourceTree = "<group>"; };
 		AA0002010000000000000002 /* MockPhotoLibrarySaver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockPhotoLibrarySaver.swift; sourceTree = "<group>"; };
 		AA0003010000000000000003 /* MediaPreviewModelSaveTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPreviewModelSaveTests.swift; sourceTree = "<group>"; };
@@ -3176,6 +3182,7 @@
 		1A2D18A71F290FAA00B2C785 /* Conversations */ = {
 			isa = PBXGroup;
 			children = (
+				92E961132FA9A686008F2B54 /* Broadcast */,
 				26EC6EF32DE0E7B9000BA551 /* ActiveCalls */,
 				26074FD524F7FF5B00374570 /* Preview */,
 				0E5806F123BE42C8007D1F5D /* views */,
@@ -3801,6 +3808,16 @@
 			path = QRCode;
 			sourceTree = "<group>";
 		};
+		92E961132FA9A686008F2B54 /* Broadcast */ = {
+			isa = PBXGroup;
+			children = (
+				92E961102FA9A686008F2B54 /* BroadcastComposeView.swift */,
+				92E961112FA9A686008F2B54 /* BroadcastContactPickerView.swift */,
+				92E961122FA9A686008F2B54 /* BroadcastViewModel.swift */,
+			);
+			path = Broadcast;
+			sourceTree = "<group>";
+		};
 		BB1E8C6B29159DDE005AE1D6 /* SwarmInfo */ = {
 			isa = PBXGroup;
 			children = (
@@ -4200,6 +4217,9 @@
 				267B95FB2C2B5FFA00353B01 /* RevocationView.swift in Sources */,
 				268309682F6ADAB800B1AA8A /* MediaPreviewState.swift in Sources */,
 				1AABA7461F0FE9C000739605 /* UIColor+Ring.swift in Sources */,
+				92E961142FA9A686008F2B54 /* BroadcastComposeView.swift in Sources */,
+				92E961152FA9A686008F2B54 /* BroadcastViewModel.swift in Sources */,
+				92E961162FA9A686008F2B54 /* BroadcastContactPickerView.swift in Sources */,
 				267B958C2C24793500353B01 /* ManageSipAccountView.swift in Sources */,
 				1A5DC0201F355DCF0075E8EF /* ContactsService.swift in Sources */,
 				26A5CE3B26BD00E700E147EA /* Array+Helper.swift in Sources */,

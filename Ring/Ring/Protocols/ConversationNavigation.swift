@@ -21,6 +21,7 @@
 
 import RxSwift
 import RxRelay
+import SwiftUI
 
 enum ConversationState: State {
     case startCall(contactRingId: String, userName: String)
@@ -30,6 +31,7 @@ enum ConversationState: State {
     case contactDetail(conversationViewModel: ConversationModel)
     case qrCode
     case createSwarm
+    case broadcastMessage
     case createNewAccount
     case showDialpad(inCall: Bool)
     case recordFile(conversation: ConversationModel, audioOnly: Bool)
@@ -77,6 +79,8 @@ extension ConversationNavigation where Self: Coordinator, Self: StateableRespons
                     self.openQRCode()
                 case .createSwarm:
                     self.createSwarm()
+                case .broadcastMessage:
+                    self.openBroadcastMessage()
                 case .recordFile(let conversation, let audioOnly):
                     self.openRecordFile(conversation: conversation, audioOnly: audioOnly)
                 case .navigateToCall(let call):
@@ -127,6 +131,21 @@ extension ConversationNavigation where Self: Coordinator, Self: StateableRespons
                      withStyle: .show,
                      withAnimation: true,
                      withStateable: swarmCreationViewController.viewModel)
+    }
+
+    func openBroadcastMessage() {
+        let broadcastVM = BroadcastViewModel(injectionBag: self.injectionBag)
+        let view = BroadcastContactPickerView(viewModel: broadcastVM)
+        let hostingVC = UIHostingController(rootView: view)
+        self.present(viewController: hostingVC,
+                     withStyle: .show,
+                     withAnimation: true,
+                     disposeBag: self.disposeBag)
+        // Pop back to SmartList after send succeeds (1.5 s toast delay handled in VM)
+        broadcastVM.onSendSuccess = { [weak hostingVC] in
+            guard let nav = hostingVC?.navigationController else { return }
+            nav.popToRootViewController(animated: true)
+        }
     }
 
     func presentContactInfo(conversation: ConversationModel) {

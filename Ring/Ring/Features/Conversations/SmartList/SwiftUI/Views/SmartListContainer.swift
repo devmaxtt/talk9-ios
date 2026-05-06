@@ -209,6 +209,7 @@ struct SmartListView: View, StateEmittingView {
         Menu {
             if !model.isSipAccount() {
                 createSwarmButton
+                broadcastMessageButton
                 if #available(iOS 16.0, *) {
                     shareLinkButton
                 }
@@ -242,6 +243,16 @@ struct SmartListView: View, StateEmittingView {
             stateEmitter.createSwarm()
         }, label: {
             Label(L10n.Swarm.newGroup, systemImage: "person.2")
+        })
+    }
+
+    private var broadcastMessageButton: some View {
+        Button(action: { [weak stateEmitter] in
+            if showAccountList { toggleAccountList() }
+            guard let stateEmitter = stateEmitter else { return }
+            stateEmitter.broadcastMessage()
+        }, label: {
+            Label("Broadcast Message", systemImage: "megaphone")
         })
     }
 

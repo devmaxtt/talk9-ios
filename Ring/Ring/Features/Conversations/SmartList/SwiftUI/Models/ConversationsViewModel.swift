@@ -41,6 +41,10 @@ class ConversationStatePublisher: StatePublisher<ConversationState> {
         self.stateSubject.onNext(ConversationState.createSwarm)
     }
 
+    func broadcastMessage() {
+        self.stateSubject.onNext(ConversationState.broadcastMessage)
+    }
+
     func scanQRCode() {
         self.stateSubject.onNext(ConversationState.qrCode)
     }
