@@ -1164,6 +1164,7 @@ extension AccountsService {
         if let sharedDefaults = UserDefaults(suiteName: Constants.appGroupIdentifier) {
             sharedDefaults.set(accountId, forKey: Constants.selectedAccountID)
         }
+
         return nil
     }
 

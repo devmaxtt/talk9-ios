@@ -76,6 +76,8 @@ struct MessagesListView: View {
     @SwiftUI.State private var dotCount = 0
     private let timer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
 
+    @SwiftUI.State private var showResetConfirmation = false
+
     init(model: MessagesListVM) {
         self.model = model
         self.callBannerViewModel = model.callBannerViewModel
@@ -384,13 +386,34 @@ struct MessagesListView: View {
     }
 
     func syncView() -> some View {
-        VStack {
+        VStack(spacing: 12) {
             Text(model.syncMessage)
                 .frame(maxWidth: .infinity)
                 .multilineTextAlignment(.center)
+            Text("If this takes too long, you can reset the conversation.")
+                .font(.footnote)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity)
+                .multilineTextAlignment(.center)
+            Button(action: {
+                showResetConfirmation = true
+            }, label: {
+                Text("Reset Conversation")
+                    .foregroundColor(.red)
+            })
         }
         .padding()
         .background(Color(UIColor.secondarySystemBackground))
+        .alert(isPresented: $showResetConfirmation) {
+            Alert(
+                title: Text("Reset Conversation"),
+                message: Text("This will remove the local conversation and resend a contact request. Any unsynced history will be lost."),
+                primaryButton: .destructive(Text("Reset")) {
+                    model.resetConversation()
+                },
+                secondaryButton: .cancel()
+            )
+        }
     }
 
     func blockView() -> some View {

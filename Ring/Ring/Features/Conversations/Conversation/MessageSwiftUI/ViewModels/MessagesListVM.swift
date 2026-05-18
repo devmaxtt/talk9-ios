@@ -503,6 +503,18 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
                                        withFlag: true)
     }
 
+    /// Called by ConversationViewModel to navigate back after a successful reset.
+    var onResetConversation: (() -> Void)?
+
+    func resetConversation() {
+        guard let jamiId = conversation.getParticipants().first?.jamiId else { return }
+        let accountId = conversation.accountId
+        let conversationId = conversation.id
+        conversationService.removeConversation(conversationId: conversationId, accountId: accountId)
+        contactsService.sendContactRequest(jamiId: jamiId, accountId: accountId)
+        onResetConversation?()
+    }
+
     func subscribeBestName(bestName: Observable<String>) {
         self.messagePanel.subscribeBestName(bestName: bestName)
     }

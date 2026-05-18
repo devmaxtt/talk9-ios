@@ -224,6 +224,7 @@ class NotificationService: UNNotificationServiceExtension {
     private let notificationCenter = CFNotificationCenterGetDarwinNotifyCenter()
     private var contentHandler: ((UNNotificationContent) -> Void)?
     private var bestAttemptContent = UNMutableNotificationContent()
+    private var requestIdentifier: String = ""
 
     // All asynchronous tasks are managed using the AutoDispatchGroup which tracks tasks using
     // IDs. Both the streaming and Jami backend tasks will be waited upon using this group.
@@ -254,6 +255,18 @@ class NotificationService: UNNotificationServiceExtension {
     // message was already treated (processed by another extension instance) — suppress.
     private var didStartDaemon = false
 
+    // Set to true for pushes that must never show any notification (resubscribe, app active).
+    // When false and decryption fails, we fall back to the original APNs "New message" title
+    // instead of delivering a blank no-title notification.
+    private var shouldSuppressCompletely = false
+
+    // Set to true when decrypt yields a real message type (.gitMessage / .call / .clone).
+    // If false at finish(), the push was for a non-message DHT event (typing indicator,
+    // read receipt, sync metadata, etc.) or an already-consumed message. Server cannot
+    // filter these because `pt` field in OpenDHT push payload is always empty — they
+    // have no DHT value type info. iOS must suppress to avoid spam from server placeholder.
+    private var decryptYieldedRealMessage = false
+
     // Sender info extracted from decrypt, used as fallback when daemon sync times out
     private var pendingSenderId: String = ""
     private var pendingConvId: String = ""
@@ -281,11 +294,19 @@ class NotificationService: UNNotificationServiceExtension {
     // Entry point for processing incoming notification requests.
     override func didReceive(_ request: UNNotificationRequest, withContentHandler contentHandler: @escaping (UNNotificationContent) -> Void) {
         self.contentHandler = contentHandler
-        // Default to empty content so any crash or timeout shows nothing instead of the
-        // raw APNs placeholder "hello". Real content is filled in by processMap / presentLocalNotification.
-        self.bestAttemptContent = UNMutableNotificationContent()
+        self.requestIdentifier = request.identifier
+        // Start with the original APNs content so failed-decrypt cases fall back to
+        // "New message" instead of a blank no-title notification.
+        self.bestAttemptContent = (request.content.mutableCopy() as? UNMutableNotificationContent)
+            ?? UNMutableNotificationContent()
         setupNotificationExtensionQueryListener()
-        log("didReceive called — userInfo keys: \(request.content.userInfo.keys.map { String(describing: $0) })")
+
+        let userInfoKeys = request.content.userInfo.keys.map { String(describing: $0) }.sorted()
+        NSLog("[Talk9-Push] ▶ didReceive id=%@ keys=%@", request.identifier, userInfoKeys.joined(separator: ","))
+        // Log the raw aps alert so we can see what the server actually sends
+        if let aps = request.content.userInfo["aps"] as? [String: Any] {
+            NSLog("[Talk9-Push]   aps=%@", aps.description)
+        }
 
         Task {
             self.processNotificationRequest(request)
@@ -297,36 +318,40 @@ class NotificationService: UNNotificationServiceExtension {
     // Handles the initial processing of the notification request.
     private func processNotificationRequest(_ request: UNNotificationRequest) {
         let requestData = requestToDictionary(request: request)
-        log("requestData keys: \(requestData.keys.sorted()), to=\(requestData["to"] ?? "NIL")")
         guard !requestData.isEmpty,
               let accountId = requestData[NotificationField.accountId.rawValue] else {
-            log("FAIL: requestData empty or 'to' field missing")
+            NSLog("[Talk9-Push] ✗ SKIP — requestData empty or 'to' missing")
             return
         }
 
-        // Save notification data so the main app can call pushNotificationReceived when it wakes.
+        let hasTimeout = requestData["timeout"] != nil && requestData["timeout"] != "<null>"
+        let convId     = requestData["conversation_id"] ?? requestData["convId"] ?? ""
+        let from       = requestData["from"] ?? ""
+        NSLog("[Talk9-Push]   to=%@ from=%@ convId=%@ timeout=%@",
+              String(accountId.prefix(8)), String(from.prefix(16)),
+              String(convId.prefix(8)), hasTimeout ? (requestData["timeout"] ?? "") : "no")
+
         saveDataIfNeeded(data: requestData)
 
         if appIsActive() {
-            // App is in foreground — it will handle this push via handleNotification() /
-            // pushNotificationReceived().  Extension must NOT show a banner here; doing so
-            // would duplicate the in-app message delivery and create notification spam.
-            log("[Talk9-Notif] App is active — deferring to main app, suppressing banner")
+            NSLog("[Talk9-Push] ✗ SKIP — app is active (in-app will handle)")
+            shouldSuppressCompletely = true
             return
         }
 
         guard !shareExtensionHasAccountActive(accountId: accountId) else {
-            log("Share extension has this account active")
+            NSLog("[Talk9-Push] ✗ SKIP — share extension active")
+            shouldSuppressCompletely = true
             return
         }
 
         guard !isResubscribe(accountId: accountId, data: requestData) else {
-            log("This is a resubscribe notification")
+            NSLog("[Talk9-Push] ✗ SKIP — resubscribe (timeout=%@)", requestData["timeout"] ?? "")
+            shouldSuppressCompletely = true
             return
         }
 
-        log("Handling new notification (app in background)")
-
+        NSLog("[Talk9-Push] ✓ PROCESS — app in background, starting stream")
         self.accountId = accountId
         self.originalNotificationData = requestData
         prepareAndStartStreaming(for: request, with: requestData)
@@ -389,16 +414,27 @@ class NotificationService: UNNotificationServiceExtension {
 
     // Processes each line received from the data stream.
     private func processStreamLine(_ line: String, with request: UNNotificationRequest, keyURL: URL, treatedMessagesURL: URL) {
+        NSLog("[Talk9-Push]   stream line bytes=%@", "\(line.utf8.count)")
         do {
             guard let jsonData = line.data(using: .utf8),
                   let map = try JSONSerialization.jsonObject(with: jsonData, options: .allowFragments) as? [String: Any],
                   let id = map["id"] as? String,
                   map["cypher"] != nil else {
+                NSLog("[Talk9-Push]   ✗ stream line invalid (no id/cypher) preview=%@", String(line.prefix(120)))
                 log("Line doesn't contain a valid schema")
                 return
             }
+            let cypherLen: Int = {
+                if let c = map["cypher"] as? String { return c.count }
+                if let c = map["cypher"] as? [Any] { return c.count }
+                return -1
+            }()
+            let mapKeys = map.keys.sorted().joined(separator: ",")
+            NSLog("[Talk9-Push]   stream entry id=%@ cypher_len=%@ keys=%@",
+                  String(id.prefix(12)), "\(cypherLen)", mapKeys)
 
             guard idsToProcess.contains(id) || processAll else {
+                NSLog("[Talk9-Push]   ✗ id not in idsToProcess: %@", String(id.prefix(12)))
                 log("Skipping line; ID is not in the list: \(id)")
                 return
             }
@@ -416,11 +452,20 @@ class NotificationService: UNNotificationServiceExtension {
     }
 
     private func processMap(map: [String: Any], keyURL: URL, treatedMessagesURL: URL, userInfo: [AnyHashable: Any]) {
-        log("[Talk9-Notif] decrypt: keyPath=\(keyURL.path) accountId=\(self.accountId) keyExists=\(FileManager.default.fileExists(atPath: keyURL.path))")
+        let keyExists = FileManager.default.fileExists(atPath: keyURL.path)
+        let treatedExists = FileManager.default.fileExists(atPath: treatedMessagesURL.path)
+        let mapKeys = map.keys.sorted().joined(separator: ",")
+        NSLog("[Talk9-Push]   ▸ decrypt call: acctId=%@ keyExists=%@ treatedExists=%@ mapKeys=%@",
+              String(self.accountId.prefix(12)),
+              keyExists ? "Y" : "N",
+              treatedExists ? "Y" : "N",
+              mapKeys)
+        log("[Talk9-Notif] decrypt: keyPath=\(keyURL.path) accountId=\(self.accountId) keyExists=\(keyExists)")
         let result = adapterService.decrypt(keyPath: keyURL.path, accountId: self.accountId, messagesPath: treatedMessagesURL.path, value: map)
-        log("Notification type: \(result)")
+        NSLog("[Talk9-Push]   decrypt result=%@", String(describing: result))
         switch result {
         case .call(let peerId, let hasVideo):
+            self.decryptYieldedRealMessage = true
             ({ [weak self] (peerId, hasVideo) in
                 guard let self = self else {
                     return
@@ -456,6 +501,7 @@ class NotificationService: UNNotificationServiceExtension {
                 finish()
                 return
             }
+            self.decryptYieldedRealMessage = true
             // Store sender ID so finish() can show a fallback notification if daemon sync times out
             self.pendingSenderId = peerId
             self.pendingConvId = convId
@@ -487,10 +533,14 @@ class NotificationService: UNNotificationServiceExtension {
             // peerId empty → title stays empty → finish() suppresses
             self.handleGitMessage(convId: convId, loadAll: convId.isEmpty) // async
         case .clone:
+            self.decryptYieldedRealMessage = true
             // Should start daemon and wait until clone completed
             self.taskPropertyQueue.sync { self.waitForCloning = true }
             self.handleGitMessage(convId: "", loadAll: false) // async
         case .unknown:
+            // Daemon could not classify this DHT value (returns nil or unknown type).
+            // Likely a non-message event (typing/receipt/sync) or already-consumed
+            // message. decryptYieldedRealMessage stays false → finish() will suppress.
             break
         }
     }
@@ -611,40 +661,107 @@ class NotificationService: UNNotificationServiceExtension {
         self.httpStreamHandler.cancelStreaming()
         if let contentHandler = contentHandler {
             if didPresentLocalNotification {
-                // Real notification already shown via UNUserNotificationCenter — suppress APNs duplicate
-                bestAttemptContent.title = ""
-                bestAttemptContent.body = ""
-                log("[Talk9-Notif] finish: local notif shown, suppressing APNs duplicate")
+                NSLog("[Talk9-Push] ✓ SHOW  title='%@' body='%@'",
+                      bestAttemptContent.title, String(bestAttemptContent.body.prefix(60)))
             } else if didStartDaemon {
-                // Daemon ran but showed nothing — message was already treated by another
-                // extension instance. Suppress to prevent a duplicate "New message" banner.
-                bestAttemptContent.title = ""
-                bestAttemptContent.body = ""
-                log("[Talk9-Notif] finish: daemon ran but no notification shown — suppressing duplicate")
-            } else if bestAttemptContent.body.isEmpty {
-                // No content was produced (resubscribe, failed URL lookups, unknown decrypt type, etc.).
-                // iOS only falls back to the raw APNs "hello" when the extension CRASHES or TIMES OUT
-                // without calling contentHandler.  When we call contentHandler ourselves — even with
-                // completely empty title + body — iOS uses our empty content and shows nothing
-                // (no banner, no sound).  Using a space here was wrong: it caused iOS to display a
-                // silent "Talk9" banner with an invisible body.  Leave both empty so iOS suppresses
-                // the banner entirely.
-                bestAttemptContent.title = ""
-                bestAttemptContent.body = ""
-                log("[Talk9-Notif] finish: suppressing — no content (resubscribe / unknown decrypt)")
+                NSLog("[Talk9-Push] ✗ SUPPRESS — daemon ran, already treated by another instance")
+                removeOldSuppressedNotifications()
+                contentHandler(makeSuppressedContent())
+                scheduleRemoval(identifier: requestIdentifier)
+                scheduleAutoRemove(identifier: requestIdentifier, after: 5.0)
+                return
+            } else if shouldSuppressCompletely {
+                // Resubscribe or app-active — must show nothing at all
+                NSLog("[Talk9-Push] ✗ SUPPRESS — resubscribe / app active")
+                removeOldSuppressedNotifications()
+                contentHandler(makeSuppressedContent())
+                scheduleRemoval(identifier: requestIdentifier)
+                scheduleAutoRemove(identifier: requestIdentifier, after: 5.0)
+                return
+            } else if !decryptYieldedRealMessage {
+                // Non-message DHT event (typing/receipt/sync) or already-consumed message.
+                // Server cannot filter (pt field empty in OpenDHT). Apple doesn't allow
+                // true suppression of alert pushes — if we pass empty title/body, iOS
+                // falls back to the original APNs alert payload (server placeholder).
+                // Workaround: see makeSuppressedContent().
+                NSLog("[Talk9-Push] ✗ SUPPRESS — decrypt yielded no real message (non-message DHT event)")
+                removeOldSuppressedNotifications()
+                contentHandler(makeSuppressedContent())
+                scheduleRemoval(identifier: requestIdentifier)
+                scheduleAutoRemove(identifier: requestIdentifier, after: 5.0)
+                return
             } else if bestAttemptContent.title.trimmingCharacters(in: .whitespaces).isEmpty {
-                // Body exists but title is empty — sender name couldn't be resolved.
-                // Suppress to avoid showing a notification with no sender name.
-                bestAttemptContent.title = ""
-                bestAttemptContent.body = ""
-                log("[Talk9-Notif] finish: suppressing — empty title (sender unresolved)")
+                // Extension ran but couldn't decrypt or resolve sender name.
+                // Show a generic notification so the user knows there's a new message —
+                // they can tap to open the app and see the real content in chat.
+                bestAttemptContent.title = "Talk9"
+                bestAttemptContent.body = "New message"
+                NSLog("[Talk9-Push] ⚠ FALLBACK — generic 'New message' (decrypt failed)")
             } else {
-                // bestAttemptContent was already updated in processMap (decrypt) and lookupSenderName
-                log("[Talk9-Notif] finish: title=\(bestAttemptContent.title) body=\(bestAttemptContent.body.prefix(40))")
+                // Has title (real sender name OR fallback "New message" from APNs)
+                NSLog("[Talk9-Push] ✓ SHOW  title='%@' body='%@'",
+                      bestAttemptContent.title, String(bestAttemptContent.body.prefix(60)))
             }
             contentHandler(self.bestAttemptContent)
         }
-        log("Finished handling notification")
+        NSLog("[Talk9-Push] ◀ finish done id=%@", requestIdentifier)
+    }
+
+    /// Builds the minimal-visibility content used by all suppress paths.
+    /// Single-space title prevents iOS from falling back to the original APNs alert.
+    /// Passive interruption + zero relevance + shared threadIdentifier collapse
+    /// repeated suppressed notifications into a single group in the notification center.
+    private func makeSuppressedContent() -> UNMutableNotificationContent {
+        let content = UNMutableNotificationContent()
+        content.title = " "
+        content.body = ""
+        content.threadIdentifier = "talk9.suppressed"
+        if #available(iOS 15.0, *) {
+            content.interruptionLevel = .passive
+            content.relevanceScore = 0
+        }
+        return content
+    }
+
+    /// Removes any previously-delivered suppressed notifications before a new one
+    /// is shown. threadIdentifier alone groups but does NOT replace — iOS keeps each
+    /// card individually on the lock screen. Explicitly removing the older ones
+    /// ensures only the latest empty card remains visible.
+    private func removeOldSuppressedNotifications() {
+        let semaphore = DispatchSemaphore(value: 0)
+        UNUserNotificationCenter.current().getDeliveredNotifications { notifications in
+            let oldIds = notifications
+                .filter { $0.request.content.threadIdentifier == "talk9.suppressed" }
+                .map { $0.request.identifier }
+            if !oldIds.isEmpty {
+                UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: oldIds)
+            }
+            semaphore.signal()
+        }
+        _ = semaphore.wait(timeout: .now() + 0.5)
+    }
+
+    /// Best-effort: schedule the just-delivered suppressed notification to be removed
+    /// after a short delay. Not guaranteed to fire — iOS may terminate the extension
+    /// before the timer elapses. When it does fire, the empty card disappears from
+    /// the lock screen and notification center, giving a "self-cleanup" feel.
+    private func scheduleAutoRemove(identifier: String, after seconds: TimeInterval) {
+        DispatchQueue.global().asyncAfter(deadline: .now() + seconds) {
+            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [identifier])
+        }
+    }
+
+    /// Stores an APNs notification identifier in shared UserDefaults so the main app
+    /// can call removeDeliveredNotifications when it becomes active.
+    /// The extension process may be killed before async removal completes, so we
+    /// delegate the actual removal to the main app which has a stable lifecycle.
+    private func scheduleRemoval(identifier: String) {
+        guard let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
+        var pending = defaults.stringArray(forKey: Constants.pendingNotificationRemovalKey) ?? []
+        if !pending.contains(identifier) {
+            pending.append(identifier)
+        }
+        defaults.set(pending, forKey: Constants.pendingNotificationRemovalKey)
     }
 
     private func appIsActive() -> Bool {

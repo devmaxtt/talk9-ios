@@ -406,6 +406,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     func sceneDidBecomeActive() {
         self.clearBadgeNumber()
+        self.removePendingNotifications()
         guard let account = self.accountService.currentAccount else { return }
         self.presenceService.subscribeBuddies(withAccount: account.id, withContacts: self.contactsService.contacts.value, subscribe: true)
         self.startConnectionTimers()
@@ -878,6 +879,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 }
             })
         }
+    }
+
+    private func removePendingNotifications() {
+        guard let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
+        let pending = defaults.stringArray(forKey: Constants.pendingNotificationRemovalKey) ?? []
+        guard !pending.isEmpty else { return }
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: pending)
+        defaults.removeObject(forKey: Constants.pendingNotificationRemovalKey)
     }
 
     private func clearBadgeNumber() {

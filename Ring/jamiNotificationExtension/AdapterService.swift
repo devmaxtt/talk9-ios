@@ -112,9 +112,17 @@ class AdapterService {
 
     func decrypt(keyPath: String, accountId: String, messagesPath: String, value: [String: Any]) -> PeerConnectionRequestType {
         if self.adapter == nil {
+            NSLog("[Talk9-Push]   ⚠ decrypt: adapter is nil")
             return .unknown
         }
         let result = adapter.decrypt(keyPath, accountId: accountId, treated: messagesPath, value: value)
+        if result == nil {
+            NSLog("[Talk9-Push]   decrypt raw: nil (daemon returned nothing)")
+        } else if let r = result, r.isEmpty {
+            NSLog("[Talk9-Push]   decrypt raw: empty-dict")
+        } else if let peer = result?.keys.first, let type = result?.values.first {
+            NSLog("[Talk9-Push]   decrypt raw: peer=%@ type=%@", String(peer.prefix(16)), "\(type)")
+        }
         guard let peerId = result?.keys.first,
               let type = result?.values.first else {
             return .unknown}

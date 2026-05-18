@@ -115,6 +115,7 @@ public struct Talk9OTPSession {
     public let maskedPhone: String
 }
 
+
 // MARK: - Service
 
 /// Networking wrapper around the Talk9 registration / reset password REST API.
@@ -222,6 +223,53 @@ public final class Talk9APIService {
             throw Talk9APIError.decoding
         }
         return Talk9OTPSession(token: token, maskedPhone: masked)
+    }
+
+    // MARK: Mobile Profile
+
+    /// Fetches mobileNumber from JAMS and stores it in UserDefaults. Silent on failure.
+    public func fetchAndStoreMobileNumber(username: String, password: String) async {
+        do {
+            let mobile = try await fetchMobileNumber(username: username, password: password)
+            let key = "talk9_registered_phone_\(username)"
+            UserDefaults.standard.set(mobile, forKey: key)
+            NSLog("[Talk9-Profile] Stored key='%@' value='%@'", key, mobile)
+        } catch {
+            NSLog("[Talk9-Profile] FAILED for username='%@' error=%@", username, error.localizedDescription)
+        }
+    }
+
+    private func fetchMobileNumber(username: String, password: String) async throws -> String {
+        // Step 1: POST /api/login with JSON body → access_token
+        guard let loginURL = URL(string: "api/login", relativeTo: baseURL) else {
+            throw Talk9APIError.network("Invalid login URL")
+        }
+        var loginRequest = URLRequest(url: loginURL)
+        loginRequest.httpMethod = "POST"
+        loginRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        loginRequest.timeoutInterval = 10
+        loginRequest.httpBody = try encoder.encode(["username": username, "password": password])
+
+        let (loginData, _) = try await performRequest(loginRequest)
+        guard let loginJSON = try? JSONSerialization.jsonObject(with: loginData) as? [String: Any],
+              let accessToken = loginJSON["access_token"] as? String, !accessToken.isEmpty else {
+            throw Talk9APIError.decoding
+        }
+
+        // Step 2: GET /api/auth/userprofile/{username} → mobileNumber
+        guard let profileURL = URL(string: "api/auth/userprofile/\(username)", relativeTo: baseURL) else {
+            throw Talk9APIError.network("Invalid profile URL")
+        }
+        var profileRequest = URLRequest(url: profileURL)
+        profileRequest.httpMethod = "GET"
+        profileRequest.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        profileRequest.timeoutInterval = 10
+
+        let (profileData, _) = try await performRequest(profileRequest)
+        guard let profileJSON = try? JSONSerialization.jsonObject(with: profileData) as? [String: Any] else {
+            throw Talk9APIError.decoding
+        }
+        return profileJSON["mobileNumber"] as? String ?? ""
     }
 
     // MARK: - Internal

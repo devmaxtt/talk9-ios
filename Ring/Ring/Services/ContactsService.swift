@@ -142,6 +142,10 @@ class ContactsService {
 
     // MARK: contacts management unban/remove
 
+    func sendContactRequest(jamiId: String, accountId: String) {
+        self.contactsAdapter.addContact(withURI: jamiId, accountId: accountId)
+    }
+
     func removeContact(withId jamiId: String, ban: Bool, withAccountId accountId: String) -> Observable<Void> {
         return Observable.create { [weak self] observable in
             guard let self = self else { return Disposables.create { } }

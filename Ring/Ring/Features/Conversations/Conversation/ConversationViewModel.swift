@@ -167,6 +167,9 @@ class ConversationViewModel: Stateable, ViewModel, ObservableObject, Identifiabl
         swiftUIModel.actionHandler.forwardMessage = { [weak self] message, conversations in
             self?.shareMessage(message: message, with: conversations)
         }
+        swiftUIModel.onResetConversation = { [weak self] in
+            self?.stateSubject.onNext(ConversationState.conversationRemoved)
+        }
         swiftUIModel.subscribeBestName(bestName: self.bestName)
         self.bestName
             .share()

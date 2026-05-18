@@ -79,8 +79,24 @@ class AccountSummaryVM: AvatarProvider, AccountProfileObserver {
         self.subscribeStatus()
         self.updateProfileDetails(account: account)
         self.registeredName = resolveAccountName(from: self.account)
-        let phoneKey = Constants.talk9RegisteredPhonePrefix + self.registeredName
+        // Use managerUsername (the JAMS login name, always lowercase) as the key,
+        // falling back to registeredName so non-JAMS accounts are unaffected.
+        let managerUsername = account.details?
+            .get(withConfigKeyModel: ConfigKeyModel(withKey: .managerUsername))
+            .lowercased() ?? ""
+        let phoneKey = Constants.talk9RegisteredPhonePrefix +
+            (managerUsername.isEmpty ? self.registeredName.lowercased() : managerUsername)
         self.registeredPhone = UserDefaults.standard.string(forKey: phoneKey) ?? ""
+        // Reactively update when fetchAndStoreMobileNumber writes the value after login
+        UserDefaults.standard.rx
+            .observe(String.self, phoneKey)
+            .compactMap { $0 }
+            .filter { !$0.isEmpty }
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] phone in
+                self?.registeredPhone = phone
+            })
+            .disposed(by: self.disposeBag)
     }
 
     var accountInfoToShare: String {

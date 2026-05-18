@@ -87,8 +87,9 @@ class WelcomeVM: ViewModel, ObservableObject {
     }
 
     func loginWithJAMS(username: String, password: String, stateHandler: StatePublisher<WalkthroughState>) {
-        print("[LOGIN] ▶️ loginWithJAMS called - username: \(username), server: app.talk9.co")
-        connectToAccountManager(userName: username,
+        let normalizedUsername = username.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        print("[LOGIN] ▶️ loginWithJAMS called - username: \(normalizedUsername), server: app.talk9.co")
+        connectToAccountManager(userName: normalizedUsername,
                                 password: password,
                                 server: "app.talk9.co",
                                 stateHandler: stateHandler,
@@ -360,6 +361,9 @@ extension WelcomeVM {
                 print("[LOGIN] ✅ connectToAccountManager SUCCESS - accountId: \(accountId)")
                 responseLog("Status: SUCCESS\nAccount ID: \(accountId)")
                 self.enablePushNotifications()
+                Task {
+                    await Talk9APIService.shared.fetchAndStoreMobileNumber(username: userName, password: password)
+                }
                 self.accountCreated(stateHandler: stateHandler)
             }, onError: { [weak self] (error) in
                 let message = (error as? AccountCreationError)?.errorDescription ?? error.localizedDescription
