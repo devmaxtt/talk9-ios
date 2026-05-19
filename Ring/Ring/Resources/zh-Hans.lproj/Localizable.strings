@@ -42,7 +42,7 @@
 "global.copy" = "複製";
 "global.reply" = "回覆";
 "global.search" = "正在搜尋……";
-"global.supportJami" = "支持Jami計劃";
+"global.supportJami" = "支持Talk9計劃";
 "global.deleteMessage" = "刪除訊息";
 "global.deleteFile" = "從此設備中刪除檔案";
 "global.editMessage" = "編輯消息";
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "對話顏色選擇";
 "swarm.editTextHint" = "雙擊以編輯";
 "swarm.conversationHeader" = "對話";
-"swarm.shareContactMessage" = "你可以在 Jami 分散式通訊平臺 (https://jami.net) 上增加此聯絡人： %1@";
+"swarm.shareContactMessage" = "你可以在 Talk9 分散式通訊平臺 (https://talk9.co) 上增加此聯絡人： %1@";
 "swarm.oneToOne" = "私人";
 "swarm.adminInvitesOnly" = "私人群組(受限制邀請)";
 "swarm.invitesOnly" = "私密組";
@@ -145,11 +145,11 @@
 "smartlist.noNumber" = "選定的連絡人沒有任何號碼";
 "smartlist.selectOneNumber" = "選取其中一個號碼";
 "smartlist.invitations" = "邀請";
-"smartlist.aboutJami" = "關於 Jami";
+"smartlist.aboutJami" = "關於 Talk9";
 "smartlist.inviteFriends" = "";
 "smartlist.accounts" = "帳號";
 "smartlist.disableDonation" = "現在不要";
-"smartlist.donationExplanation" = "如果您喜歡使用 Jami 並相信我們的使命，您願意捐款嗎？";
+"smartlist.donationExplanation" = "如果您喜歡使用 Talk9 並相信我們的使命，您願意捐款嗎？";
 "smartlist.inSynchronization" = "";
 "smartlist.newMessage" = "新訊息";
 
@@ -191,12 +191,12 @@
 // Walkthrough
 
 //Welcome Screen
-"welcome.title" = "使用 Jami 分享，自由、私密";
-"welcome.text" = "Jami 是一個自由且通用的通訊平臺，其尊重使用者的隱私與自由。";
+"welcome.title" = "使用 Talk9 分享，自由、私密";
+"welcome.text" = "Talk9 是一個自由且通用的通訊平臺，其尊重使用者的隱私與自由。";
 "welcome.haveAccount" = "我已經有一個帳戶";
 "welcome.linkDevice" = "從其他裝置匯入";
 "welcome.linkBackup" = "從封存備份匯入";
-"welcome.createAccount" = "建立 Jami 帳號";
+"welcome.createAccount" = "建立 Talk9 帳號";
 "welcome.connectToJAMS" = "連線到管理伺服器";
 
 // Creation Profile Screen
@@ -209,7 +209,7 @@
 "createProfile.createProfilePicture" = "新增個人照片";
 
 // Create Account form
-"createAccount.createAccountFormTitle" = "加入 Jami";
+"createAccount.createAccountFormTitle" = "加入 Talk9";
 "createAccount.lookingForUsernameAvailability" = "檢查使用者名稱是否可用...";
 "createAccount.invalidUsername" = "無效的使用者名稱，請輸入正確的使用者名稱。";
 "createAccount.usernameAlreadyTaken" = "已取得的使用者名稱";
@@ -220,13 +220,13 @@
 "createAccount.timeoutMessage" = "使用者名稱正在註冊中。請稍候...";
 "createAccount.sipConfigure" = "配置現有 SIP 帳戶";
 "createAccount.creatingAccount" = "正在建立帳號……";
-"createAccount.nameExplanation" = "您可以選擇一個使用者名稱,以幫助其他人更容易地找到和聯繫您在Jami.";
+"createAccount.nameExplanation" = "您可以選擇一個使用者名稱,以幫助其他人更容易地找到和聯繫您在Talk9.";
 "createAccount.newAccount" = "新增帳號";
 "createAccount.encryptionEnabled" = "已啟用密碼保護";
 "createAccount.encrypt" = "密碼保護";
 "createAccount.customize" = "自訂";
 "createAccount.encryptTitle" = "密碼保護戶口";
-"createAccount.encryptExplanation" = "新增的 Jami 帳戶只儲存在本地裝置上，作為包含帳戶金鑰的存檔。可以選擇用密碼保護對該檔案的訪問。";
+"createAccount.encryptExplanation" = "新增的 Talk9 帳戶只儲存在本地裝置上，作為包含帳戶金鑰的存檔。可以選擇用密碼保護對該檔案的訪問。";
 
 // Link To Account form
 "linkToAccount.importAccount" = "匯入帳戶";
@@ -246,7 +246,7 @@
 "linkToAccount.alertMessage" = "停止操作將取消匯入帳戶操作。";
 
 // Import from Archive
-"importFromArchive.explanation" = "從本地檔案文件匯入Jami帳戶。";
+"importFromArchive.explanation" = "從本地檔案文件匯入Talk9帳戶。";
 "importFromArchive.passwordExplanation" = "如果帳號有密碼保護，請輸入此欄。";
 "importFromArchive.title" = "從封存備份匯入";
 "importFromArchive.buttonTitle" = "匯入";
@@ -262,16 +262,16 @@
 
 // Alerts
 "alerts.accountCannotBeFoundTitle" = "無法找到帳戶";
-"alerts.accountCannotBeFoundMessage" = "在 Jami 網路上找不到帳戶。請確保它是從現有設備上的 Jami 匯出的，並且提供的憑據是正確的。";
+"alerts.accountCannotBeFoundMessage" = "在 Talk9 網路上找不到帳戶。請確保它是從現有設備上的 Talk9 匯出的，並且提供的憑據是正確的。";
 "alerts.accountAddedTitle" = "已新增帳號";
 "alerts.accountNoNetworkTitle" = "網路錯誤";
-"alerts.accountNoNetworkMessage" = "在連接到Jami分佈式網路時出現問題，請重試。如果問題持續，請聯絡系統管理員。";
+"alerts.accountNoNetworkMessage" = "在連接到Talk9分佈式網路時出現問題，請重試。如果問題持續，請聯絡系統管理員。";
 "alerts.accountDefaultErrorTitle" = "無法找到帳戶";
 "alerts.accountDefaultErrorMessage" = "創建帳戶時出錯";
 "alerts.profileTakePhoto" = "照相";
 "alerts.profileUploadPhoto" = "上傳照片";
 "alerts.accountLinkedTitle" = "連結帳號";
-"alerts.dbFailedTitle" = "當啟動 Jami 時發生錯誤";
+"alerts.dbFailedTitle" = "當啟動 Talk9 時發生錯誤";
 "alerts.dbFailedMessage" = "請關閉應用程式並再次嘗試開啟它";
 "alerts.confirmBlockContact" = "要封鎖此聯絡人嗎？與此聯絡人的所有對話將被刪除。";
 "alerts.confirmDeleteConversation" = "您確定您想要永久刪除此對話嗎？";
@@ -289,7 +289,7 @@
 "alerts.uploadFile" = "傳送檔案";
 "alerts.uploadPhoto" = "開啟相簿";
 "alerts.sendPhoto" = "寄送照片";
-"alerts.locationServiceIsDisabled" = "開啟「位置服務」以讓「Jami」確定您的位置。";
+"alerts.locationServiceIsDisabled" = "開啟「位置服務」以讓「Talk9」確定您的位置。";
 "alerts.locationSharing" = "分享我的位置";
 "alerts.alreadylocationSharing" = "已與此使用者分享位置";
 "alerts.locationSharingDurationTitle" = "位置分享應該持續多久？";
@@ -355,8 +355,8 @@
 "accountPage.other" = "其他";
 "accountPage.removeAccountMessage" = "如果該帳戶未備份或添加到其他設備，則該帳戶和註冊使用者名稱將不可找回地遺失。";
 "accountPage.inviteFriends" = "邀請好友";
-"accountPage.contactMeOnJamiTitle" = "在 Jami 上聯絡我";
-"accountPage.contactMeOnJamiContant" = "在 Jami 分散式通訊平臺 (https://jami.net) 上使用「%s」聯絡我";
+"accountPage.contactMeOnJamiTitle" = "在 Talk9 上聯絡我";
+"accountPage.contactMeOnJamiContant" = "在 Talk9 分散式通訊平臺 (https://talk9.co) 上使用「%s」聯絡我";
 "accountPage.passwordPlaceholder" = "輸入帳號密碼";
 "accountPage.usernamePlaceholder" = "輸入所需的使用者名稱";
 "accountPage.registerNameErrorMessage" = "使用者名稱不可用。";
@@ -373,7 +373,7 @@
 "accountPage.enableBoothMode" = "啟用展示模式";
 "accountPage.disableBoothMode" = "停用展示模式";
 "accountPage.disableBoothModeExplanation" = "請提供您的帳號密碼";
-"accountPage.boothModeExplanation" = "在展示模式下，不會儲存對話歷史，Jami 的功能也僅限撥出通話。當您啟用展示模式時，您所有的對話都會被移除。";
+"accountPage.boothModeExplanation" = "在展示模式下，不會儲存對話歷史，Talk9 的功能也僅限撥出通話。當您啟用展示模式時，您所有的對話都會被移除。";
 "accountPage.noBoothMode" = "要啟用展示模式，您必須先建立帳號密碼。";
 "accountPage.boothModeAlertMessage" = "在啟用展示模式後，所有的對話都會被移除。";
 "accountPage.peerDiscovery" = "啟用區域夥伴探索";
@@ -388,7 +388,7 @@
 "accountPage.upnpEnabled" = "使用 UPnP";
 "accountPage.security" = "安全性";
 "accountPage.enableSRTP" = "加密媒體串流 (SRTP)";
-"accountPage.registerNameExplanation" = "您可以選擇一個使用者名稱，以幫助其他人更容易在Jami聯絡您。";
+"accountPage.registerNameExplanation" = "您可以選擇一個使用者名稱，以幫助其他人更容易在Talk9聯絡您。";
 "accountPage.profileHeader" = "介紹";
 "accountPage.profileNameNotSelected" = "未選擇名稱";
 "accountPage.accountHeader" = "帳號";
@@ -397,7 +397,7 @@
 "accountPage.editProfile" = "編輯個人檔案";
 "accountPage.manageAccount" = "管理帳號";
 "accountPage.encryptAccount" = "密碼保護戶口";
-"accountPage.passwordExplanation" = "新增的 Jami 帳戶只儲存在本地裝置上，作為包含帳戶金鑰的存檔。可以選擇用密碼保護對該檔案的訪問。";
+"accountPage.passwordExplanation" = "新增的 Talk9 帳戶只儲存在本地裝置上，作為包含帳戶金鑰的存檔。可以選擇用密碼保護對該檔案的訪問。";
 "accountPage.passwordsDoNotMatch" = "密碼不匹配。";
 "accountPage.passwordCreated" = "已設定密碼";
 "accountPage.passwordUpdated" = "已更新密碼<br>";
@@ -406,7 +406,7 @@
 "accountPage.generatingPin" = "正在生成 PIN 碼";
 "accountPage.passwordForPin" = "此帳戶已被加密，請輸入密碼以生成PIN碼。";
 "accountPage.pinExplanationTitle" = "在其他設備上";
-"accountPage.pinExplanationMessage" = "安裝並啟動 Jami。選擇“從其他設備匯入”，並掃描二維碼。或手動輸入 PIN 碼。";
+"accountPage.pinExplanationMessage" = "安裝並啟動 Talk9。選擇“從其他設備匯入”，並掃描二維碼。或手動輸入 PIN 碼。";
 "accountPage.pinError" = "在生成PIN碼時出現問題";
 "accountPage.notificationTitle" = "通知";
 "accountPage.notificationError" = "已禁用通知。在裝置設定中啟用此功能。";
@@ -433,7 +433,7 @@
 "accountPage.typingIndicatorExplanation" = "顯示消息正在輸入中。";
 
 // Backup Account
-"backupAccount.explanation" = "此 Jami 帳戶僅在本裝置上存在。如果裝置遺失或應用程式移除，帳號將遺失。建議備份此帳戶。";
+"backupAccount.explanation" = "此 Talk9 帳戶僅在本裝置上存在。如果裝置遺失或應用程式移除，帳號將遺失。建議備份此帳戶。";
 "backupAccount.title" = "備份帳號";
 "backupAccount.creating" = "正在建立備份";
 "backupAccount.archiveName" = "請為此封存檔命名";
@@ -563,7 +563,7 @@
 "migrateAccount.migrateAnother" = "遷移其他帳號";
 
 // About Jami
-"aboutJami.declaration1" = "Jami 是一個 GNU 套件，是通用且分散式點對點通訊的軟體，尊重使用者的自由和隱私。請造訪 ";
+"aboutJami.declaration1" = "Talk9 是一個 GNU 套件，是通用且分散式點對點通訊的軟體，尊重使用者的自由和隱私。請造訪 ";
 "aboutJami.declaration2" = "以瞭解更多。";
 "aboutJami.noWarranty1" = "本程式無任何保固責任";
 "aboutJami.noWarranty2" = "版本3或之後以取得詳細資訊。<br>";
@@ -573,7 +573,7 @@
 "aboutJami.media" = "媒體";
 "aboutJami.communityManagement" = "社區管理";
 "aboutJami.specialThanks" = "特別感謝";
-"aboutJami.info" = "這是一份為Jami投入了大量時間並取得了有益成果的人員名單。任何希望添加到列表中的此類貢獻者都應與我們聯繫。";
+"aboutJami.info" = "這是一份為Talk9投入了大量時間並取得了有益成果的人員名單。任何希望添加到列表中的此類貢獻者都應與我們聯繫。";
 "aboutJami.header" = "我們要感謝我們的貢獻者，他們多年來的努力使這個軟體成為現在的樣子。";
 
 // Accessibility
@@ -581,8 +581,8 @@
 "accessibility.smartListSwitchAccounts" = "改變帳號<br>";
 "accessibility.smartListConnectedAs" = "目前帳號是%@";
 "accessibility.smartListAddAccount" = "加入帳號";
-"accessibility.aboutJamiTitle" = "關於 Jami";
-"accessibility.welcomeToJamiTitle" = "歡迎來到 Jami";
+"accessibility.aboutJamiTitle" = "關於 Talk9";
+"accessibility.welcomeToJamiTitle" = "歡迎來到 Talk9";
 "accessibility.createAccountVerifyUsernamePrompt" = "請輸入使用者名稱來檢查是否可用";
 "accessibility.profilePicturePicker" = "個人資料圖片";
 "accessibility.profilePicturePickerHint" = "雙點以拍照，或者從相簿中選擇圖片";

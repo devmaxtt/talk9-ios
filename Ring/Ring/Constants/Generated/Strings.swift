@@ -285,8 +285,8 @@ internal enum L10n {
     internal static let blockedContacts = L10n.tr("Localizable", "accountPage.blockedContacts", fallback: "Blocked contacts")
     /// After enabling booth mode, all the conversations will be removed.
     internal static let boothModeAlertMessage = L10n.tr("Localizable", "accountPage.boothModeAlertMessage", fallback: "After enabling booth mode, all the conversations will be removed.")
-    /// In booth mode conversation history not saved and jami functionality limited by making outgoing calls. When you enable booth mode all your conversations will be removed.
-    internal static let boothModeExplanation = L10n.tr("Localizable", "accountPage.boothModeExplanation", fallback: "In booth mode conversation history not saved and jami functionality limited by making outgoing calls. When you enable booth mode all your conversations will be removed.")
+    /// In booth mode conversation history not saved and Talk9 functionality limited by making outgoing calls. When you enable booth mode all your conversations will be removed.
+    internal static let boothModeExplanation = L10n.tr("Localizable", "accountPage.boothModeExplanation", fallback: "In booth mode conversation history not saved and Talk9 functionality limited by making outgoing calls. When you enable booth mode all your conversations will be removed.")
     /// Bootstrap
     internal static let bootstrap = L10n.tr("Localizable", "accountPage.bootstrap", fallback: "Bootstrap")
     /// Allow calls from unknown contacts.

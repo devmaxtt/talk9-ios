@@ -42,7 +42,7 @@
 "global.copy" = "Cúrsa";
 "global.reply" = "Freagra";
 "global.search" = "Ag lorg...";
-"global.supportJami" = "Support Jami project";
+"global.supportJami" = "Support Talk9 project";
 "global.deleteMessage" = "Teachtaireacht a scriosadh";
 "global.deleteFile" = "Delete file from device";
 "global.editMessage" = "Teachtaireacht a eisiúint";
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "Conversation color picker";
 "swarm.editTextHint" = "Double-tap to edit";
 "swarm.conversationHeader" = "Conversation";
-"swarm.shareContactMessage" = "You can add this contact, %1@, on the Jami distributed communication platform: https://jami.net";
+"swarm.shareContactMessage" = "You can add this contact, %1@, on the Talk9 distributed communication platform: https://talk9.co";
 "swarm.oneToOne" = "Priontáil";
 "swarm.adminInvitesOnly" = "Grúpa príobháideach (aistealann teoranta)";
 "swarm.invitesOnly" = "Ghrúpa príobháideach";
@@ -145,11 +145,11 @@
 "smartlist.noNumber" = "Níl aon uimhir ag an teagmháil roghnaithe";
 "smartlist.selectOneNumber" = "Roghnaigh ceann de na huimhreacha";
 "smartlist.invitations" = "Ceiliúradh";
-"smartlist.aboutJami" = "Maidir le Jami";
+"smartlist.aboutJami" = "Maidir le Talk9";
 "smartlist.inviteFriends" = "Invite friends";
 "smartlist.accounts" = "Contae";
 "smartlist.disableDonation" = "Níos déanaí";
-"smartlist.donationExplanation" = "If you enjoy using Jami and believe in our mission, do you want to make a donation?";
+"smartlist.donationExplanation" = "If you enjoy using Talk9 and believe in our mission, do you want to make a donation?";
 "smartlist.inSynchronization" = "conversation in synchronization";
 "smartlist.newMessage" = "New message";
 
@@ -191,12 +191,12 @@
 // Walkthrough
 
 //Welcome Screen
-"welcome.title" = "Share, freely and privately with Jami";
-"welcome.text" = "Is ardán cumarsáide saor in aisce agus uilethír é Jami a chaomhnaíonn príobháideacht agus saoirsí na n-úsáideoirí";
+"welcome.title" = "Share, freely and privately with Talk9";
+"welcome.text" = "Is ardán cumarsáide saor in aisce agus uilethír é Talk9 a chaomhnaíonn príobháideacht agus saoirsí na n-úsáideoirí";
 "welcome.haveAccount" = "Tá cuntas agam cheana féin";
 "welcome.linkDevice" = "Importaíocht ó threalamh eile";
 "welcome.linkBackup" = "Importaí ó chúltaca archiv";
-"welcome.createAccount" = "Creidigh cuntas Jami";
+"welcome.createAccount" = "Creidigh cuntas Talk9";
 "welcome.connectToJAMS" = "Connect to a management server";
 
 // Creation Profile Screen
@@ -209,7 +209,7 @@
 "createProfile.createProfilePicture" = "Create profile picture";
 
 // Create Account form
-"createAccount.createAccountFormTitle" = "Téigh le Jami";
+"createAccount.createAccountFormTitle" = "Téigh le Talk9";
 "createAccount.lookingForUsernameAvailability" = "Checking username availability…";
 "createAccount.invalidUsername" = "Invalid username. Please enter the correct username.";
 "createAccount.usernameAlreadyTaken" = "Ainm úsáideora a glacadh cheana féin";
@@ -220,13 +220,13 @@
 "createAccount.timeoutMessage" = "Username registration is in progress. Please wait…";
 "createAccount.sipConfigure" = "Configure existing SIP account";
 "createAccount.creatingAccount" = "Creating account";
-"createAccount.nameExplanation" = "Is féidir leat ainm úsáideora a roghnú chun cabhrú le daoine eile teacht ar do shon agus teagmháil a dhéanamh leat níos éasca ar Jami.";
+"createAccount.nameExplanation" = "Is féidir leat ainm úsáideora a roghnú chun cabhrú le daoine eile teacht ar do shon agus teagmháil a dhéanamh leat níos éasca ar Talk9.";
 "createAccount.newAccount" = "New account";
 "createAccount.encryptionEnabled" = "Password protection enabled";
 "createAccount.encrypt" = "Password protect";
 "createAccount.customize" = "Custaimáil";
 "createAccount.encryptTitle" = "Password protect account";
-"createAccount.encryptExplanation" = "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.";
+"createAccount.encryptExplanation" = "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.";
 
 // Link To Account form
 "linkToAccount.importAccount" = "Import account";
@@ -246,7 +246,7 @@
 "linkToAccount.alertMessage" = "Stopping will cancel the import account operation.";
 
 // Import from Archive
-"importFromArchive.explanation" = "Cúltas Jami a allmhairí ó charrlann archiv áitiúil.";
+"importFromArchive.explanation" = "Cúltas Talk9 a allmhairí ó charrlann archiv áitiúil.";
 "importFromArchive.passwordExplanation" = "If the account is password protected, please fill the following field.";
 "importFromArchive.title" = "Import from archive";
 "importFromArchive.buttonTitle" = "Éireodh";
@@ -262,16 +262,16 @@
 
 // Alerts
 "alerts.accountCannotBeFoundTitle" = "Account error";
-"alerts.accountCannotBeFoundMessage" = "Unable to find account on the Jami network. Make sure it was exported on Jami from an existing device, and that provided credentials are correct.";
+"alerts.accountCannotBeFoundMessage" = "Unable to find account on the Talk9 network. Make sure it was exported on Talk9 from an existing device, and that provided credentials are correct.";
 "alerts.accountAddedTitle" = "Account added";
 "alerts.accountNoNetworkTitle" = "Measáin";
-"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Jami account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
+"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Talk9 account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
 "alerts.accountDefaultErrorTitle" = "Account error";
 "alerts.accountDefaultErrorMessage" = "An error occurred while creating the account.";
 "alerts.profileTakePhoto" = "Déan grianghraf";
 "alerts.profileUploadPhoto" = "Fógraí a uaslódáil";
 "alerts.accountLinkedTitle" = "Cunntas nasc";
-"alerts.dbFailedTitle" = "An error happened when launching Jami";
+"alerts.dbFailedTitle" = "An error happened when launching Talk9";
 "alerts.dbFailedMessage" = "Cuir isteach an t-iarratas agus déan iarracht é a oscailt arís";
 "alerts.confirmBlockContact" = "Do you want to block this contact? The conversation history with this contact will also be deleted permanently.";
 "alerts.confirmDeleteConversation" = "Do you want to remove this conversation permanently?";
@@ -289,7 +289,7 @@
 "alerts.uploadFile" = "Comhad a sheoladh";
 "alerts.uploadPhoto" = "Open gallery";
 "alerts.sendPhoto" = "Send photo";
-"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Jami” to determine device location.";
+"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Talk9” to determine device location.";
 "alerts.locationSharing" = "Comhroinn mo shuíomh";
 "alerts.alreadylocationSharing" = "Ag roinnt suíomh cheana féin leis an úsáideoir seo";
 "alerts.locationSharingDurationTitle" = "Cé chomh fada is ba chóir an suíomh a roinnt?";
@@ -355,8 +355,8 @@
 "accountPage.other" = "Cinntí";
 "accountPage.removeAccountMessage" = "If the account has not been backed up or added to another device, the account and registered username will be IRREVOCABLY LOST.";
 "accountPage.inviteFriends" = "Invite friends";
-"accountPage.contactMeOnJamiTitle" = "Déan teagmháil liom ar Jami!";
-"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Jami distributed communication platform: https://jami.net";
+"accountPage.contactMeOnJamiTitle" = "Déan teagmháil liom ar Talk9!";
+"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Talk9 distributed communication platform: https://talk9.co";
 "accountPage.passwordPlaceholder" = "Cluiche Pasfhocal";
 "accountPage.usernamePlaceholder" = "Cuir isteach ainm úsáideora is mian leat";
 "accountPage.registerNameErrorMessage" = "The username is unavailable.";
@@ -373,7 +373,7 @@
 "accountPage.enableBoothMode" = "Cumas a chur ar an modh Booth";
 "accountPage.disableBoothMode" = "Cinntí an modh Booth";
 "accountPage.disableBoothModeExplanation" = "Please provide the account password";
-"accountPage.boothModeExplanation" = "I modh booth, ní shábháil go bhfuil stair comhrá agus cumaíocht jami teoranta ag glaochanna amach. Nuair a chuireann tú ar chumas modh booth, déanfar do chuid comhráite go léir a bhaint.";
+"accountPage.boothModeExplanation" = "I modh booth, ní shábháil go bhfuil stair comhrá agus cumaíocht Talk9 teoranta ag glaochanna amach. Nuair a chuireann tú ar chumas modh booth, déanfar do chuid comhráite go léir a bhaint.";
 "accountPage.noBoothMode" = "To enable Booth mode, password protect the account first.";
 "accountPage.boothModeAlertMessage" = "After enabling booth mode, all the conversations will be removed.";
 "accountPage.peerDiscovery" = "Aibriú ar an gcloinneadh comhghleacaithe áitiúil";
@@ -388,7 +388,7 @@
 "accountPage.upnpEnabled" = "Úsáid UPnP";
 "accountPage.security" = "Slándáil";
 "accountPage.enableSRTP" = "Criosadh srutháin meán (SRTP)";
-"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Jami.";
+"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Talk9.";
 "accountPage.profileHeader" = "Proifíl";
 "accountPage.profileNameNotSelected" = "Name not selected";
 "accountPage.accountHeader" = "Contae";
@@ -397,7 +397,7 @@
 "accountPage.editProfile" = "Edit Profile";
 "accountPage.manageAccount" = "Bainistiú cuntas";
 "accountPage.encryptAccount" = "Password protect account";
-"accountPage.passwordExplanation" = "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
+"accountPage.passwordExplanation" = "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
 "accountPage.passwordsDoNotMatch" = "Passwords do not match.";
 "accountPage.passwordCreated" = "Password created";
 "accountPage.passwordUpdated" = "Password updated";
@@ -406,10 +406,10 @@
 "accountPage.generatingPin" = "Generating PIN code…";
 "accountPage.passwordForPin" = "The account is password protected. Enter the password to generate a PIN code.";
 "accountPage.pinExplanationTitle" = "On another device";
-"accountPage.pinExplanationMessage" = "Install and launch Jami. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
+"accountPage.pinExplanationMessage" = "Install and launch Talk9. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
 "accountPage.pinError" = "An error occurred while generating the PIN code.";
 "accountPage.notificationTitle" = "Feidhmeanna";
-"accountPage.notificationError" = "Notifications for Jami are disabled. Enable it in device settings in order to use this feature.";
+"accountPage.notificationError" = "Notifications for Talk9 are disabled. Enable it in device settings in order to use this feature.";
 "accountPage.callsFromUnknownContacts" = "Allow calls from unknown contacts.";
 "accountPage.accountSettingsExplanation" = "These settings will only apply to this account.";
 "accountPage.appSettings" = "App settings";
@@ -433,7 +433,7 @@
 "accountPage.typingIndicatorExplanation" = "Indicate when messages are being typed.";
 
 // Backup Account
-"backupAccount.explanation" = "This Jami account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
+"backupAccount.explanation" = "This Talk9 account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
 "backupAccount.title" = "Cunntas cúltaca";
 "backupAccount.creating" = "Creating backup";
 "backupAccount.archiveName" = "Select a name for the archive.";
@@ -563,7 +563,7 @@
 "migrateAccount.migrateAnother" = "Imirceáil chun cuntas eile";
 
 // About Jami
-"aboutJami.declaration1" = "Jami, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
+"aboutJami.declaration1" = "Talk9, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
 "aboutJami.declaration2" = "to learn more.";
 "aboutJami.noWarranty1" = "This program comes with absolutely no warranty. See the";
 "aboutJami.noWarranty2" = "version 3 or later for details.";
@@ -573,7 +573,7 @@
 "aboutJami.media" = "Meáin";
 "aboutJami.communityManagement" = "Community Management";
 "aboutJami.specialThanks" = "Special thanks to";
-"aboutJami.info" = "This is a list of people who have made a significant investment of time, with useful results, into Jami. Any such contributors who want to be added to the list should contact us.";
+"aboutJami.info" = "This is a list of people who have made a significant investment of time, with useful results, into Talk9. Any such contributors who want to be added to the list should contact us.";
 "aboutJami.header" = "We would like to thank our contributors, whose efforts over many years have made this software what it is.";
 
 // Accessibility
@@ -581,8 +581,8 @@
 "accessibility.smartListSwitchAccounts" = "Switch account";
 "accessibility.smartListConnectedAs" = "The current account is %@";
 "accessibility.smartListAddAccount" = "Cuid ar an cuntas";
-"accessibility.aboutJamiTitle" = "Maidir le Jami";
-"accessibility.welcomeToJamiTitle" = "Fáilte go Jami";
+"accessibility.aboutJamiTitle" = "Maidir le Talk9";
+"accessibility.welcomeToJamiTitle" = "Fáilte go Talk9";
 "accessibility.createAccountVerifyUsernamePrompt" = "Enter username to check availability.";
 "accessibility.profilePicturePicker" = "Dealbh próifíle";
 "accessibility.profilePicturePickerHint" = "Double-tap to take a picture or select a picture from the library";

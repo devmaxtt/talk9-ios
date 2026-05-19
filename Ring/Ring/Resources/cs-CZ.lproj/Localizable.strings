@@ -42,7 +42,7 @@
 "global.copy" = "Zkopírovat";
 "global.reply" = "Odpovědět";
 "global.search" = "Hledá se…";
-"global.supportJami" = "Support Jami project";
+"global.supportJami" = "Support Talk9 project";
 "global.deleteMessage" = "Smazat zprávu";
 "global.deleteFile" = "Delete file from device";
 "global.editMessage" = "Upravit zprávu";
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "Conversation color picker";
 "swarm.editTextHint" = "Double-tap to edit";
 "swarm.conversationHeader" = "Konverzace";
-"swarm.shareContactMessage" = "You can add this contact, %1@, on the Jami distributed communication platform: https://jami.net";
+"swarm.shareContactMessage" = "You can add this contact, %1@, on the Talk9 distributed communication platform: https://talk9.co";
 "swarm.oneToOne" = "Soukromý";
 "swarm.adminInvitesOnly" = "Soukromá skupina (omezené pozvánky)";
 "swarm.invitesOnly" = "Soukromá skupina";
@@ -145,11 +145,11 @@
 "smartlist.noNumber" = "Vybraný kontakt nemá žádné číslo.";
 "smartlist.selectOneNumber" = "Vyberte jedno z čísel.";
 "smartlist.invitations" = "Pozvání";
-"smartlist.aboutJami" = "O Jami";
+"smartlist.aboutJami" = "O Talk9";
 "smartlist.inviteFriends" = "Invite friends";
 "smartlist.accounts" = "Účty";
 "smartlist.disableDonation" = "Teď ne";
-"smartlist.donationExplanation" = "If you enjoy using Jami and believe in our mission, do you want to make a donation?";
+"smartlist.donationExplanation" = "If you enjoy using Talk9 and believe in our mission, do you want to make a donation?";
 "smartlist.inSynchronization" = "conversation in synchronization";
 "smartlist.newMessage" = "Nová zpráva";
 
@@ -191,12 +191,12 @@
 // Walkthrough
 
 //Welcome Screen
-"welcome.title" = "Share, freely and privately with Jami";
-"welcome.text" = "Jami je svobodný software a všeobecný dorozumívací systém, který zachovává soukromí a svobody uživatelů.";
+"welcome.title" = "Share, freely and privately with Talk9";
+"welcome.text" = "Talk9 je svobodný software a všeobecný dorozumívací systém, který zachovává soukromí a svobody uživatelů.";
 "welcome.haveAccount" = "Už účet mám";
 "welcome.linkDevice" = "Import z jiného zařízení";
 "welcome.linkBackup" = "Importovat ze záložního archivu";
-"welcome.createAccount" = "Vytvoři Jami účet";
+"welcome.createAccount" = "Vytvoři Talk9 účet";
 "welcome.connectToJAMS" = "Connect to a management server";
 
 // Creation Profile Screen
@@ -209,7 +209,7 @@
 "createProfile.createProfilePicture" = "Create profile picture";
 
 // Create Account form
-"createAccount.createAccountFormTitle" = "Připojit k Jami";
+"createAccount.createAccountFormTitle" = "Připojit k Talk9";
 "createAccount.lookingForUsernameAvailability" = "Kontrola dostupnosti uživatelského jména…";
 "createAccount.invalidUsername" = "Invalid username. Please enter the correct username.";
 "createAccount.usernameAlreadyTaken" = "Uživatelské jméno je již zabrané.";
@@ -220,13 +220,13 @@
 "createAccount.timeoutMessage" = "Probíhá registrace uživatelského jména. Čekejte prosím…";
 "createAccount.sipConfigure" = "Nakonfigurujte stávající SIP účet";
 "createAccount.creatingAccount" = "Creating account";
-"createAccount.nameExplanation" = "Můžete si zvolit uživatelské jméno, aby vás ostatní mohli na Jami snáze najít a zastihnout.";
+"createAccount.nameExplanation" = "Můžete si zvolit uživatelské jméno, aby vás ostatní mohli na Talk9 snáze najít a zastihnout.";
 "createAccount.newAccount" = "Nový účet";
 "createAccount.encryptionEnabled" = "Password protection enabled";
 "createAccount.encrypt" = "Password protect";
 "createAccount.customize" = "Upravit";
 "createAccount.encryptTitle" = "Password protect account";
-"createAccount.encryptExplanation" = "Účet Jami je vytvořen a uložen lokálně pouze na tomto zařízení jako archiv obsahující jeho klíče účtu. Přístup do archivu lze volitelně chránit heslem.";
+"createAccount.encryptExplanation" = "Účet Talk9 je vytvořen a uložen lokálně pouze na tomto zařízení jako archiv obsahující jeho klíče účtu. Přístup do archivu lze volitelně chránit heslem.";
 
 // Link To Account form
 "linkToAccount.importAccount" = "Import account";
@@ -246,7 +246,7 @@
 "linkToAccount.alertMessage" = "Stopping will cancel the import account operation.";
 
 // Import from Archive
-"importFromArchive.explanation" = "Import účtu Jami z místního archivního souboru.";
+"importFromArchive.explanation" = "Import účtu Talk9 z místního archivního souboru.";
 "importFromArchive.passwordExplanation" = "If the account is password protected, please fill the following field.";
 "importFromArchive.title" = "Import from archive";
 "importFromArchive.buttonTitle" = "Importovat";
@@ -262,16 +262,16 @@
 
 // Alerts
 "alerts.accountCannotBeFoundTitle" = "Chyba účtu";
-"alerts.accountCannotBeFoundMessage" = "Nelze najít účet v síti Jami. Ujistěte se, že byl exportován na Jami z existujícího zařízení a že poskytnuté přihlašovací údaje jsou správné.";
+"alerts.accountCannotBeFoundMessage" = "Nelze najít účet v síti Talk9. Ujistěte se, že byl exportován na Talk9 z existujícího zařízení a že poskytnuté přihlašovací údaje jsou správné.";
 "alerts.accountAddedTitle" = "Account added";
 "alerts.accountNoNetworkTitle" = "Chyba sítě";
-"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Jami account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
+"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Talk9 account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
 "alerts.accountDefaultErrorTitle" = "Chyba účtu";
 "alerts.accountDefaultErrorMessage" = "Při vytváření účtu došlo k chybě.";
 "alerts.profileTakePhoto" = "Vyfotit";
 "alerts.profileUploadPhoto" = "Nahrát fotografii";
 "alerts.accountLinkedTitle" = "Připojuje se účet";
-"alerts.dbFailedTitle" = "An error happened when launching Jami";
+"alerts.dbFailedTitle" = "An error happened when launching Talk9";
 "alerts.dbFailedMessage" = "Zavřete, prosím, program a zkuste jej otevřít znovu";
 "alerts.confirmBlockContact" = "Do you want to block this contact? The conversation history with this contact will also be deleted permanently.";
 "alerts.confirmDeleteConversation" = "Do you want to remove this conversation permanently?";
@@ -289,7 +289,7 @@
 "alerts.uploadFile" = "Poslat soubor";
 "alerts.uploadPhoto" = "Otevřít galerii";
 "alerts.sendPhoto" = "Send photo";
-"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Jami” to determine device location.";
+"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Talk9” to determine device location.";
 "alerts.locationSharing" = "Sdílet mou polohu";
 "alerts.alreadylocationSharing" = "Poloha je již sdílena s tímto uživatelem.";
 "alerts.locationSharingDurationTitle" = "Jak dlouho má sdílení polohy trvat?";
@@ -355,8 +355,8 @@
 "accountPage.other" = "Ostatní";
 "accountPage.removeAccountMessage" = "Pokud účet nebyl zálohován nebo přidán do jiného zařízení, účet a registrované uživatelské jméno budou NENÁVRATNĚ ZTRACENY.";
 "accountPage.inviteFriends" = "Invite friends";
-"accountPage.contactMeOnJamiTitle" = "Spojte se se mnou přes Jami!";
-"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Jami distributed communication platform: https://jami.net";
+"accountPage.contactMeOnJamiTitle" = "Spojte se se mnou přes Talk9!";
+"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Talk9 distributed communication platform: https://talk9.co";
 "accountPage.passwordPlaceholder" = "Zadejte heslo k účtu.";
 "accountPage.usernamePlaceholder" = "Zadejte požadované uživatelské jméno.";
 "accountPage.registerNameErrorMessage" = "The username is unavailable.";
@@ -373,7 +373,7 @@
 "accountPage.enableBoothMode" = "Umožnit režim budky";
 "accountPage.disableBoothMode" = "Znemožnit režim budky";
 "accountPage.disableBoothModeExplanation" = "Please provide the account password";
-"accountPage.boothModeExplanation" = "V režimu budky není historie konverzace ukládána a funkce Jami jsou omezeny na uskutečňování odchozích hovorů. Umožnění režimu budky odstraní všechny vaše konverzace.";
+"accountPage.boothModeExplanation" = "V režimu budky není historie konverzace ukládána a funkce Talk9 jsou omezeny na uskutečňování odchozích hovorů. Umožnění režimu budky odstraní všechny vaše konverzace.";
 "accountPage.noBoothMode" = "To enable Booth mode, password protect the account first.";
 "accountPage.boothModeAlertMessage" = "After enabling booth mode, all the conversations will be removed.";
 "accountPage.peerDiscovery" = "Povolit zjištění místních klientů";
@@ -388,7 +388,7 @@
 "accountPage.upnpEnabled" = "Použít UPnP";
 "accountPage.security" = "Zabezpečení";
 "accountPage.enableSRTP" = "Šifrovat datový tok (SRTP)";
-"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Jami.";
+"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Talk9.";
 "accountPage.profileHeader" = "Profil";
 "accountPage.profileNameNotSelected" = "Name not selected";
 "accountPage.accountHeader" = "Účet";
@@ -397,7 +397,7 @@
 "accountPage.editProfile" = "Edit Profile";
 "accountPage.manageAccount" = "Spravovat účet";
 "accountPage.encryptAccount" = "Password protect account";
-"accountPage.passwordExplanation" = "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
+"accountPage.passwordExplanation" = "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
 "accountPage.passwordsDoNotMatch" = "Hesla se neshodují.";
 "accountPage.passwordCreated" = "Password created";
 "accountPage.passwordUpdated" = "Password updated";
@@ -406,10 +406,10 @@
 "accountPage.generatingPin" = "Generating PIN code…";
 "accountPage.passwordForPin" = "The account is password protected. Enter the password to generate a PIN code.";
 "accountPage.pinExplanationTitle" = "On another device";
-"accountPage.pinExplanationMessage" = "Install and launch Jami. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
+"accountPage.pinExplanationMessage" = "Install and launch Talk9. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
 "accountPage.pinError" = "An error occurred while generating the PIN code.";
 "accountPage.notificationTitle" = "Oznámení";
-"accountPage.notificationError" = "Notifications for Jami are disabled. Enable it in device settings in order to use this feature.";
+"accountPage.notificationError" = "Notifications for Talk9 are disabled. Enable it in device settings in order to use this feature.";
 "accountPage.callsFromUnknownContacts" = "Allow calls from unknown contacts.";
 "accountPage.accountSettingsExplanation" = "Tato nastavení se budou vztahovat pouze na tento účet.";
 "accountPage.appSettings" = "App settings";
@@ -433,7 +433,7 @@
 "accountPage.typingIndicatorExplanation" = "Indicate when messages are being typed.";
 
 // Backup Account
-"backupAccount.explanation" = "Tento účet Jami existuje pouze na tomto zařízení. Účet bude ztracen, pokud toto zařízení ztratíte nebo pokud bude aplikace odinstalována. Doporučuje se vytvořit zálohu tohoto účtu.";
+"backupAccount.explanation" = "Tento účet Talk9 existuje pouze na tomto zařízení. Účet bude ztracen, pokud toto zařízení ztratíte nebo pokud bude aplikace odinstalována. Doporučuje se vytvořit zálohu tohoto účtu.";
 "backupAccount.title" = "Zálohovat účet";
 "backupAccount.creating" = "Creating backup";
 "backupAccount.archiveName" = "Select a name for the archive.";
@@ -563,7 +563,7 @@
 "migrateAccount.migrateAnother" = "Převést jiný účet";
 
 // About Jami
-"aboutJami.declaration1" = "Jami, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
+"aboutJami.declaration1" = "Talk9, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
 "aboutJami.declaration2" = "to learn more.";
 "aboutJami.noWarranty1" = "This program comes with absolutely no warranty. See the";
 "aboutJami.noWarranty2" = "version 3 or later for details.";
@@ -573,7 +573,7 @@
 "aboutJami.media" = "Média";
 "aboutJami.communityManagement" = "Správa komunity";
 "aboutJami.specialThanks" = "Zvláštní poděkování";
-"aboutJami.info" = "Toto je seznam lidí, kteří do Jami významně investovali čas s užitečnými výsledky. Všichni tito přispěvatelé, kteří chtějí být přidáni do seznamu, by nás měli kontaktovat.";
+"aboutJami.info" = "Toto je seznam lidí, kteří do Talk9 významně investovali čas s užitečnými výsledky. Všichni tito přispěvatelé, kteří chtějí být přidáni do seznamu, by nás měli kontaktovat.";
 "aboutJami.header" = "Rádi bychom poděkovali našim přispěvatelům, jejichž úsilí po mnoho let učinilo tento software tím, čím je.";
 
 // Accessibility
@@ -581,8 +581,8 @@
 "accessibility.smartListSwitchAccounts" = "Switch account";
 "accessibility.smartListConnectedAs" = "The current account is %@";
 "accessibility.smartListAddAccount" = "Přidat účet";
-"accessibility.aboutJamiTitle" = "O Jami";
-"accessibility.welcomeToJamiTitle" = "Vítejte v Jami";
+"accessibility.aboutJamiTitle" = "O Talk9";
+"accessibility.welcomeToJamiTitle" = "Vítejte v Talk9";
 "accessibility.createAccountVerifyUsernamePrompt" = "Enter username to check availability.";
 "accessibility.profilePicturePicker" = "Profilový obrázek";
 "accessibility.profilePicturePickerHint" = "Double-tap to take a picture or select a picture from the library";

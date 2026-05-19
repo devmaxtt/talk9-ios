@@ -42,7 +42,7 @@
 "global.copy" = "Kopiraj";
 "global.reply" = "Odgovori";
 "global.search" = "Iskanje ...";
-"global.supportJami" = "Podprite projekt Jami";
+"global.supportJami" = "Podprite projekt Talk9";
 "global.deleteMessage" = "Izbriši sporočilo";
 "global.deleteFile" = "Izbriši datoteko z naprave";
 "global.editMessage" = "Uredi sporočilo";
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "Izbirnik barve pogovora";
 "swarm.editTextHint" = "Dvakrat tapnite za urejanje";
 "swarm.conversationHeader" = "Pogovor";
-"swarm.shareContactMessage" = "Ta stik %1@ lahko dodate na razpršeno komunikacijsko platformo Jami: https://jami.net";
+"swarm.shareContactMessage" = "Ta stik %1@ lahko dodate na razpršeno komunikacijsko platformo Talk9: https://talk9.co";
 "swarm.oneToOne" = "Zasebno";
 "swarm.adminInvitesOnly" = "Zasebna skupina (omejena povabila)";
 "swarm.invitesOnly" = "Zasebna skupina";
@@ -145,11 +145,11 @@
 "smartlist.noNumber" = "Izbrani stiki nimajo številke";
 "smartlist.selectOneNumber" = "Izberite eno od številk";
 "smartlist.invitations" = "Povabila";
-"smartlist.aboutJami" = "O programu Jami";
+"smartlist.aboutJami" = "O programu Talk9";
 "smartlist.inviteFriends" = "Povabi prijatelje";
 "smartlist.accounts" = "Računi";
 "smartlist.disableDonation" = "Ne zdaj";
-"smartlist.donationExplanation" = "Če vam je Jami všeč in verjamete v naše poslanstvo - bi prispevali projektu?";
+"smartlist.donationExplanation" = "Če vam je Talk9 všeč in verjamete v naše poslanstvo - bi prispevali projektu?";
 "smartlist.inSynchronization" = "pogovor v usklajevanju";
 "smartlist.newMessage" = "Novo sporočilo";
 
@@ -191,12 +191,12 @@
 // Walkthrough
 
 //Welcome Screen
-"welcome.title" = "Delite z drugimi, prosto in zasebno prek Jami";
-"welcome.text" = "Jami je prosta in brezplačna univerzalna komunikacijska platforma, ki spoštuje svobodo in zasebnost svojih uporabnikov.";
+"welcome.title" = "Delite z drugimi, prosto in zasebno prek Talk9";
+"welcome.text" = "Talk9 je prosta in brezplačna univerzalna komunikacijska platforma, ki spoštuje svobodo in zasebnost svojih uporabnikov.";
 "welcome.haveAccount" = "Račun že imam";
 "welcome.linkDevice" = "Uvozi z druge naprave";
 "welcome.linkBackup" = "Uvozi iz varnostne kopije arhiva";
-"welcome.createAccount" = "Ustvarite račun Jami";
+"welcome.createAccount" = "Ustvarite račun Talk9";
 "welcome.connectToJAMS" = "Povežite se na upravljalni strežnik";
 
 // Creation Profile Screen
@@ -209,7 +209,7 @@
 "createProfile.createProfilePicture" = "Ustvari sliko profila";
 
 // Create Account form
-"createAccount.createAccountFormTitle" = "Pridruži se Jami";
+"createAccount.createAccountFormTitle" = "Pridruži se Talk9";
 "createAccount.lookingForUsernameAvailability" = "Poteka preverjanje, ali je uporabniško ime na voljo ...";
 "createAccount.invalidUsername" = "Nepravilno uporabniško ime. Vnesite pravilno uporabniško ime.";
 "createAccount.usernameAlreadyTaken" = "Uporabniško ime je že oddano";
@@ -220,13 +220,13 @@
 "createAccount.timeoutMessage" = "Registracija uporabniškega imena poteka ... Počakajte za trenutek.";
 "createAccount.sipConfigure" = "Nastavi obstoječi račun SIP";
 "createAccount.creatingAccount" = "Ustvarjanje računa";
-"createAccount.nameExplanation" = "Izberete lahko uporabniško ime in s tem pomagate drugim, da vas lažje poiščejo in najdejo na Jamiju.";
+"createAccount.nameExplanation" = "Izberete lahko uporabniško ime in s tem pomagate drugim, da vas lažje poiščejo in najdejo na Talk9ju.";
 "createAccount.newAccount" = "Nov račun";
 "createAccount.encryptionEnabled" = "Zaščita z geslom je omogočena";
 "createAccount.encrypt" = "Zaščiti z geslom";
 "createAccount.customize" = "Prilagodi";
 "createAccount.encryptTitle" = "Zaščitite račun z geslom";
-"createAccount.encryptExplanation" = "Račun Jami je ustvarjen in hranjen krajevno samo na tej napravi, kot arhiv, ki vsebuje ključe vašega računa. Dostop do arhiva lahko dodatno zaščitite z geslom.";
+"createAccount.encryptExplanation" = "Račun Talk9 je ustvarjen in hranjen krajevno samo na tej napravi, kot arhiv, ki vsebuje ključe vašega računa. Dostop do arhiva lahko dodatno zaščitite z geslom.";
 
 // Link To Account form
 "linkToAccount.importAccount" = "Uvozi račun";
@@ -246,7 +246,7 @@
 "linkToAccount.alertMessage" = "Z ustavljanjem boste preklicali operacijo uvoza računa.";
 
 // Import from Archive
-"importFromArchive.explanation" = "Uvozite račun Jami iz krajevne arhivske datoteke.";
+"importFromArchive.explanation" = "Uvozite račun Talk9 iz krajevne arhivske datoteke.";
 "importFromArchive.passwordExplanation" = "Če je račun zaščiten z geslom, izpolnite naslednje polje.";
 "importFromArchive.title" = "Uvozi iz arhiva";
 "importFromArchive.buttonTitle" = "Uvoz";
@@ -262,16 +262,16 @@
 
 // Alerts
 "alerts.accountCannotBeFoundTitle" = "Napaka računa";
-"alerts.accountCannotBeFoundMessage" = "Računa v omrežju Jami ni bilo mogoče najti. Preverite, da je bilo izvoženo na Jami iz obstoječe naprave in da so bili posredovani pravi podatki.";
+"alerts.accountCannotBeFoundMessage" = "Računa v omrežju Talk9 ni bilo mogoče najti. Preverite, da je bilo izvoženo na Talk9 iz obstoječe naprave in da so bili posredovani pravi podatki.";
 "alerts.accountAddedTitle" = "Račun dodan";
 "alerts.accountNoNetworkTitle" = "Napaka na omrežju";
-"alerts.accountNoNetworkMessage" = "Prišlo je do napake povezovanja med dodajanjem računa Jami v razpršeno omrežje. Poskusite znova. Če se napaka ponavlja, stopite v stik s sistemskim skrbnikom.";
+"alerts.accountNoNetworkMessage" = "Prišlo je do napake povezovanja med dodajanjem računa Talk9 v razpršeno omrežje. Poskusite znova. Če se napaka ponavlja, stopite v stik s sistemskim skrbnikom.";
 "alerts.accountDefaultErrorTitle" = "Napaka računa";
 "alerts.accountDefaultErrorMessage" = "Pri ustvarjanju računa je prišlo do napake.";
 "alerts.profileTakePhoto" = "Slikaj";
 "alerts.profileUploadPhoto" = "Naloži sliko";
 "alerts.accountLinkedTitle" = "Povezovanje računa";
-"alerts.dbFailedTitle" = "Ob zagonu Jami je prišlo do napake";
+"alerts.dbFailedTitle" = "Ob zagonu Talk9 je prišlo do napake";
 "alerts.dbFailedMessage" = "Zaprite program in ga ponovno zaženite";
 "alerts.confirmBlockContact" = "Ali želite blokirati ta stik? Zgodovina pogovorov s tem stikom bo trajno izbrisana.";
 "alerts.confirmDeleteConversation" = "Ali želite trajno izbrisati ta pogovor?";
@@ -289,7 +289,7 @@
 "alerts.uploadFile" = "Pošlji datoteko";
 "alerts.uploadPhoto" = "Odpri galerijo";
 "alerts.sendPhoto" = "Pošlji fotografijo";
-"alerts.locationServiceIsDisabled" = "Vklopite »Location services«, da omogočite Jami, da določi vašo lokacijo.";
+"alerts.locationServiceIsDisabled" = "Vklopite »Location services«, da omogočite Talk9, da določi vašo lokacijo.";
 "alerts.locationSharing" = "Deli mojo lokacijo";
 "alerts.alreadylocationSharing" = "S tem uporabnikom že delim lokacijo";
 "alerts.locationSharingDurationTitle" = "Koliko časa naj delim lokacijo?";
@@ -355,8 +355,8 @@
 "accountPage.other" = "Drugo";
 "accountPage.removeAccountMessage" = "Če vaš račun ni bil varnostno kopiran ali dodan na drugo napravo, bosta račun in registrirano uporabniško ime NEPOVRATNO IZGUBLJENA.";
 "accountPage.inviteFriends" = "Povabi prijatelje";
-"accountPage.contactMeOnJamiTitle" = "Poišči me na Jami-ju!";
-"accountPage.contactMeOnJamiContant" = "Stopi v stik z menoj z uporabo »%s« na razpršeni komunikacijski platformi Jami: https://jami.net";
+"accountPage.contactMeOnJamiTitle" = "Poišči me na Talk9-ju!";
+"accountPage.contactMeOnJamiContant" = "Stopi v stik z menoj z uporabo »%s« na razpršeni komunikacijski platformi Talk9: https://talk9.co";
 "accountPage.passwordPlaceholder" = "Vnesite geslo računa";
 "accountPage.usernamePlaceholder" = "Vnesite želeno uporabniško ime";
 "accountPage.registerNameErrorMessage" = "Uporabniško ime ni na voljo.";
@@ -373,7 +373,7 @@
 "accountPage.enableBoothMode" = "Vklopi način govorilnice";
 "accountPage.disableBoothMode" = "Izklopi način govorilnice";
 "accountPage.disableBoothModeExplanation" = "Vnesite geslo za račun";
-"accountPage.boothModeExplanation" = "V načinu govorilnice se zgodvina pogovora ne shranjuje, funkcionalnost Jamija pa je omejena na odhodne klice. Ob vklopu tega načina se odstranijo vsi pogovori.";
+"accountPage.boothModeExplanation" = "V načinu govorilnice se zgodvina pogovora ne shranjuje, funkcionalnost Talk9ja pa je omejena na odhodne klice. Ob vklopu tega načina se odstranijo vsi pogovori.";
 "accountPage.noBoothMode" = "Za vklop načina govorilnice morate najprej svoj račun zavarovati z geslom.";
 "accountPage.boothModeAlertMessage" = "Ob vklopu načina govorilnice bodo odstranjeni vsi vaši pogovori.";
 "accountPage.peerDiscovery" = "Vklopi lokalno odkrivanje soležnikov";
@@ -388,7 +388,7 @@
 "accountPage.upnpEnabled" = "Uporabi UPnP";
 "accountPage.security" = "Varnost";
 "accountPage.enableSRTP" = "Šifriranje pretoka podatkov (SRTP)";
-"accountPage.registerNameExplanation" = "Registrirajte uporabniško ime in s tem pomagajte drugim, da vas lažje poiščejo in dosežejo na Jamiju.";
+"accountPage.registerNameExplanation" = "Registrirajte uporabniško ime in s tem pomagajte drugim, da vas lažje poiščejo in dosežejo na Talk9ju.";
 "accountPage.profileHeader" = "Profil";
 "accountPage.profileNameNotSelected" = "Ime ni izbrano";
 "accountPage.accountHeader" = "Račun";
@@ -397,7 +397,7 @@
 "accountPage.editProfile" = "Uredi profil";
 "accountPage.manageAccount" = "Upravljanje računa";
 "accountPage.encryptAccount" = "Zaščitite račun z geslom";
-"accountPage.passwordExplanation" = "Račun Jami je ustvarjen in hranjen krajevno samo na tej napravi, kot arhiv, ki vsebuje ključe vašega računa. Dostop do arhiva lahko dodatno zaščitite z geslom.";
+"accountPage.passwordExplanation" = "Račun Talk9 je ustvarjen in hranjen krajevno samo na tej napravi, kot arhiv, ki vsebuje ključe vašega računa. Dostop do arhiva lahko dodatno zaščitite z geslom.";
 "accountPage.passwordsDoNotMatch" = "Gesli se ne ujemata.";
 "accountPage.passwordCreated" = "Geslo ustvarjeno";
 "accountPage.passwordUpdated" = "Geslo posodobljeno";
@@ -406,10 +406,10 @@
 "accountPage.generatingPin" = "Generiranje kode PIN ...";
 "accountPage.passwordForPin" = "Ta račun je zaščiten z geslom. Vnesite geslo, da tvorite kodo PIN.";
 "accountPage.pinExplanationTitle" = "Na drugi napravi";
-"accountPage.pinExplanationMessage" = "Namestite in zaženite Jami, izberite uvoz iz druge naprave in optično preberite kodo QR. Lahko tudi ročno vnesete kodo PIN.";
+"accountPage.pinExplanationMessage" = "Namestite in zaženite Talk9, izberite uvoz iz druge naprave in optično preberite kodo QR. Lahko tudi ročno vnesete kodo PIN.";
 "accountPage.pinError" = "Pri izdelavi kode PIN je prišlo do napake.";
 "accountPage.notificationTitle" = "Obveščanje";
-"accountPage.notificationError" = "Obvestila za Jami so onemogočena. Omogočite jih v nastavitvah naprave, če želite uporabljati to funkcijo.";
+"accountPage.notificationError" = "Obvestila za Talk9 so onemogočena. Omogočite jih v nastavitvah naprave, če želite uporabljati to funkcijo.";
 "accountPage.callsFromUnknownContacts" = "Dovoli klice neznanih stikov.";
 "accountPage.accountSettingsExplanation" = "Te nastavitve bodo veljale le za ta račun.";
 "accountPage.appSettings" = "Nastavitve aplikacije";
@@ -433,7 +433,7 @@
 "accountPage.typingIndicatorExplanation" = "Nakaži, da se sporočila vnašajo.";
 
 // Backup Account
-"backupAccount.explanation" = "Ta račun Jami obstaja samo na tej napravi. Račun bo izgubljen, če to napravo izgubite ali če odstranite program. Priporočamo, da naredite varnostno kopijo tega računa.";
+"backupAccount.explanation" = "Ta račun Talk9 obstaja samo na tej napravi. Račun bo izgubljen, če to napravo izgubite ali če odstranite program. Priporočamo, da naredite varnostno kopijo tega računa.";
 "backupAccount.title" = "Varnostno kopiranje računa";
 "backupAccount.creating" = "Ustvarjanje varnostne kopije";
 "backupAccount.archiveName" = "Izberite ime arhiva.";
@@ -563,7 +563,7 @@
 "migrateAccount.migrateAnother" = "Preseli še en račun";
 
 // About Jami
-"aboutJami.declaration1" = "Jami je prost in brezplačen program za univerzalno in porazdeljeno komunikacijo P2P, ki spoštuje svobodo in zasebnost svojih uporabnikov. Obiščite";
+"aboutJami.declaration1" = "Talk9 je prost in brezplačen program za univerzalno in porazdeljeno komunikacijo P2P, ki spoštuje svobodo in zasebnost svojih uporabnikov. Obiščite";
 "aboutJami.declaration2" = ", da izveste več.";
 "aboutJami.noWarranty1" = "Ta program nima nikakršne garancije. Glejte";
 "aboutJami.noWarranty2" = "različico 3 ali novejše za podrobnosti.";
@@ -573,7 +573,7 @@
 "aboutJami.media" = "Medij";
 "aboutJami.communityManagement" = "Upravljanje skupnosti";
 "aboutJami.specialThanks" = "Posebne zahvale";
-"aboutJami.info" = "To je seznam vseh, ki so pomembno prispevali svoj čas in napore ter doprinesli k projektu Jami. Vsi, ki zaradi svojega prispevka pogrešate svoje ime na seznamu, stopite v stik z nami.";
+"aboutJami.info" = "To je seznam vseh, ki so pomembno prispevali svoj čas in napore ter doprinesli k projektu Talk9. Vsi, ki zaradi svojega prispevka pogrešate svoje ime na seznamu, stopite v stik z nami.";
 "aboutJami.header" = "Želimo se zahvaliti avtorjem prispevkov, katerih prizadevanja so skozi vrsto let naredili to programje, kakršno je.";
 
 // Accessibility
@@ -581,8 +581,8 @@
 "accessibility.smartListSwitchAccounts" = "Preklopi med računi";
 "accessibility.smartListConnectedAs" = "Trenutni račun je %@";
 "accessibility.smartListAddAccount" = "Dodajanje računa";
-"accessibility.aboutJamiTitle" = "O programu Jami";
-"accessibility.welcomeToJamiTitle" = "Dobrodošli v Jami";
+"accessibility.aboutJamiTitle" = "O programu Talk9";
+"accessibility.welcomeToJamiTitle" = "Dobrodošli v Talk9";
 "accessibility.createAccountVerifyUsernamePrompt" = "Vnesite uporabniško ime, da preverite razpoložljivost.";
 "accessibility.profilePicturePicker" = "Slika profila";
 "accessibility.profilePicturePickerHint" = "Dvakrat tapnite, da slikate ali izberete sliko iz knjižnice";

@@ -42,7 +42,7 @@
 "global.copy" = "प्रतिलिपि";
 "global.reply" = "उत्तर";
 "global.search" = "खोज्दै...";
-"global.supportJami" = "Support Jami project";
+"global.supportJami" = "Support Talk9 project";
 "global.deleteMessage" = "सन्देश हटाउने";
 "global.deleteFile" = "Delete file from device";
 "global.editMessage" = "सन्देश सम्पादन गर्नुहोस्";
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "Conversation color picker";
 "swarm.editTextHint" = "Double-tap to edit";
 "swarm.conversationHeader" = "वार्तालाप";
-"swarm.shareContactMessage" = "You can add this contact, %1@, on the Jami distributed communication platform: https://jami.net";
+"swarm.shareContactMessage" = "You can add this contact, %1@, on the Talk9 distributed communication platform: https://talk9.co";
 "swarm.oneToOne" = "निजी";
 "swarm.adminInvitesOnly" = "निजी समूह (प्रतिबन्धित निमन्त्रणा)";
 "swarm.invitesOnly" = "निजी समूह";
@@ -149,7 +149,7 @@
 "smartlist.inviteFriends" = "Invite friends";
 "smartlist.accounts" = "लेखा";
 "smartlist.disableDonation" = "अहिले होइन";
-"smartlist.donationExplanation" = "If you enjoy using Jami and believe in our mission, do you want to make a donation?";
+"smartlist.donationExplanation" = "If you enjoy using Talk9 and believe in our mission, do you want to make a donation?";
 "smartlist.inSynchronization" = "conversation in synchronization";
 "smartlist.newMessage" = "New message";
 
@@ -191,12 +191,12 @@
 // Walkthrough
 
 //Welcome Screen
-"welcome.title" = "Share, freely and privately with Jami";
-"welcome.text" = "जामी एक स्वतन्त्र र सार्वभौमिक संचार प्लेटफर्म हो जसले प्रयोगकर्ताहरूको गोपनीयता र स्वतन्त्रतालाई सुरक्षित गर्दछ";
+"welcome.title" = "Share, freely and privately with Talk9";
+"welcome.text" = "Talk9 एक स्वतन्त्र र सार्वभौमिक संचार प्लेटफर्म हो जसले प्रयोगकर्ताहरूको गोपनीयता र स्वतन्त्रतालाई सुरक्षित गर्दछ";
 "welcome.haveAccount" = "मेरो खाता छ";
 "welcome.linkDevice" = "अर्को उपकरणबाट आयात";
 "welcome.linkBackup" = "अभिलेख प्रतिस्थापनबाट आयात";
-"welcome.createAccount" = "Jami खाता सिर्जना गर्नुहोस्";
+"welcome.createAccount" = "Talk9 खाता सिर्जना गर्नुहोस्";
 "welcome.connectToJAMS" = "Connect to a management server";
 
 // Creation Profile Screen
@@ -209,7 +209,7 @@
 "createProfile.createProfilePicture" = "Create profile picture";
 
 // Create Account form
-"createAccount.createAccountFormTitle" = "जामीमा सामेल हुनुहोस्";
+"createAccount.createAccountFormTitle" = "Talk9मा सामेल हुनुहोस्";
 "createAccount.lookingForUsernameAvailability" = "Checking username availability…";
 "createAccount.invalidUsername" = "Invalid username. Please enter the correct username.";
 "createAccount.usernameAlreadyTaken" = "प्रयोगकर्ता नाम पहिले नै लिइएको";
@@ -226,7 +226,7 @@
 "createAccount.encrypt" = "Password protect";
 "createAccount.customize" = "अनुकूलन";
 "createAccount.encryptTitle" = "Password protect account";
-"createAccount.encryptExplanation" = "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.";
+"createAccount.encryptExplanation" = "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.";
 
 // Link To Account form
 "linkToAccount.importAccount" = "Import account";
@@ -246,7 +246,7 @@
 "linkToAccount.alertMessage" = "Stopping will cancel the import account operation.";
 
 // Import from Archive
-"importFromArchive.explanation" = "स्थानीय अभिलेख फाइलबाट जामी खाता आयात गर्नुहोस्।";
+"importFromArchive.explanation" = "स्थानीय अभिलेख फाइलबाट Talk9 खाता आयात गर्नुहोस्।";
 "importFromArchive.passwordExplanation" = "If the account is password protected, please fill the following field.";
 "importFromArchive.title" = "Import from archive";
 "importFromArchive.buttonTitle" = "आयात";
@@ -262,16 +262,16 @@
 
 // Alerts
 "alerts.accountCannotBeFoundTitle" = "Account error";
-"alerts.accountCannotBeFoundMessage" = "Unable to find account on the Jami network. Make sure it was exported on Jami from an existing device, and that provided credentials are correct.";
+"alerts.accountCannotBeFoundMessage" = "Unable to find account on the Talk9 network. Make sure it was exported on Talk9 from an existing device, and that provided credentials are correct.";
 "alerts.accountAddedTitle" = "Account added";
 "alerts.accountNoNetworkTitle" = "नेटवर्क त्रुटि";
-"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Jami account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
+"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Talk9 account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
 "alerts.accountDefaultErrorTitle" = "Account error";
 "alerts.accountDefaultErrorMessage" = "An error occurred while creating the account.";
 "alerts.profileTakePhoto" = "फोटो खिच्नुस्";
 "alerts.profileUploadPhoto" = "फोटो अपलोड गर्नुहोस्";
 "alerts.accountLinkedTitle" = "लिङ्क खाता";
-"alerts.dbFailedTitle" = "An error happened when launching Jami";
+"alerts.dbFailedTitle" = "An error happened when launching Talk9";
 "alerts.dbFailedMessage" = "कृपया आवेदन बन्द गर्नुहोस् र फेरि खोल्न प्रयास गर्नुहोस्";
 "alerts.confirmBlockContact" = "Do you want to block this contact? The conversation history with this contact will also be deleted permanently.";
 "alerts.confirmDeleteConversation" = "Do you want to remove this conversation permanently?";
@@ -289,7 +289,7 @@
 "alerts.uploadFile" = "फाइलहरू पठाउनुहोस्";
 "alerts.uploadPhoto" = "खुला ग्यालरी";
 "alerts.sendPhoto" = "Send photo";
-"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Jami” to determine device location.";
+"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Talk9” to determine device location.";
 "alerts.locationSharing" = "मेरो स्थान साझा गर्नुहोस्";
 "alerts.alreadylocationSharing" = "यो प्रयोगकर्तासँग स्थान साझा गर्नु";
 "alerts.locationSharingDurationTitle" = "स्थान साझेदारी कति लामो हुनुपर्छ?";
@@ -355,8 +355,8 @@
 "accountPage.other" = "अन्य";
 "accountPage.removeAccountMessage" = "If the account has not been backed up or added to another device, the account and registered username will be IRREVOCABLY LOST.";
 "accountPage.inviteFriends" = "Invite friends";
-"accountPage.contactMeOnJamiTitle" = "मलाई Jami मा सम्पर्क!";
-"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Jami distributed communication platform: https://jami.net";
+"accountPage.contactMeOnJamiTitle" = "मलाई Talk9 मा सम्पर्क!";
+"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Talk9 distributed communication platform: https://talk9.co";
 "accountPage.passwordPlaceholder" = "खाता पासवर्ड प्रविष्ट गर्नुहोस्";
 "accountPage.usernamePlaceholder" = "इच्छित प्रयोगकर्ता नाम प्रविष्ट गर्नुहोस्";
 "accountPage.registerNameErrorMessage" = "The username is unavailable.";
@@ -388,7 +388,7 @@
 "accountPage.upnpEnabled" = "UPnP प्रयोग गर्नुहोस्";
 "accountPage.security" = "सुरक्षा";
 "accountPage.enableSRTP" = "एन्क्रिप्ट मिडिया स्ट्रिमहरू (SRTP)";
-"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Jami.";
+"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Talk9.";
 "accountPage.profileHeader" = "प्रोफाइल";
 "accountPage.profileNameNotSelected" = "Name not selected";
 "accountPage.accountHeader" = "खाता";
@@ -397,7 +397,7 @@
 "accountPage.editProfile" = "Edit Profile";
 "accountPage.manageAccount" = "खाता व्यवस्थापन";
 "accountPage.encryptAccount" = "Password protect account";
-"accountPage.passwordExplanation" = "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
+"accountPage.passwordExplanation" = "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
 "accountPage.passwordsDoNotMatch" = "Passwords do not match.";
 "accountPage.passwordCreated" = "Password created";
 "accountPage.passwordUpdated" = "Password updated";
@@ -406,10 +406,10 @@
 "accountPage.generatingPin" = "Generating PIN code…";
 "accountPage.passwordForPin" = "The account is password protected. Enter the password to generate a PIN code.";
 "accountPage.pinExplanationTitle" = "On another device";
-"accountPage.pinExplanationMessage" = "Install and launch Jami. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
+"accountPage.pinExplanationMessage" = "Install and launch Talk9. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
 "accountPage.pinError" = "An error occurred while generating the PIN code.";
 "accountPage.notificationTitle" = "सूचनाहरू";
-"accountPage.notificationError" = "Notifications for Jami are disabled. Enable it in device settings in order to use this feature.";
+"accountPage.notificationError" = "Notifications for Talk9 are disabled. Enable it in device settings in order to use this feature.";
 "accountPage.callsFromUnknownContacts" = "Allow calls from unknown contacts.";
 "accountPage.accountSettingsExplanation" = "These settings will only apply to this account.";
 "accountPage.appSettings" = "App settings";
@@ -433,7 +433,7 @@
 "accountPage.typingIndicatorExplanation" = "Indicate when messages are being typed.";
 
 // Backup Account
-"backupAccount.explanation" = "This Jami account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
+"backupAccount.explanation" = "This Talk9 account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
 "backupAccount.title" = "ब्याकअप खाता";
 "backupAccount.creating" = "Creating backup";
 "backupAccount.archiveName" = "Select a name for the archive.";
@@ -563,7 +563,7 @@
 "migrateAccount.migrateAnother" = "अर्को खातामा माइग्रेट गर्नुहोस्";
 
 // About Jami
-"aboutJami.declaration1" = "Jami, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
+"aboutJami.declaration1" = "Talk9, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
 "aboutJami.declaration2" = "to learn more.";
 "aboutJami.noWarranty1" = "This program comes with absolutely no warranty. See the";
 "aboutJami.noWarranty2" = "version 3 or later for details.";
@@ -573,7 +573,7 @@
 "aboutJami.media" = "मिडिया";
 "aboutJami.communityManagement" = "Community Management";
 "aboutJami.specialThanks" = "Special thanks to";
-"aboutJami.info" = "This is a list of people who have made a significant investment of time, with useful results, into Jami. Any such contributors who want to be added to the list should contact us.";
+"aboutJami.info" = "This is a list of people who have made a significant investment of time, with useful results, into Talk9. Any such contributors who want to be added to the list should contact us.";
 "aboutJami.header" = "We would like to thank our contributors, whose efforts over many years have made this software what it is.";
 
 // Accessibility
@@ -582,7 +582,7 @@
 "accessibility.smartListConnectedAs" = "The current account is %@";
 "accessibility.smartListAddAccount" = "खाता थप्नुहोस्";
 "accessibility.aboutJamiTitle" = "जमीको बारेमा";
-"accessibility.welcomeToJamiTitle" = "जामीमा स्वागत छ";
+"accessibility.welcomeToJamiTitle" = "Talk9मा स्वागत छ";
 "accessibility.createAccountVerifyUsernamePrompt" = "Enter username to check availability.";
 "accessibility.profilePicturePicker" = "प्रोफाइल चित्र";
 "accessibility.profilePicturePickerHint" = "Double-tap to take a picture or select a picture from the library";

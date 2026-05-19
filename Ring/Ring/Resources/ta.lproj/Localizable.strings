@@ -42,7 +42,7 @@
 "global.copy" = "பதிப்பு";
 "global.reply" = "பதில்";
 "global.search" = "தேடுவது.";
-"global.supportJami" = "Support Jami project";
+"global.supportJami" = "Support Talk9 project";
 "global.deleteMessage" = "செய்தி நீக்கவும்";
 "global.deleteFile" = "Delete file from device";
 "global.editMessage" = "செய்தி திருத்தவும்";
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "Conversation color picker";
 "swarm.editTextHint" = "Double-tap to edit";
 "swarm.conversationHeader" = "உரையாடல்";
-"swarm.shareContactMessage" = "You can add this contact, %1@, on the Jami distributed communication platform: https://jami.net";
+"swarm.shareContactMessage" = "You can add this contact, %1@, on the Talk9 distributed communication platform: https://talk9.co";
 "swarm.oneToOne" = "தனியார்";
 "swarm.adminInvitesOnly" = "தனியார் குழு (குறைந்த அழைப்பு)";
 "swarm.invitesOnly" = "தனியார் குழு";
@@ -145,11 +145,11 @@
 "smartlist.noNumber" = "தேர்ந்தெடுக்கப்பட்ட தொடர்பு எண் இல்லை";
 "smartlist.selectOneNumber" = "எண்களில் ஒன்றைத் தேர்ந்தெடுக்கவும்";
 "smartlist.invitations" = "அழைப்பிதழ்கள்";
-"smartlist.aboutJami" = "ஜாமி பற்றி";
+"smartlist.aboutJami" = "Talk9 பற்றி";
 "smartlist.inviteFriends" = "Invite friends";
 "smartlist.accounts" = "கணக்குகள்";
 "smartlist.disableDonation" = "இப்போது வேண்டாம்";
-"smartlist.donationExplanation" = "If you enjoy using Jami and believe in our mission, do you want to make a donation?";
+"smartlist.donationExplanation" = "If you enjoy using Talk9 and believe in our mission, do you want to make a donation?";
 "smartlist.inSynchronization" = "conversation in synchronization";
 "smartlist.newMessage" = "New message";
 
@@ -191,12 +191,12 @@
 // Walkthrough
 
 //Welcome Screen
-"welcome.title" = "Share, freely and privately with Jami";
-"welcome.text" = "ஜாமி என்பது பயனர்களின் தனியுரிமையும் சுதந்திரமும் பாதுகாக்கப்படும் இலவச மற்றும் உலகளாவிய தகவல் தொடர்பு தளமாகும்";
+"welcome.title" = "Share, freely and privately with Talk9";
+"welcome.text" = "Talk9 என்பது பயனர்களின் தனியுரிமையும் சுதந்திரமும் பாதுகாக்கப்படும் இலவச மற்றும் உலகளாவிய தகவல் தொடர்பு தளமாகும்";
 "welcome.haveAccount" = "எனக்கு ஏற்கனவே ஒரு கணக்கு இருக்கிறது";
 "welcome.linkDevice" = "மற்றொரு சாதனத்திலிருந்து இறக்குமதி";
 "welcome.linkBackup" = "காப்புரிமை காப்புரிமை இருந்து இறக்குமதி";
-"welcome.createAccount" = "ஜாமி கணக்கை உருவாக்கவும்";
+"welcome.createAccount" = "Talk9 கணக்கை உருவாக்கவும்";
 "welcome.connectToJAMS" = "Connect to a management server";
 
 // Creation Profile Screen
@@ -209,7 +209,7 @@
 "createProfile.createProfilePicture" = "Create profile picture";
 
 // Create Account form
-"createAccount.createAccountFormTitle" = "ஜாமிக்கு சேரவும்";
+"createAccount.createAccountFormTitle" = "Talk9க்கு சேரவும்";
 "createAccount.lookingForUsernameAvailability" = "Checking username availability…";
 "createAccount.invalidUsername" = "Invalid username. Please enter the correct username.";
 "createAccount.usernameAlreadyTaken" = "ஏற்கனவே எடுக்கப்பட்ட பயனர் பெயர்";
@@ -220,13 +220,13 @@
 "createAccount.timeoutMessage" = "Username registration is in progress. Please wait…";
 "createAccount.sipConfigure" = "Configure existing SIP account";
 "createAccount.creatingAccount" = "Creating account";
-"createAccount.nameExplanation" = "ஜாமி மீது உங்களை எளிதாகக் கண்டுபிடித்து அடைய உதவும் பயனர் பெயரை நீங்கள் தேர்வு செய்யலாம்.";
+"createAccount.nameExplanation" = "Talk9 மீது உங்களை எளிதாகக் கண்டுபிடித்து அடைய உதவும் பயனர் பெயரை நீங்கள் தேர்வு செய்யலாம்.";
 "createAccount.newAccount" = "New account";
 "createAccount.encryptionEnabled" = "Password protection enabled";
 "createAccount.encrypt" = "Password protect";
 "createAccount.customize" = "தனிப்பயனாக்க";
 "createAccount.encryptTitle" = "Password protect account";
-"createAccount.encryptExplanation" = "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.";
+"createAccount.encryptExplanation" = "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.";
 
 // Link To Account form
 "linkToAccount.importAccount" = "Import account";
@@ -246,7 +246,7 @@
 "linkToAccount.alertMessage" = "Stopping will cancel the import account operation.";
 
 // Import from Archive
-"importFromArchive.explanation" = "உள்ளூர் காப்பக கோப்பிலிருந்து ஜாமி கணக்கை இறக்குமதி செய்யுங்கள்.";
+"importFromArchive.explanation" = "உள்ளூர் காப்பக கோப்பிலிருந்து Talk9 கணக்கை இறக்குமதி செய்யுங்கள்.";
 "importFromArchive.passwordExplanation" = "If the account is password protected, please fill the following field.";
 "importFromArchive.title" = "Import from archive";
 "importFromArchive.buttonTitle" = "இறக்குமதி";
@@ -262,16 +262,16 @@
 
 // Alerts
 "alerts.accountCannotBeFoundTitle" = "Account error";
-"alerts.accountCannotBeFoundMessage" = "Unable to find account on the Jami network. Make sure it was exported on Jami from an existing device, and that provided credentials are correct.";
+"alerts.accountCannotBeFoundMessage" = "Unable to find account on the Talk9 network. Make sure it was exported on Talk9 from an existing device, and that provided credentials are correct.";
 "alerts.accountAddedTitle" = "Account added";
 "alerts.accountNoNetworkTitle" = "நெட்வொர்க் தவறு";
-"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Jami account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
+"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Talk9 account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
 "alerts.accountDefaultErrorTitle" = "Account error";
 "alerts.accountDefaultErrorMessage" = "An error occurred while creating the account.";
 "alerts.profileTakePhoto" = "புகைப்படம் எடு";
 "alerts.profileUploadPhoto" = "புகைப்படத்தை பதிவேற்றவும்";
 "alerts.accountLinkedTitle" = "இணைப்பு கணக்கு";
-"alerts.dbFailedTitle" = "An error happened when launching Jami";
+"alerts.dbFailedTitle" = "An error happened when launching Talk9";
 "alerts.dbFailedMessage" = "தயவுசெய்து விண்ணப்பத்தை மூடிவிட்டு மீண்டும் திறக்க முயற்சிக்கவும்";
 "alerts.confirmBlockContact" = "Do you want to block this contact? The conversation history with this contact will also be deleted permanently.";
 "alerts.confirmDeleteConversation" = "Do you want to remove this conversation permanently?";
@@ -289,7 +289,7 @@
 "alerts.uploadFile" = "கோப்பை அனுப்பு";
 "alerts.uploadPhoto" = "திறந்த கேலரி";
 "alerts.sendPhoto" = "Send photo";
-"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Jami” to determine device location.";
+"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Talk9” to determine device location.";
 "alerts.locationSharing" = "என் இருப்பிடத்தை பகிர்ந்து";
 "alerts.alreadylocationSharing" = "ஏற்கனவே இந்த பயனருடன் இருப்பிட பகிர்வு";
 "alerts.locationSharingDurationTitle" = "இருப்பிட பகிர்வு எவ்வளவு காலம் ஆக வேண்டும்?";
@@ -355,8 +355,8 @@
 "accountPage.other" = "மற்றவை";
 "accountPage.removeAccountMessage" = "If the account has not been backed up or added to another device, the account and registered username will be IRREVOCABLY LOST.";
 "accountPage.inviteFriends" = "Invite friends";
-"accountPage.contactMeOnJamiTitle" = "ஜாமி மீது என்னை தொடர்பு!";
-"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Jami distributed communication platform: https://jami.net";
+"accountPage.contactMeOnJamiTitle" = "Talk9 மீது என்னை தொடர்பு!";
+"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Talk9 distributed communication platform: https://talk9.co";
 "accountPage.passwordPlaceholder" = "கணக்கு கடவுச்சொல்லை உள்ளிடவும்";
 "accountPage.usernamePlaceholder" = "விரும்பிய பயனர்பெயரை உள்ளிடவும்";
 "accountPage.registerNameErrorMessage" = "The username is unavailable.";
@@ -373,7 +373,7 @@
 "accountPage.enableBoothMode" = "புத்து பயன்முறையை இயக்கு";
 "accountPage.disableBoothMode" = "புத் பயன்முறையை முடக்கு";
 "accountPage.disableBoothModeExplanation" = "Please provide the account password";
-"accountPage.boothModeExplanation" = "ஸ்டேஷன் பயன்முறையில் உரையாடல் வரலாறு சேமிக்கப்படவில்லை மற்றும் ஜாமி செயல்பாடு புறப்படும் அழைப்புகளைச் செய்வதன் மூலம் வரையறுக்கப்பட்டுள்ளது. நீங்கள் ஸ்டேஷன் பயன்முறையை இயக்கும்போது உங்கள் உரையாடல்கள் அனைத்தும் நீக்கப்படும்.";
+"accountPage.boothModeExplanation" = "ஸ்டேஷன் பயன்முறையில் உரையாடல் வரலாறு சேமிக்கப்படவில்லை மற்றும் Talk9 செயல்பாடு புறப்படும் அழைப்புகளைச் செய்வதன் மூலம் வரையறுக்கப்பட்டுள்ளது. நீங்கள் ஸ்டேஷன் பயன்முறையை இயக்கும்போது உங்கள் உரையாடல்கள் அனைத்தும் நீக்கப்படும்.";
 "accountPage.noBoothMode" = "To enable Booth mode, password protect the account first.";
 "accountPage.boothModeAlertMessage" = "After enabling booth mode, all the conversations will be removed.";
 "accountPage.peerDiscovery" = "உள்ளூர் சகாக்களைக் கண்டறிவதை இயக்குதல்";
@@ -388,7 +388,7 @@
 "accountPage.upnpEnabled" = "UPnP ஐப் பயன்படுத்தவும்";
 "accountPage.security" = "பாதுகாப்பு";
 "accountPage.enableSRTP" = "ஊடக ஓட்டங்களை (SRTP) குறியாக்குதல்";
-"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Jami.";
+"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Talk9.";
 "accountPage.profileHeader" = "சுயவிவரம்";
 "accountPage.profileNameNotSelected" = "Name not selected";
 "accountPage.accountHeader" = "கணக்கு";
@@ -397,7 +397,7 @@
 "accountPage.editProfile" = "Edit Profile";
 "accountPage.manageAccount" = "கணக்கை நிர்வகிக்கவும்";
 "accountPage.encryptAccount" = "Password protect account";
-"accountPage.passwordExplanation" = "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
+"accountPage.passwordExplanation" = "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
 "accountPage.passwordsDoNotMatch" = "Passwords do not match.";
 "accountPage.passwordCreated" = "Password created";
 "accountPage.passwordUpdated" = "Password updated";
@@ -406,10 +406,10 @@
 "accountPage.generatingPin" = "Generating PIN code…";
 "accountPage.passwordForPin" = "The account is password protected. Enter the password to generate a PIN code.";
 "accountPage.pinExplanationTitle" = "On another device";
-"accountPage.pinExplanationMessage" = "Install and launch Jami. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
+"accountPage.pinExplanationMessage" = "Install and launch Talk9. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
 "accountPage.pinError" = "An error occurred while generating the PIN code.";
 "accountPage.notificationTitle" = "அறிவிப்புகள்";
-"accountPage.notificationError" = "Notifications for Jami are disabled. Enable it in device settings in order to use this feature.";
+"accountPage.notificationError" = "Notifications for Talk9 are disabled. Enable it in device settings in order to use this feature.";
 "accountPage.callsFromUnknownContacts" = "Allow calls from unknown contacts.";
 "accountPage.accountSettingsExplanation" = "These settings will only apply to this account.";
 "accountPage.appSettings" = "App settings";
@@ -433,7 +433,7 @@
 "accountPage.typingIndicatorExplanation" = "Indicate when messages are being typed.";
 
 // Backup Account
-"backupAccount.explanation" = "This Jami account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
+"backupAccount.explanation" = "This Talk9 account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
 "backupAccount.title" = "காப்பு கணக்கு";
 "backupAccount.creating" = "Creating backup";
 "backupAccount.archiveName" = "Select a name for the archive.";
@@ -563,7 +563,7 @@
 "migrateAccount.migrateAnother" = "மற்றொரு கணக்கை நகர்த்தவும்";
 
 // About Jami
-"aboutJami.declaration1" = "Jami, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
+"aboutJami.declaration1" = "Talk9, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
 "aboutJami.declaration2" = "to learn more.";
 "aboutJami.noWarranty1" = "This program comes with absolutely no warranty. See the";
 "aboutJami.noWarranty2" = "version 3 or later for details.";
@@ -573,7 +573,7 @@
 "aboutJami.media" = "ஊடகங்கள்";
 "aboutJami.communityManagement" = "Community Management";
 "aboutJami.specialThanks" = "சிறப்பு நன்றி";
-"aboutJami.info" = "This is a list of people who have made a significant investment of time, with useful results, into Jami. Any such contributors who want to be added to the list should contact us.";
+"aboutJami.info" = "This is a list of people who have made a significant investment of time, with useful results, into Talk9. Any such contributors who want to be added to the list should contact us.";
 "aboutJami.header" = "We would like to thank our contributors, whose efforts over many years have made this software what it is.";
 
 // Accessibility
@@ -581,8 +581,8 @@
 "accessibility.smartListSwitchAccounts" = "Switch account";
 "accessibility.smartListConnectedAs" = "The current account is %@";
 "accessibility.smartListAddAccount" = "கணக்கை சேர்க்கவும்";
-"accessibility.aboutJamiTitle" = "ஜாமி பற்றி";
-"accessibility.welcomeToJamiTitle" = "ஜாமிக்கு வரவேற்கிறோம்";
+"accessibility.aboutJamiTitle" = "Talk9 பற்றி";
+"accessibility.welcomeToJamiTitle" = "Talk9க்கு வரவேற்கிறோம்";
 "accessibility.createAccountVerifyUsernamePrompt" = "Enter username to check availability.";
 "accessibility.profilePicturePicker" = "சுயவிவரப் படம்";
 "accessibility.profilePicturePickerHint" = "Double-tap to take a picture or select a picture from the library";

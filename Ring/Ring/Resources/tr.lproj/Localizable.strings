@@ -42,7 +42,7 @@
 "global.copy" = "Kopyala";
 "global.reply" = "Yanıtla";
 "global.search" = "Aranıyor…";
-"global.supportJami" = "Support Jami project";
+"global.supportJami" = "Support Talk9 project";
 "global.deleteMessage" = "İletiyi sil";
 "global.deleteFile" = "Dosyayı aygıttan sil";
 "global.editMessage" = "İletiyi düzenle";
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "Conversation color picker";
 "swarm.editTextHint" = "Double-tap to edit";
 "swarm.conversationHeader" = "Görüşme";
-"swarm.shareContactMessage" = "You can add this contact, %1@, on the Jami distributed communication platform: https://jami.net";
+"swarm.shareContactMessage" = "You can add this contact, %1@, on the Talk9 distributed communication platform: https://talk9.co";
 "swarm.oneToOne" = "Özel";
 "swarm.adminInvitesOnly" = "Özel grup (sınırlı davet)";
 "swarm.invitesOnly" = "Özel grup";
@@ -145,11 +145,11 @@
 "smartlist.noNumber" = "Seçilen kişinin herhangi bir numarası yok";
 "smartlist.selectOneNumber" = "Numaralardan birini seçin";
 "smartlist.invitations" = "Davetiyeler";
-"smartlist.aboutJami" = "Jami Hakkında";
+"smartlist.aboutJami" = "Talk9 Hakkında";
 "smartlist.inviteFriends" = "Arkadaşlarını davet et";
 "smartlist.accounts" = "Hesaplar";
 "smartlist.disableDonation" = "Şimdi değil";
-"smartlist.donationExplanation" = "Jami'yi kullanmaktan hoşlanıyor ve misyonumuza güveniyorsan bağış yapmak ister misin?";
+"smartlist.donationExplanation" = "Talk9'yi kullanmaktan hoşlanıyor ve misyonumuza güveniyorsan bağış yapmak ister misin?";
 "smartlist.inSynchronization" = "conversation in synchronization";
 "smartlist.newMessage" = "Yeni ileti";
 
@@ -191,12 +191,12 @@
 // Walkthrough
 
 //Welcome Screen
-"welcome.title" = "Jami ile özgürce ve özel olarak paylaşın";
-"welcome.text" = "Jami, kullanıcılarının gizlilik ve özgürlüklerini sağlayan evrensel ve özgür platformdur.";
+"welcome.title" = "Talk9 ile özgürce ve özel olarak paylaşın";
+"welcome.text" = "Talk9, kullanıcılarının gizlilik ve özgürlüklerini sağlayan evrensel ve özgür platformdur.";
 "welcome.haveAccount" = "- Hesabım var.";
 "welcome.linkDevice" = "Diğer aygıttan içe aktar";
 "welcome.linkBackup" = "Arşiv yedeklemesinden içe aktar";
-"welcome.createAccount" = "Jami hesabı oluştur";
+"welcome.createAccount" = "Talk9 hesabı oluştur";
 "welcome.connectToJAMS" = "Connect to a management server";
 
 // Creation Profile Screen
@@ -209,7 +209,7 @@
 "createProfile.createProfilePicture" = "Create profile picture";
 
 // Create Account form
-"createAccount.createAccountFormTitle" = "Jami'ye katılın.";
+"createAccount.createAccountFormTitle" = "Talk9'ye katılın.";
 "createAccount.lookingForUsernameAvailability" = "Kullanıcı adının kullanılabilirliği kontrol ediliyor…";
 "createAccount.invalidUsername" = "Invalid username. Please enter the correct username.";
 "createAccount.usernameAlreadyTaken" = "Kullanıcı adı önceden alınmış";
@@ -220,13 +220,13 @@
 "createAccount.timeoutMessage" = "Kullanıcı adı kaydı devam ediyor. Lütfen bekle…";
 "createAccount.sipConfigure" = "Mevcut SIP hesabını yapılandır";
 "createAccount.creatingAccount" = "Creating account";
-"createAccount.nameExplanation" = "Jami'de bulunmanı kolaylaştırmak için bir kullanıcı adı seçebilirsin.";
+"createAccount.nameExplanation" = "Talk9'de bulunmanı kolaylaştırmak için bir kullanıcı adı seçebilirsin.";
 "createAccount.newAccount" = "Yeni hesap";
 "createAccount.encryptionEnabled" = "Parola koruması etkin";
 "createAccount.encrypt" = "Parola koruması";
 "createAccount.customize" = "Özelleştir";
 "createAccount.encryptTitle" = "Parola korumalı hesap";
-"createAccount.encryptExplanation" = "Jami hesabı, hesap anahtarlarını içeren bir arşiv olarak yalnızca bu aygıtta yerel olarak oluşturulur ve saklanır. Bu arşive erişim isteğe bağlı olarak parola ile korunabilir.";
+"createAccount.encryptExplanation" = "Talk9 hesabı, hesap anahtarlarını içeren bir arşiv olarak yalnızca bu aygıtta yerel olarak oluşturulur ve saklanır. Bu arşive erişim isteğe bağlı olarak parola ile korunabilir.";
 
 // Link To Account form
 "linkToAccount.importAccount" = "Hesabı içe aktar";
@@ -246,7 +246,7 @@
 "linkToAccount.alertMessage" = "Durdurma işlemi, hesabın içeri aktarılması işlemini iptal edecek.";
 
 // Import from Archive
-"importFromArchive.explanation" = "Jami hesabını yerel arşiv dosyasından içe aktar.";
+"importFromArchive.explanation" = "Talk9 hesabını yerel arşiv dosyasından içe aktar.";
 "importFromArchive.passwordExplanation" = "Hesabın parola korumalı ise lütfen aşağıdaki alanı doldur.";
 "importFromArchive.title" = "Import from archive";
 "importFromArchive.buttonTitle" = "İçe aktar";
@@ -262,16 +262,16 @@
 
 // Alerts
 "alerts.accountCannotBeFoundTitle" = "Hesap hatası";
-"alerts.accountCannotBeFoundMessage" = "Jami ağında hesap bulunamadı. Mevcut bir cihazdan Jami'ye aktarıldığından ve sağlanan kimlik bilgilerinin doğru olduğundan emin ol.";
+"alerts.accountCannotBeFoundMessage" = "Talk9 ağında hesap bulunamadı. Mevcut bir cihazdan Talk9'ye aktarıldığından ve sağlanan kimlik bilgilerinin doğru olduğundan emin ol.";
 "alerts.accountAddedTitle" = "Account added";
 "alerts.accountNoNetworkTitle" = "Ağ hatası";
-"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Jami account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
+"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Talk9 account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
 "alerts.accountDefaultErrorTitle" = "Hesap hatası";
 "alerts.accountDefaultErrorMessage" = "Hesap oluşturulurken bir hata oluştu.";
 "alerts.profileTakePhoto" = "Fotoğraf çek";
 "alerts.profileUploadPhoto" = "Fotograf yükle";
 "alerts.accountLinkedTitle" = "Hesap bağlama";
-"alerts.dbFailedTitle" = "Jami başlatılırken bir hata oluştu";
+"alerts.dbFailedTitle" = "Talk9 başlatılırken bir hata oluştu";
 "alerts.dbFailedMessage" = "Lütfen uygulamayı kapatın ve yeniden açmayı deneyin";
 "alerts.confirmBlockContact" = "Do you want to block this contact? The conversation history with this contact will also be deleted permanently.";
 "alerts.confirmDeleteConversation" = "Do you want to remove this conversation permanently?";
@@ -289,7 +289,7 @@
 "alerts.uploadFile" = "Dosya gönder";
 "alerts.uploadPhoto" = "Galeriyi aç";
 "alerts.sendPhoto" = "Send photo";
-"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Jami” to determine device location.";
+"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Talk9” to determine device location.";
 "alerts.locationSharing" = "Konumumu paylaş";
 "alerts.alreadylocationSharing" = "Bu kullanıcıyla hâlihazırda konum paylaşılıyor";
 "alerts.locationSharingDurationTitle" = "Konum paylaşımı ne zamana dek sürmeli?";
@@ -355,8 +355,8 @@
 "accountPage.other" = "Diğer";
 "accountPage.removeAccountMessage" = "Hesap yedeklenmediyse veya başka bir cihaza eklenmediyse, hesap ve kayıtlı kullanıcı adı KURTARILAMAZ ŞEKİLDE KAYBOLACAKTIR.";
 "accountPage.inviteFriends" = "Arkadaşlarını davet et";
-"accountPage.contactMeOnJamiTitle" = "Benimle Jami'de iletişime geç!";
-"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Jami distributed communication platform: https://jami.net";
+"accountPage.contactMeOnJamiTitle" = "Benimle Talk9'de iletişime geç!";
+"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Talk9 distributed communication platform: https://talk9.co";
 "accountPage.passwordPlaceholder" = "Hesap parolanı gir";
 "accountPage.usernamePlaceholder" = "İstenen kullanıcı adını girin";
 "accountPage.registerNameErrorMessage" = "Kullanıcı adı uygun değil.";
@@ -373,7 +373,7 @@
 "accountPage.enableBoothMode" = "Kabin Kipini Etkinleştir";
 "accountPage.disableBoothMode" = "Kabin Kipini Devre Dışı Bırak";
 "accountPage.disableBoothModeExplanation" = "Lütfen hesap parolanı gir";
-"accountPage.boothModeExplanation" = "Kabin kipinde konuşma geçmişiniz kaydedilmez ve jami'nin işlevleri giden aramalar ile kısıtlandırılır. Kabin kipini etkinleştirdiğinizde tüm konuşmalarınız kaldırılacaktır.";
+"accountPage.boothModeExplanation" = "Kabin kipinde konuşma geçmişiniz kaydedilmez ve Talk9'nin işlevleri giden aramalar ile kısıtlandırılır. Kabin kipini etkinleştirdiğinizde tüm konuşmalarınız kaldırılacaktır.";
 "accountPage.noBoothMode" = "To enable Booth mode, password protect the account first.";
 "accountPage.boothModeAlertMessage" = "After enabling booth mode, all the conversations will be removed.";
 "accountPage.peerDiscovery" = "Yerel bağlantı bulmayı etkinleştir";
@@ -388,7 +388,7 @@
 "accountPage.upnpEnabled" = "UpnP kullan";
 "accountPage.security" = "Güvenlik";
 "accountPage.enableSRTP" = "Ortam akışlarını şifrele (SRTP)";
-"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Jami.";
+"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Talk9.";
 "accountPage.profileHeader" = "Profil";
 "accountPage.profileNameNotSelected" = "Name not selected";
 "accountPage.accountHeader" = "Hesap";
@@ -397,7 +397,7 @@
 "accountPage.editProfile" = "Edit Profile";
 "accountPage.manageAccount" = "Hesabı yönet";
 "accountPage.encryptAccount" = "Parola korumalı hesap";
-"accountPage.passwordExplanation" = "Jami hesabı, hesap anahtarlarını içeren bir arşiv olarak yalnızca bu aygıtta yerel olarak oluşturulur ve saklanır. Bu arşive erişim isteğe bağlı olarak parola ile korunabilir.";
+"accountPage.passwordExplanation" = "Talk9 hesabı, hesap anahtarlarını içeren bir arşiv olarak yalnızca bu aygıtta yerel olarak oluşturulur ve saklanır. Bu arşive erişim isteğe bağlı olarak parola ile korunabilir.";
 "accountPage.passwordsDoNotMatch" = "Parolalar eşleşmiyor";
 "accountPage.passwordCreated" = "Parola oluşturuldu";
 "accountPage.passwordUpdated" = "Parola güncellendi";
@@ -406,10 +406,10 @@
 "accountPage.generatingPin" = "Generating PIN code…";
 "accountPage.passwordForPin" = "Bu hesap parola korumalıdır, PIN kodu oluşturmak için parolayı gir.";
 "accountPage.pinExplanationTitle" = "Diğer aygıtta";
-"accountPage.pinExplanationMessage" = "Jami'yi kur ve başlat. “Başka bir cihazdan içe aktar”ı seç ve QR kodunu tara. Alternatif olarak PIN kodunu manuel olarak gir.";
+"accountPage.pinExplanationMessage" = "Talk9'yi kur ve başlat. “Başka bir cihazdan içe aktar”ı seç ve QR kodunu tara. Alternatif olarak PIN kodunu manuel olarak gir.";
 "accountPage.pinError" = "An error occurred while generating the PIN code.";
 "accountPage.notificationTitle" = "Bildirimler";
-"accountPage.notificationError" = "Notifications for Jami are disabled. Enable it in device settings in order to use this feature.";
+"accountPage.notificationError" = "Notifications for Talk9 are disabled. Enable it in device settings in order to use this feature.";
 "accountPage.callsFromUnknownContacts" = "Allow calls from unknown contacts.";
 "accountPage.accountSettingsExplanation" = "These settings will only apply to this account.";
 "accountPage.appSettings" = "App settings";
@@ -433,7 +433,7 @@
 "accountPage.typingIndicatorExplanation" = "İletilerin ne zaman yazıldığını belirt.";
 
 // Backup Account
-"backupAccount.explanation" = "This Jami account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
+"backupAccount.explanation" = "This Talk9 account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
 "backupAccount.title" = "Hesabı yedekle";
 "backupAccount.creating" = "Creating backup";
 "backupAccount.archiveName" = "Select a name for the archive.";
@@ -563,7 +563,7 @@
 "migrateAccount.migrateAnother" = "Başka Bir Hesabı Taşı";
 
 // About Jami
-"aboutJami.declaration1" = "Jami, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
+"aboutJami.declaration1" = "Talk9, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
 "aboutJami.declaration2" = "to learn more.";
 "aboutJami.noWarranty1" = "This program comes with absolutely no warranty. See the";
 "aboutJami.noWarranty2" = "version 3 or later for details.";
@@ -573,7 +573,7 @@
 "aboutJami.media" = "Ortam";
 "aboutJami.communityManagement" = "Topluluk Yönetimi";
 "aboutJami.specialThanks" = "Özel teşekkürler";
-"aboutJami.info" = "Bu, Jami'ye önemli miktarda zaman yatırımı yapan ve faydalı sonuçlar veren kişilerin listesidir. Listeye eklenmek isteyen bu tür katkıda bulunanların bizimle iletişime geçmesi gerekir.";
+"aboutJami.info" = "Bu, Talk9'ye önemli miktarda zaman yatırımı yapan ve faydalı sonuçlar veren kişilerin listesidir. Listeye eklenmek isteyen bu tür katkıda bulunanların bizimle iletişime geçmesi gerekir.";
 "aboutJami.header" = "Bu yazılımın bu hale gelmesinde şimdiye kadar yardımı dokunan herkese teşekkür ediyoruz.";
 
 // Accessibility
@@ -581,8 +581,8 @@
 "accessibility.smartListSwitchAccounts" = "Switch account";
 "accessibility.smartListConnectedAs" = "The current account is %@";
 "accessibility.smartListAddAccount" = "Hesap ekle";
-"accessibility.aboutJamiTitle" = "Jami Hakkında";
-"accessibility.welcomeToJamiTitle" = "Jami ye Hoş geldin";
+"accessibility.aboutJamiTitle" = "Talk9 Hakkında";
+"accessibility.welcomeToJamiTitle" = "Talk9 ye Hoş geldin";
 "accessibility.createAccountVerifyUsernamePrompt" = "Enter username to check availability.";
 "accessibility.profilePicturePicker" = "Profil görseli";
 "accessibility.profilePicturePickerHint" = "Double-tap to take a picture or select a picture from the library";

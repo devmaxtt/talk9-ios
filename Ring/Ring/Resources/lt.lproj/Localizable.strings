@@ -42,7 +42,7 @@
 "global.copy" = "Kopijuoti";
 "global.reply" = "Atsakyti";
 "global.search" = "Ieškoma…";
-"global.supportJami" = "Support Jami project";
+"global.supportJami" = "Support Talk9 project";
 "global.deleteMessage" = "Ištrinti žinutę";
 "global.deleteFile" = "Ištrinti failą iš įrenginio";
 "global.editMessage" = "Taisyti žinutę";
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "Conversation color picker";
 "swarm.editTextHint" = "Double-tap to edit";
 "swarm.conversationHeader" = "Pokalbis";
-"swarm.shareContactMessage" = "You can add this contact, %1@, on the Jami distributed communication platform: https://jami.net";
+"swarm.shareContactMessage" = "You can add this contact, %1@, on the Talk9 distributed communication platform: https://talk9.co";
 "swarm.oneToOne" = "Privatus";
 "swarm.adminInvitesOnly" = "Private group (restricted invites)";
 "swarm.invitesOnly" = "Privati grupė";
@@ -145,11 +145,11 @@
 "smartlist.noNumber" = "Pasirinktas adresatas neturi numerio";
 "smartlist.selectOneNumber" = "Pasirinkite vieną iš numerių";
 "smartlist.invitations" = "Pakvietimai";
-"smartlist.aboutJami" = "Apie Jami";
+"smartlist.aboutJami" = "Apie Talk9";
 "smartlist.inviteFriends" = "Invite friends";
 "smartlist.accounts" = "Paskyros";
 "smartlist.disableDonation" = "Ne dabar";
-"smartlist.donationExplanation" = "If you enjoy using Jami and believe in our mission, do you want to make a donation?";
+"smartlist.donationExplanation" = "If you enjoy using Talk9 and believe in our mission, do you want to make a donation?";
 "smartlist.inSynchronization" = "conversation in synchronization";
 "smartlist.newMessage" = "Nauja žinutė";
 
@@ -191,12 +191,12 @@
 // Walkthrough
 
 //Welcome Screen
-"welcome.title" = "Share, freely and privately with Jami";
-"welcome.text" = "Jami yra laisva ir universali bendravimo platforma, kuri išsaugo naudotojo privatumą ir laisves.";
+"welcome.title" = "Share, freely and privately with Talk9";
+"welcome.text" = "Talk9 yra laisva ir universali bendravimo platforma, kuri išsaugo naudotojo privatumą ir laisves.";
 "welcome.haveAccount" = "Aš jau turiu paskyrą";
 "welcome.linkDevice" = "Importuoti iš kito įrenginio";
 "welcome.linkBackup" = "Importuoti iš atsarginės kopijos archyvo";
-"welcome.createAccount" = "Susikurkite Jami paskyrą";
+"welcome.createAccount" = "Susikurkite Talk9 paskyrą";
 "welcome.connectToJAMS" = "Connect to a management server";
 
 // Creation Profile Screen
@@ -209,7 +209,7 @@
 "createProfile.createProfilePicture" = "Create profile picture";
 
 // Create Account form
-"createAccount.createAccountFormTitle" = "Join Jami";
+"createAccount.createAccountFormTitle" = "Join Talk9";
 "createAccount.lookingForUsernameAvailability" = "Tikrinamas naudotojo vardo prieinamumas…";
 "createAccount.invalidUsername" = "Invalid username. Please enter the correct username.";
 "createAccount.usernameAlreadyTaken" = "Naudotojo vardas jau užimtas";
@@ -220,13 +220,13 @@
 "createAccount.timeoutMessage" = "Vyksta naudotojo vardo registracija. Palaukite…";
 "createAccount.sipConfigure" = "Configure existing SIP account";
 "createAccount.creatingAccount" = "Creating account";
-"createAccount.nameExplanation" = "Galite pasirinkti naudotojo vardą, kad padėtumėte kitiems lengvai jus rasti ir pasiekti per Jami.";
+"createAccount.nameExplanation" = "Galite pasirinkti naudotojo vardą, kad padėtumėte kitiems lengvai jus rasti ir pasiekti per Talk9.";
 "createAccount.newAccount" = "Nauja paskyra";
 "createAccount.encryptionEnabled" = "Apsauga slaptažodžiu įjungta";
 "createAccount.encrypt" = "Password protect";
 "createAccount.customize" = "Tinkinti";
 "createAccount.encryptTitle" = "Password protect account";
-"createAccount.encryptExplanation" = "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.";
+"createAccount.encryptExplanation" = "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.";
 
 // Link To Account form
 "linkToAccount.importAccount" = "Importuoti paskyrą";
@@ -246,7 +246,7 @@
 "linkToAccount.alertMessage" = "Stopping will cancel the import account operation.";
 
 // Import from Archive
-"importFromArchive.explanation" = "Importuoti Jami paskyrą iš vietinio archyvo failo.";
+"importFromArchive.explanation" = "Importuoti Talk9 paskyrą iš vietinio archyvo failo.";
 "importFromArchive.passwordExplanation" = "Jei paskyra yra apsaugota slaptažodžiu, įrašykite jį į šį lauką.";
 "importFromArchive.title" = "Importuoti iš archyvo";
 "importFromArchive.buttonTitle" = "Importuoti";
@@ -262,16 +262,16 @@
 
 // Alerts
 "alerts.accountCannotBeFoundTitle" = "Paskyros klaida";
-"alerts.accountCannotBeFoundMessage" = "Unable to find account on the Jami network. Make sure it was exported on Jami from an existing device, and that provided credentials are correct.";
+"alerts.accountCannotBeFoundMessage" = "Unable to find account on the Talk9 network. Make sure it was exported on Talk9 from an existing device, and that provided credentials are correct.";
 "alerts.accountAddedTitle" = "Paskyra pridėta";
 "alerts.accountNoNetworkTitle" = "Tinklo klaida";
-"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Jami account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
+"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Talk9 account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
 "alerts.accountDefaultErrorTitle" = "Paskyros klaida";
 "alerts.accountDefaultErrorMessage" = "Kuriant paskyrą įvyko klaida.";
 "alerts.profileTakePhoto" = "Padaryti nuotrauką";
 "alerts.profileUploadPhoto" = "Įkelti nuotrauką";
 "alerts.accountLinkedTitle" = "Susiejama paskyra";
-"alerts.dbFailedTitle" = "Paleidžiant Jami įvyko klaida";
+"alerts.dbFailedTitle" = "Paleidžiant Talk9 įvyko klaida";
 "alerts.dbFailedMessage" = "Prašome užverti programą ir bandyti ją atverti dar kartą";
 "alerts.confirmBlockContact" = "Do you want to block this contact? The conversation history with this contact will also be deleted permanently.";
 "alerts.confirmDeleteConversation" = "Do you want to remove this conversation permanently?";
@@ -289,7 +289,7 @@
 "alerts.uploadFile" = "Siųsti failą";
 "alerts.uploadPhoto" = "Atverti galeriją";
 "alerts.sendPhoto" = "Send photo";
-"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Jami” to determine device location.";
+"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Talk9” to determine device location.";
 "alerts.locationSharing" = "Share my location";
 "alerts.alreadylocationSharing" = "Already sharing location with this user";
 "alerts.locationSharingDurationTitle" = "How long should the location sharing be?";
@@ -355,8 +355,8 @@
 "accountPage.other" = "Kita";
 "accountPage.removeAccountMessage" = "If the account has not been backed up or added to another device, the account and registered username will be IRREVOCABLY LOST.";
 "accountPage.inviteFriends" = "Invite friends";
-"accountPage.contactMeOnJamiTitle" = "Contact me on Jami!";
-"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Jami distributed communication platform: https://jami.net";
+"accountPage.contactMeOnJamiTitle" = "Contact me on Talk9!";
+"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Talk9 distributed communication platform: https://talk9.co";
 "accountPage.passwordPlaceholder" = "Įveskite paskyros slaptažodį";
 "accountPage.usernamePlaceholder" = "Įveskite pageidaujamą naudotojo vardą";
 "accountPage.registerNameErrorMessage" = "Naudotojo vardas yra neprieinamas.";
@@ -373,7 +373,7 @@
 "accountPage.enableBoothMode" = "Enable Booth Mode";
 "accountPage.disableBoothMode" = "Disable Booth Mode";
 "accountPage.disableBoothModeExplanation" = "Please provide the account password";
-"accountPage.boothModeExplanation" = "In booth mode conversation history not saved and jami functionality limited by making outgoing calls. When you enable booth mode all your conversations will be removed.";
+"accountPage.boothModeExplanation" = "In booth mode conversation history not saved and Talk9 functionality limited by making outgoing calls. When you enable booth mode all your conversations will be removed.";
 "accountPage.noBoothMode" = "To enable Booth mode, password protect the account first.";
 "accountPage.boothModeAlertMessage" = "After enabling booth mode, all the conversations will be removed.";
 "accountPage.peerDiscovery" = "Enable local peer discovery";
@@ -388,7 +388,7 @@
 "accountPage.upnpEnabled" = "Naudoti UPnP";
 "accountPage.security" = "Saugumas";
 "accountPage.enableSRTP" = "Šifruoti medija srautus (SRTP)";
-"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Jami.";
+"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Talk9.";
 "accountPage.profileHeader" = "Profilis";
 "accountPage.profileNameNotSelected" = "Name not selected";
 "accountPage.accountHeader" = "Paskyra";
@@ -397,7 +397,7 @@
 "accountPage.editProfile" = "Taisyti profilį";
 "accountPage.manageAccount" = "Tvarkyti paskyrą";
 "accountPage.encryptAccount" = "Password protect account";
-"accountPage.passwordExplanation" = "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
+"accountPage.passwordExplanation" = "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
 "accountPage.passwordsDoNotMatch" = "Passwords do not match.";
 "accountPage.passwordCreated" = "Slaptažodis sukurtas";
 "accountPage.passwordUpdated" = "Slaptažodis atnaujintas";
@@ -406,10 +406,10 @@
 "accountPage.generatingPin" = "Generuojamas PIN kodas…";
 "accountPage.passwordForPin" = "The account is password protected. Enter the password to generate a PIN code.";
 "accountPage.pinExplanationTitle" = "On another device";
-"accountPage.pinExplanationMessage" = "Install and launch Jami. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
+"accountPage.pinExplanationMessage" = "Install and launch Talk9. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
 "accountPage.pinError" = "An error occurred while generating the PIN code.";
 "accountPage.notificationTitle" = "Pranešimai";
-"accountPage.notificationError" = "Notifications for Jami are disabled. Enable it in device settings in order to use this feature.";
+"accountPage.notificationError" = "Notifications for Talk9 are disabled. Enable it in device settings in order to use this feature.";
 "accountPage.callsFromUnknownContacts" = "Leisti skambučius nuo nežinomų adresatų.";
 "accountPage.accountSettingsExplanation" = "Šie nustatymai bus taikomi tik šiai paskyrai.";
 "accountPage.appSettings" = "Programos nustatymai";
@@ -433,7 +433,7 @@
 "accountPage.typingIndicatorExplanation" = "Indicate when messages are being typed.";
 
 // Backup Account
-"backupAccount.explanation" = "This Jami account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
+"backupAccount.explanation" = "This Talk9 account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
 "backupAccount.title" = "Padaryti paskyros atsarginę kopiją";
 "backupAccount.creating" = "Creating backup";
 "backupAccount.archiveName" = "Select a name for the archive.";
@@ -563,7 +563,7 @@
 "migrateAccount.migrateAnother" = "Perkelti kitą paskyrą";
 
 // About Jami
-"aboutJami.declaration1" = "Jami, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
+"aboutJami.declaration1" = "Talk9, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
 "aboutJami.declaration2" = "to learn more.";
 "aboutJami.noWarranty1" = "This program comes with absolutely no warranty. See the";
 "aboutJami.noWarranty2" = "version 3 or later for details.";
@@ -573,7 +573,7 @@
 "aboutJami.media" = "Medija";
 "aboutJami.communityManagement" = "Community Management";
 "aboutJami.specialThanks" = "Ypatingai dėkojame";
-"aboutJami.info" = "This is a list of people who have made a significant investment of time, with useful results, into Jami. Any such contributors who want to be added to the list should contact us.";
+"aboutJami.info" = "This is a list of people who have made a significant investment of time, with useful results, into Talk9. Any such contributors who want to be added to the list should contact us.";
 "aboutJami.header" = "Norėtume padėkoti mūsų pagalbininkams, kurių daugiamečių pastangų dėka ši programa tapo tokia, kokia yra dabar.";
 
 // Accessibility
@@ -581,8 +581,8 @@
 "accessibility.smartListSwitchAccounts" = "Perjungti paskyrą";
 "accessibility.smartListConnectedAs" = "The current account is %@";
 "accessibility.smartListAddAccount" = "Pridėti paskyrą";
-"accessibility.aboutJamiTitle" = "Apie Jami";
-"accessibility.welcomeToJamiTitle" = "Sveiki atvykę į Jami";
+"accessibility.aboutJamiTitle" = "Apie Talk9";
+"accessibility.welcomeToJamiTitle" = "Sveiki atvykę į Talk9";
 "accessibility.createAccountVerifyUsernamePrompt" = "Enter username to check availability.";
 "accessibility.profilePicturePicker" = "Profile picture";
 "accessibility.profilePicturePickerHint" = "Double-tap to take a picture or select a picture from the library";

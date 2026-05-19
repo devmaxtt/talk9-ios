@@ -42,7 +42,7 @@
 "global.copy" = "Копіювати";
 "global.reply" = "Відповісти";
 "global.search" = "Пошук…";
-"global.supportJami" = "Support Jami project";
+"global.supportJami" = "Support Talk9 project";
 "global.deleteMessage" = "Видалити повідомлення";
 "global.deleteFile" = "Видалити файл із пристрою";
 "global.editMessage" = "Редагувати повідомлення";
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "Conversation color picker";
 "swarm.editTextHint" = "Double-tap to edit";
 "swarm.conversationHeader" = "Розмова";
-"swarm.shareContactMessage" = "You can add this contact, %1@, on the Jami distributed communication platform: https://jami.net";
+"swarm.shareContactMessage" = "You can add this contact, %1@, on the Talk9 distributed communication platform: https://talk9.co";
 "swarm.oneToOne" = "Приватне";
 "swarm.adminInvitesOnly" = "Частна група (запрошення обмежені)";
 "swarm.invitesOnly" = "Приватна група";
@@ -145,11 +145,11 @@
 "smartlist.noNumber" = "Вибраний контакт не має ніякого номера";
 "smartlist.selectOneNumber" = "Виберіть один з цифр";
 "smartlist.invitations" = "Запрошення";
-"smartlist.aboutJami" = "Про Jami";
+"smartlist.aboutJami" = "Про Talk9";
 "smartlist.inviteFriends" = "Запросити друзів";
 "smartlist.accounts" = "Облікові записи";
 "smartlist.disableDonation" = "Не зараз";
-"smartlist.donationExplanation" = "Якщо вам подобається користуватися Jami і ви вірите в нашу місію, чи хочете зробити пожертву?";
+"smartlist.donationExplanation" = "Якщо вам подобається користуватися Talk9 і ви вірите в нашу місію, чи хочете зробити пожертву?";
 "smartlist.inSynchronization" = "conversation in synchronization";
 "smartlist.newMessage" = "Нове повідомлення";
 
@@ -191,12 +191,12 @@
 // Walkthrough
 
 //Welcome Screen
-"welcome.title" = "Діліться вільно і приватно з Jami";
-"welcome.text" = "Джамі — це вільна та універсальна платформа для зв'язку, яка оберігає приватність і свободи користувачів";
+"welcome.title" = "Діліться вільно і приватно з Talk9";
+"welcome.text" = "Talk9 — це вільна та універсальна платформа для зв'язку, яка оберігає приватність і свободи користувачів";
 "welcome.haveAccount" = "У мене вже є рахунок.";
 "welcome.linkDevice" = "Імпорт з іншого пристрою";
 "welcome.linkBackup" = "Імпорт з архивного резервного копію";
-"welcome.createAccount" = "Створення акаунту Jami";
+"welcome.createAccount" = "Створення акаунту Talk9";
 "welcome.connectToJAMS" = "Connect to a management server";
 
 // Creation Profile Screen
@@ -209,7 +209,7 @@
 "createProfile.createProfilePicture" = "Create profile picture";
 
 // Create Account form
-"createAccount.createAccountFormTitle" = "Приєднуйся до Jami";
+"createAccount.createAccountFormTitle" = "Приєднуйся до Talk9";
 "createAccount.lookingForUsernameAvailability" = "Перевірка доступності імені користувача...";
 "createAccount.invalidUsername" = "Invalid username. Please enter the correct username.";
 "createAccount.usernameAlreadyTaken" = "Ім'я користувача вже зайнято";
@@ -220,13 +220,13 @@
 "createAccount.timeoutMessage" = "Реєстрація імені користувача триває. Будь ласка, зачекайте...";
 "createAccount.sipConfigure" = "Налаштувати існуючий SIP-обліковий запис";
 "createAccount.creatingAccount" = "Creating account";
-"createAccount.nameExplanation" = "Ви можете вибрати ім'я користувача, щоб іншим було легше знайти вас і зв'язатися з вами в Jami.";
+"createAccount.nameExplanation" = "Ви можете вибрати ім'я користувача, щоб іншим було легше знайти вас і зв'язатися з вами в Talk9.";
 "createAccount.newAccount" = "Новий аккаунт";
 "createAccount.encryptionEnabled" = "Password protection enabled";
 "createAccount.encrypt" = "Password protect";
 "createAccount.customize" = "Натомість";
 "createAccount.encryptTitle" = "Password protect account";
-"createAccount.encryptExplanation" = "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.";
+"createAccount.encryptExplanation" = "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.";
 
 // Link To Account form
 "linkToAccount.importAccount" = "Імпортувати аккаунт";
@@ -246,7 +246,7 @@
 "linkToAccount.alertMessage" = "Stopping will cancel the import account operation.";
 
 // Import from Archive
-"importFromArchive.explanation" = "Імпортувати обліковий запис Jami з локального архівного файлу.";
+"importFromArchive.explanation" = "Імпортувати обліковий запис Talk9 з локального архівного файлу.";
 "importFromArchive.passwordExplanation" = "If the account is password protected, please fill the following field.";
 "importFromArchive.title" = "Import from archive";
 "importFromArchive.buttonTitle" = "Імпортувати";
@@ -262,16 +262,16 @@
 
 // Alerts
 "alerts.accountCannotBeFoundTitle" = "Account error";
-"alerts.accountCannotBeFoundMessage" = "Не вдається знайти обліковий запис у мережі Jami. Переконайтеся, що він був експортований з Jami з існуючого пристрою, і що надані облікові дані правильні.";
+"alerts.accountCannotBeFoundMessage" = "Не вдається знайти обліковий запис у мережі Talk9. Переконайтеся, що він був експортований з Talk9 з існуючого пристрою, і що надані облікові дані правильні.";
 "alerts.accountAddedTitle" = "Account added";
 "alerts.accountNoNetworkTitle" = "Збій мережі";
-"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Jami account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
+"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Talk9 account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
 "alerts.accountDefaultErrorTitle" = "Account error";
 "alerts.accountDefaultErrorMessage" = "Сталася помилка під час створення облікового запису.";
 "alerts.profileTakePhoto" = "Зняти фото";
 "alerts.profileUploadPhoto" = "Завантажити фото";
 "alerts.accountLinkedTitle" = "Спільний рахунок";
-"alerts.dbFailedTitle" = "Сталася помилка при запуску Jami";
+"alerts.dbFailedTitle" = "Сталася помилка при запуску Talk9";
 "alerts.dbFailedMessage" = "Будь ласка, закрийте заявку і спробуйте відкрити її знову";
 "alerts.confirmBlockContact" = "Do you want to block this contact? The conversation history with this contact will also be deleted permanently.";
 "alerts.confirmDeleteConversation" = "Do you want to remove this conversation permanently?";
@@ -289,7 +289,7 @@
 "alerts.uploadFile" = "Відправити файл";
 "alerts.uploadPhoto" = "Відкрити галерею";
 "alerts.sendPhoto" = "Send photo";
-"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Jami” to determine device location.";
+"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Talk9” to determine device location.";
 "alerts.locationSharing" = "Розділіть моє місцезнаходження";
 "alerts.alreadylocationSharing" = "Уже поділяється місцезнаходженням з цим користувачем";
 "alerts.locationSharingDurationTitle" = "Як довго ділиться місцезнаходження?";
@@ -355,8 +355,8 @@
 "accountPage.other" = "Інше";
 "accountPage.removeAccountMessage" = "If the account has not been backed up or added to another device, the account and registered username will be IRREVOCABLY LOST.";
 "accountPage.inviteFriends" = "Запросити друзів";
-"accountPage.contactMeOnJamiTitle" = "Звініться зі мною на Джамі!";
-"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Jami distributed communication platform: https://jami.net";
+"accountPage.contactMeOnJamiTitle" = "Звініться зі мною на Talk9!";
+"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Talk9 distributed communication platform: https://talk9.co";
 "accountPage.passwordPlaceholder" = "Введіть пароль рахунку";
 "accountPage.usernamePlaceholder" = "Введіть бажане ім'я користувача";
 "accountPage.registerNameErrorMessage" = "Ім'я користувача недоступне.";
@@ -373,7 +373,7 @@
 "accountPage.enableBoothMode" = "Отримати режим бути";
 "accountPage.disableBoothMode" = "Виключити режим бути";
 "accountPage.disableBoothModeExplanation" = "Please provide the account password";
-"accountPage.boothModeExplanation" = "У режимі кабіни історія розмов не збереглася і функціонал Jami обмежений виходячими дзвінками.";
+"accountPage.boothModeExplanation" = "У режимі кабіни історія розмов не збереглася і функціонал Talk9 обмежений виходячими дзвінками.";
 "accountPage.noBoothMode" = "To enable Booth mode, password protect the account first.";
 "accountPage.boothModeAlertMessage" = "After enabling booth mode, all the conversations will be removed.";
 "accountPage.peerDiscovery" = "Отримати локальне відкриття однолітків";
@@ -388,7 +388,7 @@
 "accountPage.upnpEnabled" = "Використовувати UPnP";
 "accountPage.security" = "Безпека";
 "accountPage.enableSRTP" = "Кодування потоку (SRTP)";
-"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Jami.";
+"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Talk9.";
 "accountPage.profileHeader" = "Профіль";
 "accountPage.profileNameNotSelected" = "Name not selected";
 "accountPage.accountHeader" = "Акаунт";
@@ -397,7 +397,7 @@
 "accountPage.editProfile" = "Edit Profile";
 "accountPage.manageAccount" = "Керувати акаунтом";
 "accountPage.encryptAccount" = "Password protect account";
-"accountPage.passwordExplanation" = "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
+"accountPage.passwordExplanation" = "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
 "accountPage.passwordsDoNotMatch" = "Паролі не збігаються.";
 "accountPage.passwordCreated" = "Password created";
 "accountPage.passwordUpdated" = "Password updated";
@@ -406,10 +406,10 @@
 "accountPage.generatingPin" = "Generating PIN code…";
 "accountPage.passwordForPin" = "The account is password protected. Enter the password to generate a PIN code.";
 "accountPage.pinExplanationTitle" = "На іншому пристрої";
-"accountPage.pinExplanationMessage" = "Install and launch Jami. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
+"accountPage.pinExplanationMessage" = "Install and launch Talk9. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
 "accountPage.pinError" = "An error occurred while generating the PIN code.";
 "accountPage.notificationTitle" = "За повідомленнями";
-"accountPage.notificationError" = "Notifications for Jami are disabled. Enable it in device settings in order to use this feature.";
+"accountPage.notificationError" = "Notifications for Talk9 are disabled. Enable it in device settings in order to use this feature.";
 "accountPage.callsFromUnknownContacts" = "Allow calls from unknown contacts.";
 "accountPage.accountSettingsExplanation" = "These settings will only apply to this account.";
 "accountPage.appSettings" = "App settings";
@@ -433,7 +433,7 @@
 "accountPage.typingIndicatorExplanation" = "Indicate when messages are being typed.";
 
 // Backup Account
-"backupAccount.explanation" = "This Jami account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
+"backupAccount.explanation" = "This Talk9 account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
 "backupAccount.title" = "Резервна копія облікового запису";
 "backupAccount.creating" = "Creating backup";
 "backupAccount.archiveName" = "Select a name for the archive.";
@@ -563,7 +563,7 @@
 "migrateAccount.migrateAnother" = "Переїжджайте на інший обліковий запис";
 
 // About Jami
-"aboutJami.declaration1" = "Jami, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
+"aboutJami.declaration1" = "Talk9, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
 "aboutJami.declaration2" = "to learn more.";
 "aboutJami.noWarranty1" = "This program comes with absolutely no warranty. See the";
 "aboutJami.noWarranty2" = "version 3 or later for details.";
@@ -573,7 +573,7 @@
 "aboutJami.media" = "Медіа";
 "aboutJami.communityManagement" = "Управління спільнотою";
 "aboutJami.specialThanks" = "Особлива подяка";
-"aboutJami.info" = "This is a list of people who have made a significant investment of time, with useful results, into Jami. Any such contributors who want to be added to the list should contact us.";
+"aboutJami.info" = "This is a list of people who have made a significant investment of time, with useful results, into Talk9. Any such contributors who want to be added to the list should contact us.";
 "aboutJami.header" = "Ми хотіли б подякувати нашим дописувачам, чиї зусилля протягом багатьох років зробили це програмне забезпечення таким, яким воно є.";
 
 // Accessibility
@@ -581,8 +581,8 @@
 "accessibility.smartListSwitchAccounts" = "Switch account";
 "accessibility.smartListConnectedAs" = "The current account is %@";
 "accessibility.smartListAddAccount" = "Додати обліковий запис";
-"accessibility.aboutJamiTitle" = "Про Jami";
-"accessibility.welcomeToJamiTitle" = "Вітаємо в Jami";
+"accessibility.aboutJamiTitle" = "Про Talk9";
+"accessibility.welcomeToJamiTitle" = "Вітаємо в Talk9";
 "accessibility.createAccountVerifyUsernamePrompt" = "Enter username to check availability.";
 "accessibility.profilePicturePicker" = "Фото профілю";
 "accessibility.profilePicturePickerHint" = "Double-tap to take a picture or select a picture from the library";

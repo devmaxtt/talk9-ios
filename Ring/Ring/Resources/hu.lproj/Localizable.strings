@@ -42,7 +42,7 @@
 "global.copy" = "Másolás";
 "global.reply" = "Válasz";
 "global.search" = "Keresés…";
-"global.supportJami" = "Jami-projekt támogatása";
+"global.supportJami" = "Talk9-projekt támogatása";
 "global.deleteMessage" = "Üzenet törlése";
 "global.deleteFile" = "Fájl törlése az eszközről";
 "global.editMessage" = "Üzenet szerkesztése";
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "Beszélgetés színválasztója";
 "swarm.editTextHint" = "Koppintson duplán a szerkesztéshez";
 "swarm.conversationHeader" = "Beszélgetés";
-"swarm.shareContactMessage" = "Ezt a kapcsolattartót, %1@, felveheti a Jami elosztott kommunikációs platformjára: https://jami.net";
+"swarm.shareContactMessage" = "Ezt a kapcsolattartót, %1@, felveheti a Talk9 elosztott kommunikációs platformjára: https://talk9.co";
 "swarm.oneToOne" = "Magánjellegű";
 "swarm.adminInvitesOnly" = "Magánjellegű csoport (korlátozott meghívók)";
 "swarm.invitesOnly" = "Magánjellegű csoport";
@@ -145,11 +145,11 @@
 "smartlist.noNumber" = "A kijelölt kapcsolattartnak nincsenek SIP-számák";
 "smartlist.selectOneNumber" = "Válasszon egy számot";
 "smartlist.invitations" = "Meghívások";
-"smartlist.aboutJami" = "A Jami névjegye";
+"smartlist.aboutJami" = "A Talk9 névjegye";
 "smartlist.inviteFriends" = "Barátok és ismerősök meghívása";
 "smartlist.accounts" = "Fiókok";
 "smartlist.disableDonation" = "Máskor";
-"smartlist.donationExplanation" = "Ha értékeli a Jami használatát, és hisz a küldetésünkben, szeretne adományozni?";
+"smartlist.donationExplanation" = "Ha értékeli a Talk9 használatát, és hisz a küldetésünkben, szeretne adományozni?";
 "smartlist.inSynchronization" = "beszélgetés összehangolásában";
 "smartlist.newMessage" = "Új üzenet";
 
@@ -191,12 +191,12 @@
 // Walkthrough
 
 //Welcome Screen
-"welcome.title" = "Megosztás, szabadon és bizalmasan Jami-vel";
-"welcome.text" = "A Jami egy szabad szoftver az egyetemes közlés emelvény, mely tiszteletben tartja a felhasználók szabadságát és magán szféráját";
+"welcome.title" = "Megosztás, szabadon és bizalmasan Talk9-vel";
+"welcome.text" = "A Talk9 egy szabad szoftver az egyetemes közlés emelvény, mely tiszteletben tartja a felhasználók szabadságát és magán szféráját";
 "welcome.haveAccount" = "Már van fiókom";
 "welcome.linkDevice" = "Importálás másik eszközről";
 "welcome.linkBackup" = "Importálás archívum biztonsági másolatból";
-"welcome.createAccount" = "Jami-fiók létrehozása";
+"welcome.createAccount" = "Talk9-fiók létrehozása";
 "welcome.connectToJAMS" = "Csatlakozás a kezelő-kiszolgálóhoz";
 
 // Creation Profile Screen
@@ -209,7 +209,7 @@
 "createProfile.createProfilePicture" = "Névjegykép létrehozása";
 
 // Create Account form
-"createAccount.createAccountFormTitle" = "Jami csatlakozása";
+"createAccount.createAccountFormTitle" = "Talk9 csatlakozása";
 "createAccount.lookingForUsernameAvailability" = "Felhasználónév elérhetőségének ellenőrzése…";
 "createAccount.invalidUsername" = "Érvénytelen felhasználónév. Kérjük, adja meg a helyes felhasználónevet.";
 "createAccount.usernameAlreadyTaken" = "A felhasználónév már foglalt";
@@ -220,13 +220,13 @@
 "createAccount.timeoutMessage" = "Felhasználónév bejegyeztetése folyamatban van. Kérjük, várjon…";
 "createAccount.sipConfigure" = "Meglévő SIP-fiók beállítása";
 "createAccount.creatingAccount" = "Fiók létrehozása";
-"createAccount.nameExplanation" = "Regisztráljon felhasználónevet, hogy mások könnyebben megtalálják és elérjék Önt a Jamin.";
+"createAccount.nameExplanation" = "Regisztráljon felhasználónevet, hogy mások könnyebben megtalálják és elérjék Önt a Talk9n.";
 "createAccount.newAccount" = "Új fiók";
 "createAccount.encryptionEnabled" = "Jelszóvédelem engedélyezve";
 "createAccount.encrypt" = "Jelszóvédelem";
 "createAccount.customize" = "Testreszabás";
 "createAccount.encryptTitle" = "Jelszóval védett fiók";
-"createAccount.encryptExplanation" = "A Jami-fiók csak helyileg jön létre és tárolódik ezen az eszközön a fiókkulcsokat tartalmazó archívumként. Az archívumhoz való hozzáférés választható jelszóval védhető.";
+"createAccount.encryptExplanation" = "A Talk9-fiók csak helyileg jön létre és tárolódik ezen az eszközön a fiókkulcsokat tartalmazó archívumként. Az archívumhoz való hozzáférés választható jelszóval védhető.";
 
 // Link To Account form
 "linkToAccount.importAccount" = "Fiók importálása";
@@ -246,7 +246,7 @@
 "linkToAccount.alertMessage" = "A leállítás megszakítja a fiók importálási műveletét.";
 
 // Import from Archive
-"importFromArchive.explanation" = "Jami-fiók importálása a helyi archívfájlból.";
+"importFromArchive.explanation" = "Talk9-fiók importálása a helyi archívfájlból.";
 "importFromArchive.passwordExplanation" = "Ha a fiók jelszóval védett, kérjük, töltse ki a következő mezőt.";
 "importFromArchive.title" = "Importálás az archívumból";
 "importFromArchive.buttonTitle" = "Importálás";
@@ -262,16 +262,16 @@
 
 // Alerts
 "alerts.accountCannotBeFoundTitle" = "Fiókhiba";
-"alerts.accountCannotBeFoundMessage" = "Nem található fiók a Jami hálózaton. Győződjön meg arról, hogy a Jami-re exportálták egy meglévő eszközről, és hogy a megadott hitelesítő adatok helyesek.";
+"alerts.accountCannotBeFoundMessage" = "Nem található fiók a Talk9 hálózaton. Győződjön meg arról, hogy a Talk9-re exportálták egy meglévő eszközről, és hogy a megadott hitelesítő adatok helyesek.";
 "alerts.accountAddedTitle" = "Fiók hozzáadva";
 "alerts.accountNoNetworkTitle" = "Hálózati hiba";
-"alerts.accountNoNetworkMessage" = "Kapcsolódási hiba történt a Jami-fióknak az elosztott hálózathoz való hozzáadása közben. Próbálkozzon újra. Ha a probléma továbbra is fennáll, forduljon a rendszergazdához.";
+"alerts.accountNoNetworkMessage" = "Kapcsolódási hiba történt a Talk9-fióknak az elosztott hálózathoz való hozzáadása közben. Próbálkozzon újra. Ha a probléma továbbra is fennáll, forduljon a rendszergazdához.";
 "alerts.accountDefaultErrorTitle" = "Fiókhiba";
 "alerts.accountDefaultErrorMessage" = "Hiba történt a fiók létrehozásakor.";
 "alerts.profileTakePhoto" = "Fénykép készítése";
 "alerts.profileUploadPhoto" = "Fénykép feltöltése";
 "alerts.accountLinkedTitle" = "Fiók összekapcsolása…";
-"alerts.dbFailedTitle" = "Hiba történt a Jami indításakor";
+"alerts.dbFailedTitle" = "Hiba történt a Talk9 indításakor";
 "alerts.dbFailedMessage" = "Kérjük, hogy zárja be az alkalmazást és próbálja meg újra megnyitni";
 "alerts.confirmBlockContact" = "Szeretne letiltani ezt a kapcsolattartót? A beszélgetés előzményei a kapcsolattartóval együtt véglegesen törlésre kerülnek.";
 "alerts.confirmDeleteConversation" = "Szeretné véglegesen eltávolítani ezt a beszélgetést?";
@@ -289,7 +289,7 @@
 "alerts.uploadFile" = "Fájl küldése";
 "alerts.uploadPhoto" = "Gyűjtemény megnyitása";
 "alerts.sendPhoto" = "Fénykép küldése";
-"alerts.locationServiceIsDisabled" = "Helymeghatározási szolgáltatások bekapcsolása, hogy a Jami meghatározhassa az eszköz tartózkodási helyét.";
+"alerts.locationServiceIsDisabled" = "Helymeghatározási szolgáltatások bekapcsolása, hogy a Talk9 meghatározhassa az eszköz tartózkodási helyét.";
 "alerts.locationSharing" = "Tartózkodási hely megosztása";
 "alerts.alreadylocationSharing" = "Tartózkodási hely már megosztva ezzel a felhasználóval.";
 "alerts.locationSharingDurationTitle" = "Mennyi ideig engedélyezi a tartózkodási hely megosztása?";
@@ -346,7 +346,7 @@
 "accountPage.revokeDevicePlaceholder" = "Fiók jelszavának megadása";
 "accountPage.deviceRevoked" = "Az eszköz visszavonása befejeződött";
 "accountPage.deviceRevocationProgress" = "Az eszköz leválasztására vonatkozó kérés folyamatban van…";
-"accountPage.deviceRevocationSuccess" = "A kijelölt eszközt leválasztották erről a Jami-fiókról.";
+"accountPage.deviceRevocationSuccess" = "A kijelölt eszközt leválasztották erről a Talk9-fiókról.";
 "accountPage.deviceRevocationTryAgain" = "Próbálkozzon újra";
 "accountPage.deviceRevocationWrongPassword" = "Hibás jelszó";
 "accountPage.deviceRevocationUnknownDevice" = "Ismeretlen eszköz";
@@ -355,8 +355,8 @@
 "accountPage.other" = "Másik";
 "accountPage.removeAccountMessage" = "Ha nincs készített biztonsági másolatot, vagy nincs összekapcsolt eszközt a fiókról, akkor a fiók és a regisztrált felhasználónév VISSZAVONHATATLANUL ELVESZIK.";
 "accountPage.inviteFriends" = "Barátok és ismerősök meghívása";
-"accountPage.contactMeOnJamiTitle" = "Lépjen kapcsolatba velem a Jami-n!";
-"accountPage.contactMeOnJamiContant" = "Lépjen kapcsolatba velem a(z) „%s” használatával a Jami elosztott kommunikációs platformon: https://jami.net";
+"accountPage.contactMeOnJamiTitle" = "Lépjen kapcsolatba velem a Talk9-n!";
+"accountPage.contactMeOnJamiContant" = "Lépjen kapcsolatba velem a(z) „%s” használatával a Talk9 elosztott kommunikációs platformon: https://talk9.co";
 "accountPage.passwordPlaceholder" = "Fiók jelszavának megadása";
 "accountPage.usernamePlaceholder" = "Kívánt felhasználónév megadása";
 "accountPage.registerNameErrorMessage" = "A felhasználónév nem érhető el.";
@@ -373,7 +373,7 @@
 "accountPage.enableBoothMode" = "Fülke üzemmód engedélyezése";
 "accountPage.disableBoothMode" = "Fülke üzemmód letiltása";
 "accountPage.disableBoothModeExplanation" = "Fiók jelszavának megadása";
-"accountPage.boothModeExplanation" = "A fülke üzemmódban a beszélgetési előzmények nem kerülnek mentésre, és a Jami funkcionalitása korlátozott a kimenő hívások kezdeményezésekor. Ha a fülke üzemmód engedélyezve van, az összes beszélgetés törlődik.";
+"accountPage.boothModeExplanation" = "A fülke üzemmódban a beszélgetési előzmények nem kerülnek mentésre, és a Talk9 funkcionalitása korlátozott a kimenő hívások kezdeményezésekor. Ha a fülke üzemmód engedélyezve van, az összes beszélgetés törlődik.";
 "accountPage.noBoothMode" = "A fülke üzemmód engedélyezéséhez először jelszóval kell védeni a fiókot.";
 "accountPage.boothModeAlertMessage" = "A fülke üzemmód engedélyezése után az összes beszélgetés eltávolításra kerül.";
 "accountPage.peerDiscovery" = "Helyi társ felderítése engedélyezése";
@@ -388,7 +388,7 @@
 "accountPage.upnpEnabled" = "UPnP használata";
 "accountPage.security" = "Biztonság";
 "accountPage.enableSRTP" = "Média-adatfolyamok titkosítása (SRTP)";
-"accountPage.registerNameExplanation" = "Regisztráljon felhasználónevet, hogy mások könnyebben megtalálják és elérjék Önt a Jamin.";
+"accountPage.registerNameExplanation" = "Regisztráljon felhasználónevet, hogy mások könnyebben megtalálják és elérjék Önt a Talk9n.";
 "accountPage.profileHeader" = "Névjegy";
 "accountPage.profileNameNotSelected" = "Név nincs kijelölve";
 "accountPage.accountHeader" = "Fiók";
@@ -397,7 +397,7 @@
 "accountPage.editProfile" = "Névjegy szerkesztése";
 "accountPage.manageAccount" = "Fiókkezelés";
 "accountPage.encryptAccount" = "Jelszóval védett fiók";
-"accountPage.passwordExplanation" = "A Jami-fiók csak helyileg jön létre és tárolódik ezen az eszközön a fiókkulcsokat tartalmazó archívumként. Az archívumhoz való hozzáférés választható jelszóval védhető.";
+"accountPage.passwordExplanation" = "A Talk9-fiók csak helyileg jön létre és tárolódik ezen az eszközön a fiókkulcsokat tartalmazó archívumként. Az archívumhoz való hozzáférés választható jelszóval védhető.";
 "accountPage.passwordsDoNotMatch" = "A jelszavak nem egyeznek.";
 "accountPage.passwordCreated" = "Jelszó létrehozva";
 "accountPage.passwordUpdated" = "Jelszó frissítve";
@@ -406,10 +406,10 @@
 "accountPage.generatingPin" = "PIN-kód generálása folyamatban…";
 "accountPage.passwordForPin" = "A fiók jelszóval védett. Kérjük, adja meg a jelszót a PIN-kód létrehozásához.";
 "accountPage.pinExplanationTitle" = "Másik eszközön";
-"accountPage.pinExplanationMessage" = "Telepítse és indítsa el a Jami alkalmazást. Válassza az „Importálás másik eszközről” lehetőséget, és olvassa be a QR-kódot. Vagy adja meg kézzel a PIN-kódot.";
+"accountPage.pinExplanationMessage" = "Telepítse és indítsa el a Talk9 alkalmazást. Válassza az „Importálás másik eszközről” lehetőséget, és olvassa be a QR-kódot. Vagy adja meg kézzel a PIN-kódot.";
 "accountPage.pinError" = "Hiba történt a PIN-kód generálása közben.";
 "accountPage.notificationTitle" = "Értesítések";
-"accountPage.notificationError" = "A Jami értesítései le vannak tiltva. A funkció használatát engedélyezze az eszköz beállításaiban.";
+"accountPage.notificationError" = "A Talk9 értesítései le vannak tiltva. A funkció használatát engedélyezze az eszköz beállításaiban.";
 "accountPage.callsFromUnknownContacts" = "Ismeretlen névjegyektől érkező hívások engedélyezése.";
 "accountPage.accountSettingsExplanation" = "Ezek a beállítások csak erre a fiókra vonatkoznak.";
 "accountPage.appSettings" = "Alkalmazási beállítások";
@@ -433,7 +433,7 @@
 "accountPage.typingIndicatorExplanation" = "Jelezze amikor begépelik az üzeneteket.";
 
 // Backup Account
-"backupAccount.explanation" = "Ez a Jami-fiók csak ezen az eszközön létezik. A fiók elveszik, ha ez az eszköz elveszik, vagy az alkalmazást eltávolítják. Javasoljuk, hogy készítsen biztonsági másolatot erről a fiókról.";
+"backupAccount.explanation" = "Ez a Talk9-fiók csak ezen az eszközön létezik. A fiók elveszik, ha ez az eszköz elveszik, vagy az alkalmazást eltávolítják. Javasoljuk, hogy készítsen biztonsági másolatot erről a fiókról.";
 "backupAccount.title" = "Fiók biztonsági mentése";
 "backupAccount.creating" = "Biztonsági másolat készítése";
 "backupAccount.archiveName" = "Fiókarchívumnév megadása.";
@@ -563,7 +563,7 @@
 "migrateAccount.migrateAnother" = "Másik fiókáttelepítés";
 
 // About Jami
-"aboutJami.declaration1" = "A Jami, egy GNU-csomag, az univerzális és elosztott társ-társ kommunikációt szolgáló szoftver, amely tiszteletben tartja a felhasználók szabadságát és magánéletét. Látogatás";
+"aboutJami.declaration1" = "A Talk9, egy GNU-csomag, az univerzális és elosztott társ-társ kommunikációt szolgáló szoftver, amely tiszteletben tartja a felhasználók szabadságát és magánéletét. Látogatás";
 "aboutJami.declaration2" = "további tájékoztatásért.";
 "aboutJami.noWarranty1" = "Ehhez a programhoz semmilyen garancia nem jár. Látogatás";
 "aboutJami.noWarranty2" = "3-as vagy újabb verziót a részletekért.";
@@ -573,7 +573,7 @@
 "aboutJami.media" = "Média";
 "aboutJami.communityManagement" = "Közösségkezelés";
 "aboutJami.specialThanks" = "Külön köszönet a következőknek:";
-"aboutJami.info" = "Ez azoknak az embereknek a listája, akik jelentős időt fektettek, és hasznos eredményeket hoztak a Jamiba. Bármely ilyen közreműködő, aki szeretne felkerülni a listára, vegye fel velünk a kapcsolatot.";
+"aboutJami.info" = "Ez azoknak az embereknek a listája, akik jelentős időt fektettek, és hasznos eredményeket hoztak a Talk9ba. Bármely ilyen közreműködő, aki szeretne felkerülni a listára, vegye fel velünk a kapcsolatot.";
 "aboutJami.header" = "Szeretnénk köszönetet mondani közreműködőinknek, akik sok éven át tartó erőfeszítéseikkel tették ezt a szoftvert azzá, amilyen.";
 
 // Accessibility
@@ -581,8 +581,8 @@
 "accessibility.smartListSwitchAccounts" = "Fiókváltás";
 "accessibility.smartListConnectedAs" = "A jelenlegi fiók %@";
 "accessibility.smartListAddAccount" = "Fiók hozzáadása";
-"accessibility.aboutJamiTitle" = "A Jami névjegye";
-"accessibility.welcomeToJamiTitle" = "Üdvözli a Jami";
+"accessibility.aboutJamiTitle" = "A Talk9 névjegye";
+"accessibility.welcomeToJamiTitle" = "Üdvözli a Talk9";
 "accessibility.createAccountVerifyUsernamePrompt" = "Felhasználónév megadása az elérhetőség ellenőrzése.";
 "accessibility.profilePicturePicker" = "Névjegykép";
 "accessibility.profilePicturePickerHint" = "Koppintson duplán a kép készítéséhez vagy a könyvtárból kijelölendő képhez";

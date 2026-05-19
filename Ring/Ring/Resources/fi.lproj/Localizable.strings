@@ -42,7 +42,7 @@
 "global.copy" = "Kopioi";
 "global.reply" = "Vastaa";
 "global.search" = "Haetaan…";
-"global.supportJami" = "Tue Jami-projektia";
+"global.supportJami" = "Tue Talk9-projektia";
 "global.deleteMessage" = "Poista viesti";
 "global.deleteFile" = "Poista tiedosto laitteelta";
 "global.editMessage" = "Muokkaa viestiä";
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "Keskustelun värivalitsin";
 "swarm.editTextHint" = "Paina kahdesti ja muokkaa";
 "swarm.conversationHeader" = "Keskustelu";
-"swarm.shareContactMessage" = "Voit lisätä tämän henkilön, %1@, Jamin viestintäalustaan: https://jami.net";
+"swarm.shareContactMessage" = "Voit lisätä tämän henkilön, %1@, Talk9n viestintäalustaan: https://talk9.co";
 "swarm.oneToOne" = "Yksityinen";
 "swarm.adminInvitesOnly" = "Yksityinen ryhmä (rajoitetut kutsut)";
 "swarm.invitesOnly" = "Yksityinen ryhmä";
@@ -145,11 +145,11 @@
 "smartlist.noNumber" = "Valitulla henkilöllä ei ole numeroa";
 "smartlist.selectOneNumber" = "Valitse yksi numeroista";
 "smartlist.invitations" = "Kutsut";
-"smartlist.aboutJami" = "Tietoa Jamista";
+"smartlist.aboutJami" = "Tietoa Talk9sta";
 "smartlist.inviteFriends" = "Kutsu ystäviä";
 "smartlist.accounts" = "Tilit";
 "smartlist.disableDonation" = "Ei nyt";
-"smartlist.donationExplanation" = "Jos pidät Jamista ja uskot tehtäväämme, Haluatko tehdä lahjoituksen?";
+"smartlist.donationExplanation" = "Jos pidät Talk9sta ja uskot tehtäväämme, Haluatko tehdä lahjoituksen?";
 "smartlist.inSynchronization" = "keskustelu synkronoituna";
 "smartlist.newMessage" = "Uusi viesti";
 
@@ -191,12 +191,12 @@
 // Walkthrough
 
 //Welcome Screen
-"welcome.title" = "Jaa vapaasti ja yksityisesti Jamilla";
-"welcome.text" = "Jami on ilmainen viestintäalusta joka turvaa käyttäjien yksityisyyden ja vapaudet";
+"welcome.title" = "Jaa vapaasti ja yksityisesti Talk9lla";
+"welcome.text" = "Talk9 on ilmainen viestintäalusta joka turvaa käyttäjien yksityisyyden ja vapaudet";
 "welcome.haveAccount" = "Minulla on jo tili.";
 "welcome.linkDevice" = "Tuo toisesta laitteesta";
 "welcome.linkBackup" = "Tuo varmuuskopiosta";
-"welcome.createAccount" = "Luo Jami-tili";
+"welcome.createAccount" = "Luo Talk9-tili";
 "welcome.connectToJAMS" = "Yhdistä hallintapalvelimeen";
 
 // Creation Profile Screen
@@ -209,7 +209,7 @@
 "createProfile.createProfilePicture" = "Luo profiilikuva";
 
 // Create Account form
-"createAccount.createAccountFormTitle" = "Liity Jamiin";
+"createAccount.createAccountFormTitle" = "Liity Talk9in";
 "createAccount.lookingForUsernameAvailability" = "Tarkistetaan käyttäjänimen saatavuutta…";
 "createAccount.invalidUsername" = "Virheellinen käyttäjänimi Anna oikea käyttäjänimi.";
 "createAccount.usernameAlreadyTaken" = "Käyttäjänimi on jo varattu";
@@ -220,13 +220,13 @@
 "createAccount.timeoutMessage" = "Käyttäjätunnuksen rekisteröinti käynnissä. Odota...";
 "createAccount.sipConfigure" = "Määritä olemassa oleva SIP-tili";
 "createAccount.creatingAccount" = "Luodaan tiliä";
-"createAccount.nameExplanation" = "Voit valita käyttäjänimen helpottamaan muita löytämään sinut Jamista.";
+"createAccount.nameExplanation" = "Voit valita käyttäjänimen helpottamaan muita löytämään sinut Talk9sta.";
 "createAccount.newAccount" = "Uusi tili";
 "createAccount.encryptionEnabled" = "Salasanasuojaus käytössä";
 "createAccount.encrypt" = "Salasanasuojattu";
 "createAccount.customize" = "Mukauta";
 "createAccount.encryptTitle" = "Salasanalla suojattu tili";
-"createAccount.encryptExplanation" = "Jami-tili luodaan ja tallennetaan paikallisesti vain tälle laitteelle. Tilin avain on pakattuna ja pääsy tähän voidaan valinnaisesti suojata salasanalla.";
+"createAccount.encryptExplanation" = "Talk9-tili luodaan ja tallennetaan paikallisesti vain tälle laitteelle. Tilin avain on pakattuna ja pääsy tähän voidaan valinnaisesti suojata salasanalla.";
 
 // Link To Account form
 "linkToAccount.importAccount" = "Tuo tunnus";
@@ -246,7 +246,7 @@
 "linkToAccount.alertMessage" = "Lopettaminen peruuttaa tilin tuontitoiminnon.";
 
 // Import from Archive
-"importFromArchive.explanation" = "Tuo Jami-tili varmuuskopiosta";
+"importFromArchive.explanation" = "Tuo Talk9-tili varmuuskopiosta";
 "importFromArchive.passwordExplanation" = "Jos tili on suojattu salasanalla, täytä seuraava kenttä.";
 "importFromArchive.title" = "Tuo varmuuskopiosta";
 "importFromArchive.buttonTitle" = "Tuo";
@@ -262,16 +262,16 @@
 
 // Alerts
 "alerts.accountCannotBeFoundTitle" = "Tilivirhe";
-"alerts.accountCannotBeFoundMessage" = "Tiliä ei löydy Jami-verkosta. Varmista, että se vietiin Jamiin olemassa olevasta laitteesta ja annetut kirjautumistiedot ovat oikein.";
+"alerts.accountCannotBeFoundMessage" = "Tiliä ei löydy Talk9-verkosta. Varmista, että se vietiin Talk9in olemassa olevasta laitteesta ja annetut kirjautumistiedot ovat oikein.";
 "alerts.accountAddedTitle" = "Tili lisätty";
 "alerts.accountNoNetworkTitle" = "Verkkovirhe";
-"alerts.accountNoNetworkMessage" = "Tapahtui yhteysvirhe lisättäessä Jami-tiliä hajautettuun verkkoon. Yritä uudelleen. Jos ongelma jatkuu, ota yhteyttä järjestelmänvalvojaan.";
+"alerts.accountNoNetworkMessage" = "Tapahtui yhteysvirhe lisättäessä Talk9-tiliä hajautettuun verkkoon. Yritä uudelleen. Jos ongelma jatkuu, ota yhteyttä järjestelmänvalvojaan.";
 "alerts.accountDefaultErrorTitle" = "Tilivirhe";
 "alerts.accountDefaultErrorMessage" = "Tilin luomisen aikana tapahtui virhe.";
 "alerts.profileTakePhoto" = "Ota valokuva";
 "alerts.profileUploadPhoto" = "Lataa valokuva";
 "alerts.accountLinkedTitle" = "Tilin linkittäminen";
-"alerts.dbFailedTitle" = "Jamia käynnistettäessä tapahtui virhe";
+"alerts.dbFailedTitle" = "Talk9a käynnistettäessä tapahtui virhe";
 "alerts.dbFailedMessage" = "Sulje sovellus ja yritä avata se uudelleen";
 "alerts.confirmBlockContact" = "Haluatko estää tämän henkilön? Henkilön keskusteluhistoria myös poistetaan pysyvästi.";
 "alerts.confirmDeleteConversation" = "Haluatko poistaa tämän keskustelun pysyvästi?";
@@ -289,7 +289,7 @@
 "alerts.uploadFile" = "Lähetä tiedosto";
 "alerts.uploadPhoto" = "Avaa valokuvat";
 "alerts.sendPhoto" = "Lähetä kuva";
-"alerts.locationServiceIsDisabled" = "Ota \"sijaintipalvelut\" käyttöön, jotta \"Jami\" voi määrittää laitteen sijainnin.";
+"alerts.locationServiceIsDisabled" = "Ota \"sijaintipalvelut\" käyttöön, jotta \"Talk9\" voi määrittää laitteen sijainnin.";
 "alerts.locationSharing" = "Jaa minun sijainti";
 "alerts.alreadylocationSharing" = "Jaat jo sijaintia tämän käyttäjän kanssa";
 "alerts.locationSharingDurationTitle" = "Kuinka kauan sijainnin pitäisi olla jaettuna?";
@@ -355,8 +355,8 @@
 "accountPage.other" = "Muu";
 "accountPage.removeAccountMessage" = "Jos tiliä ei ole varmuuskopioitu tai lisätty toiseen laitteeseen, tilisi ja rekisteröity nimi menetetään LOPULLISESTI.";
 "accountPage.inviteFriends" = "Kutsu ystäviä";
-"accountPage.contactMeOnJamiTitle" = "Ota minuun yhteyttä Jamilla!";
-"accountPage.contactMeOnJamiContant" = "Ota minuun yhteyttä \"%s\" Jami viestintäalustan kautta:  https://jami.net";
+"accountPage.contactMeOnJamiTitle" = "Ota minuun yhteyttä Talk9lla!";
+"accountPage.contactMeOnJamiContant" = "Ota minuun yhteyttä \"%s\" Talk9 viestintäalustan kautta:  https://talk9.co";
 "accountPage.passwordPlaceholder" = "Anna tilin salasana";
 "accountPage.usernamePlaceholder" = "Kirjoita haluamasi käyttäjänimi";
 "accountPage.registerNameErrorMessage" = "Käyttäjänimi ei ole saatavilla.";
@@ -373,7 +373,7 @@
 "accountPage.enableBoothMode" = "Kioskitila käyttöön";
 "accountPage.disableBoothMode" = "Poista kioskitila";
 "accountPage.disableBoothModeExplanation" = "Anna tilin salasana";
-"accountPage.boothModeExplanation" = "Kioskitilassa keskusteluhistoriaa ei tallenneta ja jamin toimintoja rajoitettu lähtevien puheluiden osalta. Kun otat kioskitilan käyttöön, kaikki keskustelusi poistetaan.";
+"accountPage.boothModeExplanation" = "Kioskitilassa keskusteluhistoriaa ei tallenneta ja Talk9:n toimintoja rajoitettu lähtevien puheluiden osalta. Kun otat kioskitilan käyttöön, kaikki keskustelusi poistetaan.";
 "accountPage.noBoothMode" = "Ota Booth-tila käyttöön suojaamalla tili ensin salasanalla.";
 "accountPage.boothModeAlertMessage" = "Booth-tilan käyttöönoton jälkeen kaikki keskustelut poistetaan.";
 "accountPage.peerDiscovery" = "Salli paikallinen vertaisten haku";
@@ -388,7 +388,7 @@
 "accountPage.upnpEnabled" = "Käytä UPnP";
 "accountPage.security" = "Turvallisuus";
 "accountPage.enableSRTP" = "Salattu mediavirta (SRTP)";
-"accountPage.registerNameExplanation" = "Rekisteröi käyttäjänimi auttaaksesi muita löytämään sinut helpommin Jamissa.";
+"accountPage.registerNameExplanation" = "Rekisteröi käyttäjänimi auttaaksesi muita löytämään sinut helpommin Talk9ssa.";
 "accountPage.profileHeader" = "Profiili";
 "accountPage.profileNameNotSelected" = "Nimi ei ole valittuna";
 "accountPage.accountHeader" = "Tili";
@@ -397,7 +397,7 @@
 "accountPage.editProfile" = "Muokkaa profiilia";
 "accountPage.manageAccount" = "Hallinnoi tiliä";
 "accountPage.encryptAccount" = "Salasanalla suojattu tili";
-"accountPage.passwordExplanation" = "Jami-tili luodaan ja tallennetaan paikallisesti vain tähän laitteeseen. Tiliavain on pakattuna ja pääsy voidaan valinnaisesti suojata salasanalla.";
+"accountPage.passwordExplanation" = "Talk9-tili luodaan ja tallennetaan paikallisesti vain tähän laitteeseen. Tiliavain on pakattuna ja pääsy voidaan valinnaisesti suojata salasanalla.";
 "accountPage.passwordsDoNotMatch" = "Salasanat eivät täsmää.";
 "accountPage.passwordCreated" = "Salasana luotu";
 "accountPage.passwordUpdated" = "Salasana päivitetty";
@@ -406,10 +406,10 @@
 "accountPage.generatingPin" = "Luodaan PIN-koodia…";
 "accountPage.passwordForPin" = "Tili on salasanasuojattu. Anna salasana ja luo pin-koodi.";
 "accountPage.pinExplanationTitle" = "Toisella laitteella";
-"accountPage.pinExplanationMessage" = "Asenna ja käynnistä Jami. Valitse \"Tuo toiselta laitteelta\" ja skannaa QR-koodi tai anna PIN-koodi käsin.";
+"accountPage.pinExplanationMessage" = "Asenna ja käynnistä Talk9. Valitse \"Tuo toiselta laitteelta\" ja skannaa QR-koodi tai anna PIN-koodi käsin.";
 "accountPage.pinError" = "PIN-koodia luotaessa tapahtui virhe.";
 "accountPage.notificationTitle" = "Ilmoitukset";
-"accountPage.notificationError" = "Jamin ilmoitukset on poistettu käytöstä. Ota käyttöön laitteen asetuksissa, jotta voit käyttää ominaisuutta.";
+"accountPage.notificationError" = "Talk9n ilmoitukset on poistettu käytöstä. Ota käyttöön laitteen asetuksissa, jotta voit käyttää ominaisuutta.";
 "accountPage.callsFromUnknownContacts" = "Salli puhelut tuntemattomilta.";
 "accountPage.accountSettingsExplanation" = "Asetukset koskevat vain tätä tiliä.";
 "accountPage.appSettings" = "Sovelluksen asetukset";
@@ -433,7 +433,7 @@
 "accountPage.typingIndicatorExplanation" = "Ilmaisee, milloin viestejä kirjoitetaan.";
 
 // Backup Account
-"backupAccount.explanation" = "Tämä Jami-tili on olemassa vain tässä laitteessa. Tilin voi menetetää, jos laite katoaa tai sovellus poistetaan. Suositeltavaa on tehdä tilistä varmuuskopio.";
+"backupAccount.explanation" = "Tämä Talk9-tili on olemassa vain tässä laitteessa. Tilin voi menetetää, jos laite katoaa tai sovellus poistetaan. Suositeltavaa on tehdä tilistä varmuuskopio.";
 "backupAccount.title" = "Varmuuskopioi tili";
 "backupAccount.creating" = "Luodaan varmuuskopio";
 "backupAccount.archiveName" = "Valitse varmuuskopiolle nimi.";
@@ -563,7 +563,7 @@
 "migrateAccount.migrateAnother" = "Siirrä toinen tunnus";
 
 // About Jami
-"aboutJami.declaration1" = "Jami GNU paketti on ilmainen ohjelmisto yleiseen viestintään, jossa kunnioitetaan käyttäjän vapauksia ja yksityisyyttä.";
+"aboutJami.declaration1" = "Talk9 GNU paketti on ilmainen ohjelmisto yleiseen viestintään, jossa kunnioitetaan käyttäjän vapauksia ja yksityisyyttä.";
 "aboutJami.declaration2" = "lue lisää.";
 "aboutJami.noWarranty1" = "Tällä ohjelmalla ei ole minkäänlaista takuuta. Katso";
 "aboutJami.noWarranty2" = "versio 3 tai uudempi. Katso lisätietoja.";
@@ -573,7 +573,7 @@
 "aboutJami.media" = "Media";
 "aboutJami.communityManagement" = "Yhteisön hallinnointi";
 "aboutJami.specialThanks" = "Erityiset kiitokset";
-"aboutJami.info" = "Luettelo ihmisistä, jotka ovat investoineet aikaa merkittävästi Jamiin. Kaikki, jotka haluavat päästä listalle, tulee ottaa yhteyttä meihin.";
+"aboutJami.info" = "Luettelo ihmisistä, jotka ovat investoineet aikaa merkittävästi Talk9in. Kaikki, jotka haluavat päästä listalle, tulee ottaa yhteyttä meihin.";
 "aboutJami.header" = "Haluamme kiittää meidän avustajia, joiden vuosien ponnistelut ovat tehneet tästä ohjelmistosta sellaisen kuin se on.";
 
 // Accessibility
@@ -581,8 +581,8 @@
 "accessibility.smartListSwitchAccounts" = "Vaihda tiliä";
 "accessibility.smartListConnectedAs" = "Nykyinen tili %@";
 "accessibility.smartListAddAccount" = "Lisää tili";
-"accessibility.aboutJamiTitle" = "Tietoja Jami'sta";
-"accessibility.welcomeToJamiTitle" = "Tervetuloa Jamiin";
+"accessibility.aboutJamiTitle" = "Tietoja Talk9'sta";
+"accessibility.welcomeToJamiTitle" = "Tervetuloa Talk9in";
 "accessibility.createAccountVerifyUsernamePrompt" = "Tarkista saatavuus kirjoittamalla tunnus.";
 "accessibility.profilePicturePicker" = "Profiilikuva";
 "accessibility.profilePicturePickerHint" = "Ota kuva napauttamalla tai valitse kuva kirjastosta";

@@ -42,7 +42,7 @@
 "global.copy" = "نُسخ";
 "global.reply" = "جاواب";
 "global.search" = "آختاريش...";
-"global.supportJami" = "Support Jami project";
+"global.supportJami" = "Support Talk9 project";
 "global.deleteMessage" = "پيغامي حذف ائدن";
 "global.deleteFile" = "Delete file from device";
 "global.editMessage" = "پیغام صوتی";
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "Conversation color picker";
 "swarm.editTextHint" = "Double-tap to edit";
 "swarm.conversationHeader" = "دانیشیق";
-"swarm.shareContactMessage" = "You can add this contact, %1@, on the Jami distributed communication platform: https://jami.net";
+"swarm.shareContactMessage" = "You can add this contact, %1@, on the Talk9 distributed communication platform: https://talk9.co";
 "swarm.oneToOne" = "خصوصی";
 "swarm.adminInvitesOnly" = "خصوصی گروه (محدود دعوت)";
 "swarm.invitesOnly" = "خصوصی گروه";
@@ -145,11 +145,11 @@
 "smartlist.noNumber" = "سئچئلن تماسون ساییسی یوخدور";
 "smartlist.selectOneNumber" = "ساییلارین بیری ساییلار";
 "smartlist.invitations" = "دعوتلر";
-"smartlist.aboutJami" = "جامی حاقّيندا";
+"smartlist.aboutJami" = "Talk9 حاقّيندا";
 "smartlist.inviteFriends" = "Invite friends";
 "smartlist.accounts" = "حسابلار";
 "smartlist.disableDonation" = "Not now";
-"smartlist.donationExplanation" = "If you enjoy using Jami and believe in our mission, do you want to make a donation?";
+"smartlist.donationExplanation" = "If you enjoy using Talk9 and believe in our mission, do you want to make a donation?";
 "smartlist.inSynchronization" = "conversation in synchronization";
 "smartlist.newMessage" = "New message";
 
@@ -191,12 +191,12 @@
 // Walkthrough
 
 //Welcome Screen
-"welcome.title" = "Share, freely and privately with Jami";
-"welcome.text" = "جامی، آزاد و آلیشلی بیر ارتباط پلتفرمیدیر کی، ایستیفاده چیلرین خصوصی و آزادلیغی قوروموشدور.";
+"welcome.title" = "Share, freely and privately with Talk9";
+"welcome.text" = "Talk9، آزاد و آلیشلی بیر ارتباط پلتفرمیدیر کی، ایستیفاده چیلرین خصوصی و آزادلیغی قوروموشدور.";
 "welcome.haveAccount" = "منیم حسابوم وار";
 "welcome.linkDevice" = "باشقا آلاتدان واردات";
 "welcome.linkBackup" = "آرشیو آرخایینلاشماسیندان واردات";
-"welcome.createAccount" = "Jami حسابي يارادين";
+"welcome.createAccount" = "Talk9 حسابي يارادين";
 "welcome.connectToJAMS" = "Connect to a management server";
 
 // Creation Profile Screen
@@ -226,7 +226,7 @@
 "createAccount.encrypt" = "Password protect";
 "createAccount.customize" = "اؤزللاشدير";
 "createAccount.encryptTitle" = "Password protect account";
-"createAccount.encryptExplanation" = "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.";
+"createAccount.encryptExplanation" = "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.";
 
 // Link To Account form
 "linkToAccount.importAccount" = "Import account";
@@ -246,7 +246,7 @@
 "linkToAccount.alertMessage" = "Stopping will cancel the import account operation.";
 
 // Import from Archive
-"importFromArchive.explanation" = "جامی حسابینی یئرلی آرکائیو فایل لاریندان واردات ائدیرم.";
+"importFromArchive.explanation" = "Talk9 حسابینی یئرلی آرکائیو فایل لاریندان واردات ائدیرم.";
 "importFromArchive.passwordExplanation" = "If the account is password protected, please fill the following field.";
 "importFromArchive.title" = "Import from archive";
 "importFromArchive.buttonTitle" = "واردات";
@@ -262,16 +262,16 @@
 
 // Alerts
 "alerts.accountCannotBeFoundTitle" = "Account error";
-"alerts.accountCannotBeFoundMessage" = "Unable to find account on the Jami network. Make sure it was exported on Jami from an existing device, and that provided credentials are correct.";
+"alerts.accountCannotBeFoundMessage" = "Unable to find account on the Talk9 network. Make sure it was exported on Talk9 from an existing device, and that provided credentials are correct.";
 "alerts.accountAddedTitle" = "Account added";
 "alerts.accountNoNetworkTitle" = "شبکه خطای";
-"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Jami account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
+"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Talk9 account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
 "alerts.accountDefaultErrorTitle" = "Account error";
 "alerts.accountDefaultErrorMessage" = "An error occurred while creating the account.";
 "alerts.profileTakePhoto" = "عکس آل";
 "alerts.profileUploadPhoto" = "عکس آپلود";
 "alerts.accountLinkedTitle" = "باغلانان حساب";
-"alerts.dbFailedTitle" = "An error happened when launching Jami";
+"alerts.dbFailedTitle" = "An error happened when launching Talk9";
 "alerts.dbFailedMessage" = "لطفاً درخواستي باغلايين و اونو گئنه آچماغا چاليشين";
 "alerts.confirmBlockContact" = "Do you want to block this contact? The conversation history with this contact will also be deleted permanently.";
 "alerts.confirmDeleteConversation" = "Do you want to remove this conversation permanently?";
@@ -289,7 +289,7 @@
 "alerts.uploadFile" = "Fayl göndər";
 "alerts.uploadPhoto" = "گالری آچیق";
 "alerts.sendPhoto" = "Send photo";
-"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Jami” to determine device location.";
+"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Talk9” to determine device location.";
 "alerts.locationSharing" = "مکانیمی بؤلوم";
 "alerts.alreadylocationSharing" = "بو ایستیفاده چیله یئرلشمه یه چالیشمیش";
 "alerts.locationSharingDurationTitle" = "مکان بؤلونوشو نه قدر طولیله جک؟";
@@ -356,7 +356,7 @@
 "accountPage.removeAccountMessage" = "If the account has not been backed up or added to another device, the account and registered username will be IRREVOCABLY LOST.";
 "accountPage.inviteFriends" = "Invite friends";
 "accountPage.contactMeOnJamiTitle" = "جمي ايله باغلي اول!";
-"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Jami distributed communication platform: https://jami.net";
+"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Talk9 distributed communication platform: https://talk9.co";
 "accountPage.passwordPlaceholder" = "حساب رمزونو دن";
 "accountPage.usernamePlaceholder" = "ایسته دیگی یئنی آدلار یئری";
 "accountPage.registerNameErrorMessage" = "The username is unavailable.";
@@ -373,7 +373,7 @@
 "accountPage.enableBoothMode" = "بوث مودونو فعال ائتمک";
 "accountPage.disableBoothMode" = "بوث مودونو غیر فعال ات";
 "accountPage.disableBoothModeExplanation" = "Please provide the account password";
-"accountPage.boothModeExplanation" = "بوخ مودوندا مکالمه تاریخ سی ساقلانیلمیر و Jami فعالیتلری چیخیشلار وئرمکله محدود اولور. بوخ مودوندا بوتون مکالمه لرین چئوریلیر.";
+"accountPage.boothModeExplanation" = "بوخ مودوندا مکالمه تاریخ سی ساقلانیلمیر و Talk9 فعالیتلری چیخیشلار وئرمکله محدود اولور. بوخ مودوندا بوتون مکالمه لرین چئوریلیر.";
 "accountPage.noBoothMode" = "To enable Booth mode, password protect the account first.";
 "accountPage.boothModeAlertMessage" = "After enabling booth mode, all the conversations will be removed.";
 "accountPage.peerDiscovery" = "یئرلی همتداشلار آچیقلاماسینی ائدیر";
@@ -388,7 +388,7 @@
 "accountPage.upnpEnabled" = "UPnP- نی ائشلشدیر";
 "accountPage.security" = "امنیت";
 "accountPage.enableSRTP" = "رمزلشدیرمه میدیال جریانلاری (SRTP)";
-"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Jami.";
+"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Talk9.";
 "accountPage.profileHeader" = "پروفایل";
 "accountPage.profileNameNotSelected" = "Name not selected";
 "accountPage.accountHeader" = "حساب";
@@ -397,7 +397,7 @@
 "accountPage.editProfile" = "Edit Profile";
 "accountPage.manageAccount" = "حسابین ایداره سی";
 "accountPage.encryptAccount" = "Password protect account";
-"accountPage.passwordExplanation" = "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
+"accountPage.passwordExplanation" = "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
 "accountPage.passwordsDoNotMatch" = "Passwords do not match.";
 "accountPage.passwordCreated" = "Password created";
 "accountPage.passwordUpdated" = "Password updated";
@@ -406,10 +406,10 @@
 "accountPage.generatingPin" = "Generating PIN code…";
 "accountPage.passwordForPin" = "The account is password protected. Enter the password to generate a PIN code.";
 "accountPage.pinExplanationTitle" = "On another device";
-"accountPage.pinExplanationMessage" = "Install and launch Jami. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
+"accountPage.pinExplanationMessage" = "Install and launch Talk9. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
 "accountPage.pinError" = "An error occurred while generating the PIN code.";
 "accountPage.notificationTitle" = "اطلاعیه لر";
-"accountPage.notificationError" = "Notifications for Jami are disabled. Enable it in device settings in order to use this feature.";
+"accountPage.notificationError" = "Notifications for Talk9 are disabled. Enable it in device settings in order to use this feature.";
 "accountPage.callsFromUnknownContacts" = "Allow calls from unknown contacts.";
 "accountPage.accountSettingsExplanation" = "These settings will only apply to this account.";
 "accountPage.appSettings" = "App settings";
@@ -433,7 +433,7 @@
 "accountPage.typingIndicatorExplanation" = "Indicate when messages are being typed.";
 
 // Backup Account
-"backupAccount.explanation" = "This Jami account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
+"backupAccount.explanation" = "This Talk9 account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
 "backupAccount.title" = "پشتیبان حساب";
 "backupAccount.creating" = "Creating backup";
 "backupAccount.archiveName" = "Select a name for the archive.";
@@ -563,7 +563,7 @@
 "migrateAccount.migrateAnother" = "باشقا حسابا کؤچ";
 
 // About Jami
-"aboutJami.declaration1" = "Jami, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
+"aboutJami.declaration1" = "Talk9, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
 "aboutJami.declaration2" = "to learn more.";
 "aboutJami.noWarranty1" = "This program comes with absolutely no warranty. See the";
 "aboutJami.noWarranty2" = "version 3 or later for details.";
@@ -573,7 +573,7 @@
 "aboutJami.media" = "میدیادا";
 "aboutJami.communityManagement" = "Community Management";
 "aboutJami.specialThanks" = "Special thanks to";
-"aboutJami.info" = "This is a list of people who have made a significant investment of time, with useful results, into Jami. Any such contributors who want to be added to the list should contact us.";
+"aboutJami.info" = "This is a list of people who have made a significant investment of time, with useful results, into Talk9. Any such contributors who want to be added to the list should contact us.";
 "aboutJami.header" = "We would like to thank our contributors, whose efforts over many years have made this software what it is.";
 
 // Accessibility
@@ -581,8 +581,8 @@
 "accessibility.smartListSwitchAccounts" = "Switch account";
 "accessibility.smartListConnectedAs" = "The current account is %@";
 "accessibility.smartListAddAccount" = "حساب قوش";
-"accessibility.aboutJamiTitle" = "جامی حاقّيندا";
-"accessibility.welcomeToJamiTitle" = "\" جامي \" نين خوش آمديد";
+"accessibility.aboutJamiTitle" = "Talk9 حاقّيندا";
+"accessibility.welcomeToJamiTitle" = "\" Talk9 \" نين خوش آمديد";
 "accessibility.createAccountVerifyUsernamePrompt" = "Enter username to check availability.";
 "accessibility.profilePicturePicker" = "پروفایل عکس";
 "accessibility.profilePicturePickerHint" = "Double-tap to take a picture or select a picture from the library";

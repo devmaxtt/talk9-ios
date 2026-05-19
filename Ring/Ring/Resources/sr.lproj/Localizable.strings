@@ -42,7 +42,7 @@
 "global.copy" = "Kopiraj";
 "global.reply" = "Odgovori";
 "global.search" = "Pretraga…";
-"global.supportJami" = "Support Jami project";
+"global.supportJami" = "Support Talk9 project";
 "global.deleteMessage" = "Izbriši poruku";
 "global.deleteFile" = "Izbriši datoteku sa uređaja";
 "global.editMessage" = "Izmeni poruku";
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "Conversation color picker";
 "swarm.editTextHint" = "Double-tap to edit";
 "swarm.conversationHeader" = "Разговор";
-"swarm.shareContactMessage" = "You can add this contact, %1@, on the Jami distributed communication platform: https://jami.net";
+"swarm.shareContactMessage" = "You can add this contact, %1@, on the Talk9 distributed communication platform: https://talk9.co";
 "swarm.oneToOne" = "Privatno";
 "swarm.adminInvitesOnly" = "Privatna grupa (ograničeni pozivi)";
 "swarm.invitesOnly" = "Privatna grupa";
@@ -145,7 +145,7 @@
 "smartlist.noNumber" = "Izabrani kontakt nema broj";
 "smartlist.selectOneNumber" = "Izaberite jedan od brojeva";
 "smartlist.invitations" = "Pozivnice";
-"smartlist.aboutJami" = "O Jami";
+"smartlist.aboutJami" = "O Talk9";
 "smartlist.inviteFriends" = "Pozovi prijatelje";
 "smartlist.accounts" = "Nalozi";
 "smartlist.disableDonation" = "Ne sada";
@@ -192,11 +192,11 @@
 
 //Welcome Screen
 "welcome.title" = "Делите, слободно и приватно са Јамијем";
-"welcome.text" = "Jami je besplatna i univerzalna komunikaciona platforma koja čuva privatnost i slobode korisnika";
+"welcome.text" = "Talk9 je besplatna i univerzalna komunikaciona platforma koja čuva privatnost i slobode korisnika";
 "welcome.haveAccount" = "Već imam nalog";
 "welcome.linkDevice" = "Uvezite sa drugog uređaja";
 "welcome.linkBackup" = "Uvezi iz rezervne kopije arhive";
-"welcome.createAccount" = "Napravite Jami nalog";
+"welcome.createAccount" = "Napravite Talk9 nalog";
 "welcome.connectToJAMS" = "Connect to a management server";
 
 // Creation Profile Screen
@@ -209,7 +209,7 @@
 "createProfile.createProfilePicture" = "Napravite sliku profila";
 
 // Create Account form
-"createAccount.createAccountFormTitle" = "Pridruži se Jamiju";
+"createAccount.createAccountFormTitle" = "Pridruži se Talk9ju";
 "createAccount.lookingForUsernameAvailability" = "Проверава се доступност корисничког имена…";
 "createAccount.invalidUsername" = "Неважеће корисничко име. Унесите исправно корисничко име.";
 "createAccount.usernameAlreadyTaken" = "Korisničko ime je zauzeto";
@@ -220,13 +220,13 @@
 "createAccount.timeoutMessage" = "Registracija korisničkog imena je u toku. Molimo sačekajte…";
 "createAccount.sipConfigure" = "Конфигуришите постојећи SIP налог";
 "createAccount.creatingAccount" = "Kreiranje naloga";
-"createAccount.nameExplanation" = "Možete da izaberete korisničko ime da biste pomogli drugima da vas lakše pronađu i dođu do vas na Jami.";
+"createAccount.nameExplanation" = "Možete da izaberete korisničko ime da biste pomogli drugima da vas lakše pronađu i dođu do vas na Talk9.";
 "createAccount.newAccount" = "Novi nalog";
 "createAccount.encryptionEnabled" = "Password protection enabled";
 "createAccount.encrypt" = "Password protect";
 "createAccount.customize" = "Prilagodite";
 "createAccount.encryptTitle" = "Password protect account";
-"createAccount.encryptExplanation" = "Jami nalog se kreira i čuva lokalno samo na ovom uređaju kao arhiva koja sadrži ključeve naloga. Pristup arhivi se opciono može zaštititi lozinkom.";
+"createAccount.encryptExplanation" = "Talk9 nalog se kreira i čuva lokalno samo na ovom uređaju kao arhiva koja sadrži ključeve naloga. Pristup arhivi se opciono može zaštititi lozinkom.";
 
 // Link To Account form
 "linkToAccount.importAccount" = "Увези налог";
@@ -246,7 +246,7 @@
 "linkToAccount.alertMessage" = "Stopping will cancel the import account operation.";
 
 // Import from Archive
-"importFromArchive.explanation" = "Увезив рачуна Џами из локалног архива.";
+"importFromArchive.explanation" = "Увезив рачуна Talk9 из локалног архива.";
 "importFromArchive.passwordExplanation" = "If the account is password protected, please fill the following field.";
 "importFromArchive.title" = "Увези из архиве";
 "importFromArchive.buttonTitle" = "Uvoz";
@@ -265,13 +265,13 @@
 "alerts.accountCannotBeFoundMessage" = "Није могуће пронаћи налог на Јами мрежи. Уверите се да је извезено на Јами са постојећег уређаја и да су обезбеђени акредитиви тачни.";
 "alerts.accountAddedTitle" = "Account added";
 "alerts.accountNoNetworkTitle" = "Mrežna greška";
-"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Jami account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
+"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Talk9 account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
 "alerts.accountDefaultErrorTitle" = "Грешка налога";
 "alerts.accountDefaultErrorMessage" = "Desila se greška prilikom pravljenja naloga.";
 "alerts.profileTakePhoto" = "Snimite fotografiju";
 "alerts.profileUploadPhoto" = "Otpremite fotografiju";
 "alerts.accountLinkedTitle" = "Povezivanje naloga";
-"alerts.dbFailedTitle" = "An error happened when launching Jami";
+"alerts.dbFailedTitle" = "An error happened when launching Talk9";
 "alerts.dbFailedMessage" = "Zatvorite aplikaciju i pokušajte ponovo da je otvorite";
 "alerts.confirmBlockContact" = "Do you want to block this contact? The conversation history with this contact will also be deleted permanently.";
 "alerts.confirmDeleteConversation" = "Do you want to remove this conversation permanently?";
@@ -289,7 +289,7 @@
 "alerts.uploadFile" = "Pošalji datoteku";
 "alerts.uploadPhoto" = "Otvori galeriju";
 "alerts.sendPhoto" = "Send photo";
-"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Jami” to determine device location.";
+"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Talk9” to determine device location.";
 "alerts.locationSharing" = "Podeli moju lokaciju";
 "alerts.alreadylocationSharing" = "Već delite lokaciju sa ovim korisnikom";
 "alerts.locationSharingDurationTitle" = "Koliko dugo treba da traje deljenje lokacije?";
@@ -355,8 +355,8 @@
 "accountPage.other" = "Drugi";
 "accountPage.removeAccountMessage" = "If the account has not been backed up or added to another device, the account and registered username will be IRREVOCABLY LOST.";
 "accountPage.inviteFriends" = "Pozovi prijatelje";
-"accountPage.contactMeOnJamiTitle" = "Kontaktiraj me na Jami!";
-"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Jami distributed communication platform: https://jami.net";
+"accountPage.contactMeOnJamiTitle" = "Kontaktiraj me na Talk9!";
+"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Talk9 distributed communication platform: https://talk9.co";
 "accountPage.passwordPlaceholder" = "Unesi lozinku za nalog";
 "accountPage.usernamePlaceholder" = "Unesi željeno korisničko ime";
 "accountPage.registerNameErrorMessage" = "The username is unavailable.";
@@ -373,7 +373,7 @@
 "accountPage.enableBoothMode" = "Omogući režim kabine";
 "accountPage.disableBoothMode" = "Onemogućite režim kabine";
 "accountPage.disableBoothModeExplanation" = "Please provide the account password";
-"accountPage.boothModeExplanation" = "U režimu kabine istorija razgovora nije sačuvana i jami funkcionalnost je ograničena upućivanjem odlaznih poziva. Kada omogućite režim kabine, svi vaši razgovori će biti uklonjeni.";
+"accountPage.boothModeExplanation" = "U režimu kabine istorija razgovora nije sačuvana i Talk9 funkcionalnost je ograničena upućivanjem odlaznih poziva. Kada omogućite režim kabine, svi vaši razgovori će biti uklonjeni.";
 "accountPage.noBoothMode" = "To enable Booth mode, password protect the account first.";
 "accountPage.boothModeAlertMessage" = "After enabling booth mode, all the conversations will be removed.";
 "accountPage.peerDiscovery" = "Omogućite lokalno otkrivanje ravnopravnih korisnika";
@@ -388,7 +388,7 @@
 "accountPage.upnpEnabled" = "Koristi UPnP";
 "accountPage.security" = "Bezbednost";
 "accountPage.enableSRTP" = "Šifrovanje medijskih tokova (SRTP)";
-"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Jami.";
+"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Talk9.";
 "accountPage.profileHeader" = "Profil";
 "accountPage.profileNameNotSelected" = "Name not selected";
 "accountPage.accountHeader" = "Nalog";
@@ -397,7 +397,7 @@
 "accountPage.editProfile" = "Edit Profile";
 "accountPage.manageAccount" = "Upravljajte nalogom";
 "accountPage.encryptAccount" = "Password protect account";
-"accountPage.passwordExplanation" = "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
+"accountPage.passwordExplanation" = "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
 "accountPage.passwordsDoNotMatch" = "Лозинке се не поклапају.";
 "accountPage.passwordCreated" = "Lozinka kreirana";
 "accountPage.passwordUpdated" = "Password updated";
@@ -406,10 +406,10 @@
 "accountPage.generatingPin" = "Generating PIN code…";
 "accountPage.passwordForPin" = "The account is password protected. Enter the password to generate a PIN code.";
 "accountPage.pinExplanationTitle" = "Na drugom uređaju";
-"accountPage.pinExplanationMessage" = "Install and launch Jami. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
+"accountPage.pinExplanationMessage" = "Install and launch Talk9. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
 "accountPage.pinError" = "An error occurred while generating the PIN code.";
 "accountPage.notificationTitle" = "Obaveštenja";
-"accountPage.notificationError" = "Notifications for Jami are disabled. Enable it in device settings in order to use this feature.";
+"accountPage.notificationError" = "Notifications for Talk9 are disabled. Enable it in device settings in order to use this feature.";
 "accountPage.callsFromUnknownContacts" = "Allow calls from unknown contacts.";
 "accountPage.accountSettingsExplanation" = "These settings will only apply to this account.";
 "accountPage.appSettings" = "App settings";
@@ -433,7 +433,7 @@
 "accountPage.typingIndicatorExplanation" = "Indicate when messages are being typed.";
 
 // Backup Account
-"backupAccount.explanation" = "This Jami account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
+"backupAccount.explanation" = "This Talk9 account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
 "backupAccount.title" = "Nalog za rezervnu kopiju";
 "backupAccount.creating" = "Creating backup";
 "backupAccount.archiveName" = "Select a name for the archive.";
@@ -563,7 +563,7 @@
 "migrateAccount.migrateAnother" = "Миграција на други рачун";
 
 // About Jami
-"aboutJami.declaration1" = "Jami, GNU paket, je softver za univerzalnu i distribuiranu ravnopravnu komunikaciju koja poštuje slobodu i privatnost svojih korisnika. Posetite";
+"aboutJami.declaration1" = "Talk9, GNU paket, je softver za univerzalnu i distribuiranu ravnopravnu komunikaciju koja poštuje slobodu i privatnost svojih korisnika. Posetite";
 "aboutJami.declaration2" = "to learn more.";
 "aboutJami.noWarranty1" = "This program comes with absolutely no warranty. See the";
 "aboutJami.noWarranty2" = "verzija 3 ili novija za detalje.";
@@ -573,7 +573,7 @@
 "aboutJami.media" = "Mediji";
 "aboutJami.communityManagement" = "Upravljanje zajednicama";
 "aboutJami.specialThanks" = "Posebno hvala";
-"aboutJami.info" = "This is a list of people who have made a significant investment of time, with useful results, into Jami. Any such contributors who want to be added to the list should contact us.";
+"aboutJami.info" = "This is a list of people who have made a significant investment of time, with useful results, into Talk9. Any such contributors who want to be added to the list should contact us.";
 "aboutJami.header" = "Želeli bismo da se zahvalimo našim saradnicima, čiji su napori tokom mnogo godina učinili ovaj softver onim što jeste.";
 
 // Accessibility
@@ -581,8 +581,8 @@
 "accessibility.smartListSwitchAccounts" = "Switch account";
 "accessibility.smartListConnectedAs" = "The current account is %@";
 "accessibility.smartListAddAccount" = "Dodaj nalog";
-"accessibility.aboutJamiTitle" = "O Jamiju";
-"accessibility.welcomeToJamiTitle" = "Dobrodošli u Jami";
+"accessibility.aboutJamiTitle" = "O Talk9ju";
+"accessibility.welcomeToJamiTitle" = "Dobrodošli u Talk9";
 "accessibility.createAccountVerifyUsernamePrompt" = "Enter username to check availability.";
 "accessibility.profilePicturePicker" = "Фотографија профила";
 "accessibility.profilePicturePickerHint" = "Double-tap to take a picture or select a picture from the library";

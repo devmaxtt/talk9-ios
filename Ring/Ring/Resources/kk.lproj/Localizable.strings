@@ -42,7 +42,7 @@
 "global.copy" = "Көшірме";
 "global.reply" = "Жауап беру";
 "global.search" = "іздеу...";
-"global.supportJami" = "Support Jami project";
+"global.supportJami" = "Support Talk9 project";
 "global.deleteMessage" = "Хатты өшіру";
 "global.deleteFile" = "Delete file from device";
 "global.editMessage" = "Хатты өңдеу";
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "Conversation color picker";
 "swarm.editTextHint" = "Double-tap to edit";
 "swarm.conversationHeader" = "Әңгіме";
-"swarm.shareContactMessage" = "You can add this contact, %1@, on the Jami distributed communication platform: https://jami.net";
+"swarm.shareContactMessage" = "You can add this contact, %1@, on the Talk9 distributed communication platform: https://talk9.co";
 "swarm.oneToOne" = "Жеке";
 "swarm.adminInvitesOnly" = "Жеке топ (шайықталған шақырулар)";
 "swarm.invitesOnly" = "Жеке топ";
@@ -145,11 +145,11 @@
 "smartlist.noNumber" = "Таңдалған байланыс нөмірі жоқ";
 "smartlist.selectOneNumber" = "Сандардың біреуін таңдаңыз";
 "smartlist.invitations" = "Шақырулар";
-"smartlist.aboutJami" = "Жами туралы";
+"smartlist.aboutJami" = "Talk9 туралы";
 "smartlist.inviteFriends" = "Invite friends";
 "smartlist.accounts" = "Есеп айырысу";
 "smartlist.disableDonation" = "Қазір емес";
-"smartlist.donationExplanation" = "If you enjoy using Jami and believe in our mission, do you want to make a donation?";
+"smartlist.donationExplanation" = "If you enjoy using Talk9 and believe in our mission, do you want to make a donation?";
 "smartlist.inSynchronization" = "conversation in synchronization";
 "smartlist.newMessage" = "New message";
 
@@ -191,12 +191,12 @@
 // Walkthrough
 
 //Welcome Screen
-"welcome.title" = "Share, freely and privately with Jami";
-"welcome.text" = "Jami - бұл пайдаланушылардың жеке өмірі мен бостандықтарын сақтайтын тегін және әмбебап байланыс платформасы";
+"welcome.title" = "Share, freely and privately with Talk9";
+"welcome.text" = "Talk9 - бұл пайдаланушылардың жеке өмірі мен бостандықтарын сақтайтын тегін және әмбебап байланыс платформасы";
 "welcome.haveAccount" = "Менде есеп бар.";
 "welcome.linkDevice" = "Басқа құрылғыдан импорттау";
 "welcome.linkBackup" = "Архивті резервтік көшірмеден импорттау";
-"welcome.createAccount" = "Jami тіркелгісін құру";
+"welcome.createAccount" = "Talk9 тіркелгісін құру";
 "welcome.connectToJAMS" = "Connect to a management server";
 
 // Creation Profile Screen
@@ -209,7 +209,7 @@
 "createProfile.createProfilePicture" = "Create profile picture";
 
 // Create Account form
-"createAccount.createAccountFormTitle" = "Жамиге қосыл";
+"createAccount.createAccountFormTitle" = "Talk9ге қосыл";
 "createAccount.lookingForUsernameAvailability" = "Checking username availability…";
 "createAccount.invalidUsername" = "Invalid username. Please enter the correct username.";
 "createAccount.usernameAlreadyTaken" = "Қолданушының аты қолданылды";
@@ -226,7 +226,7 @@
 "createAccount.encrypt" = "Password protect";
 "createAccount.customize" = "Өзгерту";
 "createAccount.encryptTitle" = "Password protect account";
-"createAccount.encryptExplanation" = "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.";
+"createAccount.encryptExplanation" = "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.";
 
 // Link To Account form
 "linkToAccount.importAccount" = "Import account";
@@ -246,7 +246,7 @@
 "linkToAccount.alertMessage" = "Stopping will cancel the import account operation.";
 
 // Import from Archive
-"importFromArchive.explanation" = "Жергiлiктi мұрағат файлынан Jami тіркелгiн импорттау.";
+"importFromArchive.explanation" = "Жергiлiктi мұрағат файлынан Talk9 тіркелгiн импорттау.";
 "importFromArchive.passwordExplanation" = "If the account is password protected, please fill the following field.";
 "importFromArchive.title" = "Import from archive";
 "importFromArchive.buttonTitle" = "Импорт";
@@ -262,16 +262,16 @@
 
 // Alerts
 "alerts.accountCannotBeFoundTitle" = "Account error";
-"alerts.accountCannotBeFoundMessage" = "Unable to find account on the Jami network. Make sure it was exported on Jami from an existing device, and that provided credentials are correct.";
+"alerts.accountCannotBeFoundMessage" = "Unable to find account on the Talk9 network. Make sure it was exported on Talk9 from an existing device, and that provided credentials are correct.";
 "alerts.accountAddedTitle" = "Account added";
 "alerts.accountNoNetworkTitle" = "Желі қатесі";
-"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Jami account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
+"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Talk9 account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
 "alerts.accountDefaultErrorTitle" = "Account error";
 "alerts.accountDefaultErrorMessage" = "An error occurred while creating the account.";
 "alerts.profileTakePhoto" = "Суретке түсіріңіз";
 "alerts.profileUploadPhoto" = "Фотоны жүктеу";
 "alerts.accountLinkedTitle" = "Қосылған шот";
-"alerts.dbFailedTitle" = "An error happened when launching Jami";
+"alerts.dbFailedTitle" = "An error happened when launching Talk9";
 "alerts.dbFailedMessage" = "Өтінішті жабыңыз және оны қайта ашуға тырысыңыз";
 "alerts.confirmBlockContact" = "Do you want to block this contact? The conversation history with this contact will also be deleted permanently.";
 "alerts.confirmDeleteConversation" = "Do you want to remove this conversation permanently?";
@@ -289,7 +289,7 @@
 "alerts.uploadFile" = "Файл жіберу";
 "alerts.uploadPhoto" = "Ашық галерея";
 "alerts.sendPhoto" = "Send photo";
-"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Jami” to determine device location.";
+"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Talk9” to determine device location.";
 "alerts.locationSharing" = "Менің орналасқан жерімді бөліңіз";
 "alerts.alreadylocationSharing" = "Бұл пайдаланушымен орналасқан жерді бөлісу";
 "alerts.locationSharingDurationTitle" = "Орналасқан жерді бөлісу қанша уақытқа созылады?";
@@ -355,8 +355,8 @@
 "accountPage.other" = "Басқа";
 "accountPage.removeAccountMessage" = "If the account has not been backed up or added to another device, the account and registered username will be IRREVOCABLY LOST.";
 "accountPage.inviteFriends" = "Invite friends";
-"accountPage.contactMeOnJamiTitle" = "Jami-де менімен байланысыңыз!";
-"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Jami distributed communication platform: https://jami.net";
+"accountPage.contactMeOnJamiTitle" = "Talk9-де менімен байланысыңыз!";
+"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Talk9 distributed communication platform: https://talk9.co";
 "accountPage.passwordPlaceholder" = "Тіркелгі паролін келтіріңіз";
 "accountPage.usernamePlaceholder" = "Қажетті пайдаланушы атауын келтіріңіз";
 "accountPage.registerNameErrorMessage" = "The username is unavailable.";
@@ -388,7 +388,7 @@
 "accountPage.upnpEnabled" = "UPnP- ды қолдану";
 "accountPage.security" = "Қауіпсіздік";
 "accountPage.enableSRTP" = "Кіпшелеу медиа ағындары (SRTP)";
-"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Jami.";
+"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Talk9.";
 "accountPage.profileHeader" = "Профиль";
 "accountPage.profileNameNotSelected" = "Name not selected";
 "accountPage.accountHeader" = "Есеп";
@@ -397,7 +397,7 @@
 "accountPage.editProfile" = "Edit Profile";
 "accountPage.manageAccount" = "Тіркелгілерді басқару";
 "accountPage.encryptAccount" = "Password protect account";
-"accountPage.passwordExplanation" = "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
+"accountPage.passwordExplanation" = "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
 "accountPage.passwordsDoNotMatch" = "Passwords do not match.";
 "accountPage.passwordCreated" = "Password created";
 "accountPage.passwordUpdated" = "Password updated";
@@ -406,10 +406,10 @@
 "accountPage.generatingPin" = "Generating PIN code…";
 "accountPage.passwordForPin" = "The account is password protected. Enter the password to generate a PIN code.";
 "accountPage.pinExplanationTitle" = "On another device";
-"accountPage.pinExplanationMessage" = "Install and launch Jami. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
+"accountPage.pinExplanationMessage" = "Install and launch Talk9. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
 "accountPage.pinError" = "An error occurred while generating the PIN code.";
 "accountPage.notificationTitle" = "Хабарламалар";
-"accountPage.notificationError" = "Notifications for Jami are disabled. Enable it in device settings in order to use this feature.";
+"accountPage.notificationError" = "Notifications for Talk9 are disabled. Enable it in device settings in order to use this feature.";
 "accountPage.callsFromUnknownContacts" = "Allow calls from unknown contacts.";
 "accountPage.accountSettingsExplanation" = "These settings will only apply to this account.";
 "accountPage.appSettings" = "App settings";
@@ -433,7 +433,7 @@
 "accountPage.typingIndicatorExplanation" = "Indicate when messages are being typed.";
 
 // Backup Account
-"backupAccount.explanation" = "This Jami account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
+"backupAccount.explanation" = "This Talk9 account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
 "backupAccount.title" = "Жасақтау шоты";
 "backupAccount.creating" = "Creating backup";
 "backupAccount.archiveName" = "Select a name for the archive.";
@@ -563,7 +563,7 @@
 "migrateAccount.migrateAnother" = "Басқа тіркелгіге көшіру";
 
 // About Jami
-"aboutJami.declaration1" = "Jami, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
+"aboutJami.declaration1" = "Talk9, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
 "aboutJami.declaration2" = "to learn more.";
 "aboutJami.noWarranty1" = "This program comes with absolutely no warranty. See the";
 "aboutJami.noWarranty2" = "version 3 or later for details.";
@@ -573,7 +573,7 @@
 "aboutJami.media" = "БАҚ";
 "aboutJami.communityManagement" = "Community Management";
 "aboutJami.specialThanks" = "Special thanks to";
-"aboutJami.info" = "This is a list of people who have made a significant investment of time, with useful results, into Jami. Any such contributors who want to be added to the list should contact us.";
+"aboutJami.info" = "This is a list of people who have made a significant investment of time, with useful results, into Talk9. Any such contributors who want to be added to the list should contact us.";
 "aboutJami.header" = "We would like to thank our contributors, whose efforts over many years have made this software what it is.";
 
 // Accessibility
@@ -581,8 +581,8 @@
 "accessibility.smartListSwitchAccounts" = "Switch account";
 "accessibility.smartListConnectedAs" = "The current account is %@";
 "accessibility.smartListAddAccount" = "Есепті қосу";
-"accessibility.aboutJamiTitle" = "Жами туралы";
-"accessibility.welcomeToJamiTitle" = "Жамиге қош келдіңіздер";
+"accessibility.aboutJamiTitle" = "Talk9 туралы";
+"accessibility.welcomeToJamiTitle" = "Talk9ге қош келдіңіздер";
 "accessibility.createAccountVerifyUsernamePrompt" = "Enter username to check availability.";
 "accessibility.profilePicturePicker" = "Профиль түсірілімі";
 "accessibility.profilePicturePickerHint" = "Double-tap to take a picture or select a picture from the library";

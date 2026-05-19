@@ -42,7 +42,7 @@
 "global.copy" = "Kopjoje";
 "global.reply" = "Përgjigjuni";
 "global.search" = "Po kërkohet…";
-"global.supportJami" = "Përkrahni projektin Jami";
+"global.supportJami" = "Përkrahni projektin Talk9";
 "global.deleteMessage" = "Fshije mesazhin";
 "global.deleteFile" = "Fshije kartelën prej pajisjeje";
 "global.editMessage" = "Përpunojeni mesazhin";
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "Zgjedhës ngjyre bisede";
 "swarm.editTextHint" = "Që ta përpunoni, prekeni dy herë";
 "swarm.conversationHeader" = "Bisedë";
-"swarm.shareContactMessage" = "Mund ta shtoni këtë kontakt, %1@, te platforma e shpërndarë e komunikimeve Jami: https://talk9.co";
+"swarm.shareContactMessage" = "Mund ta shtoni këtë kontakt, %1@, te platforma e shpërndarë e komunikimeve Talk9: https://talk9.co";
 "swarm.oneToOne" = "Privat";
 "swarm.adminInvitesOnly" = "Grup privat (kufizim ftesash)";
 "swarm.invitesOnly" = "Grup privat";
@@ -145,11 +145,11 @@
 "smartlist.noNumber" = "Kontakti i përzgjedhur s’ka ndonjë numër";
 "smartlist.selectOneNumber" = "Përzgjidhni një nga numrat";
 "smartlist.invitations" = "Ftesa";
-"smartlist.aboutJami" = "Mbi Jami-n";
+"smartlist.aboutJami" = "Mbi Talk9-n";
 "smartlist.inviteFriends" = "Ftoni shokë";
 "smartlist.accounts" = "Llogari";
 "smartlist.disableDonation" = "Jo tani";
-"smartlist.donationExplanation" = "Nëse ju shijon të përdorni Jami-n dhe besoni në misionin tonë, doni të bëni një dhurim?";
+"smartlist.donationExplanation" = "Nëse ju shijon të përdorni Talk9-n dhe besoni në misionin tonë, doni të bëni një dhurim?";
 "smartlist.inSynchronization" = "bisedë në njëkohësim e sipër";
 "smartlist.newMessage" = "Mesazh i ri";
 
@@ -191,12 +191,12 @@
 // Walkthrough
 
 //Welcome Screen
-"welcome.title" = "Ndani lirisht dhe privatisht me të tjerët, përmes Jami-t";
-"welcome.text" = "Jami është një platformë e lirë dhe universale komunikimesh që ruan privatësinë dhe liritë e përdoruesve";
+"welcome.title" = "Ndani lirisht dhe privatisht me të tjerët, përmes Talk9-t";
+"welcome.text" = "Talk9 është një platformë e lirë dhe universale komunikimesh që ruan privatësinë dhe liritë e përdoruesve";
 "welcome.haveAccount" = "Kam tashmë një llogari";
 "welcome.linkDevice" = "Importoni nga pajisje tjetër";
 "welcome.linkBackup" = "Importoni prej kopjeruajtjeje arkivi";
-"welcome.createAccount" = "Krijoni një llogari Jami";
+"welcome.createAccount" = "Krijoni një llogari Talk9";
 "welcome.connectToJAMS" = "Lidhuni me një shërbyes administrimi";
 
 // Creation Profile Screen
@@ -209,7 +209,7 @@
 "createProfile.createProfilePicture" = "Krijo foto profili";
 
 // Create Account form
-"createAccount.createAccountFormTitle" = "Bëhuni pjesë e Jami-t";
+"createAccount.createAccountFormTitle" = "Bëhuni pjesë e Talk9-t";
 "createAccount.lookingForUsernameAvailability" = "Po kontrollohet a është i zënë emri i përdoruesit…";
 "createAccount.invalidUsername" = "Emër përdoruesi i pavlefshëm. Ju lutemi, jepni emrin e saktë të përdoruesit.";
 "createAccount.usernameAlreadyTaken" = "Emër përdoruesi tashmë i zënë";
@@ -220,13 +220,13 @@
 "createAccount.timeoutMessage" = "Regjistrimi i emrit të përdoruesit është në ecuri e sipër. Ju lutemi, prisni…";
 "createAccount.sipConfigure" = "Formësoni llogari SIP ekzistuese";
 "createAccount.creatingAccount" = "Po krijohet llogari";
-"createAccount.nameExplanation" = "Mund të zgjidhni një emër përdoruesi, për t’i ndihmuar të tjerët t’ju gjejnë dhe të komunikojmë më lehtë me ju në Jami.";
+"createAccount.nameExplanation" = "Mund të zgjidhni një emër përdoruesi, për t’i ndihmuar të tjerët t’ju gjejnë dhe të komunikojmë më lehtë me ju në Talk9.";
 "createAccount.newAccount" = "Llogari e re";
 "createAccount.encryptionEnabled" = "Mbrojtja me fjalëkalim u aktivizua";
 "createAccount.encrypt" = "Mbroje me fjalëkalim";
 "createAccount.customize" = "Përshtateni";
 "createAccount.encryptTitle" = "Llogari e mbrojtur me fjalëkalim";
-"createAccount.encryptExplanation" = "Një llogari Jami krijohet dhe depozitohet lokalisht vetëm në këtë pajisje, si një arkiv që përmban kyçet e veta të llogarisë. Hyrja në arkiv, në daçi, mund të mbrohet me një fjalëkalimi.";
+"createAccount.encryptExplanation" = "Një llogari Talk9 krijohet dhe depozitohet lokalisht vetëm në këtë pajisje, si një arkiv që përmban kyçet e veta të llogarisë. Hyrja në arkiv, në daçi, mund të mbrohet me një fjalëkalimi.";
 
 // Link To Account form
 "linkToAccount.importAccount" = "Importoni llogari";
@@ -246,7 +246,7 @@
 "linkToAccount.alertMessage" = "Ndalja do të anulojë veprimin e importimit të llogarisë.";
 
 // Import from Archive
-"importFromArchive.explanation" = "Importo llogari Jami prej një kartele vendore arkiv";
+"importFromArchive.explanation" = "Importo llogari Talk9 prej një kartele vendore arkiv";
 "importFromArchive.passwordExplanation" = "Nëse llogaria mbrohet me fjalëkalim, ju lutemi, plotësoni fushën vijuese.";
 "importFromArchive.title" = "Importo prej arkive";
 "importFromArchive.buttonTitle" = "Importoje";
@@ -262,16 +262,16 @@
 
 // Alerts
 "alerts.accountCannotBeFoundTitle" = "Gabim lidhjeje";
-"alerts.accountCannotBeFoundMessage" = "S’arrihet të gjendet llogari në rrjetin Jami. Sigurohuni që qe eksportuar në Jami që prej një pajisjeje ekzistuese dhe se kredencialet e dhëna për hyrjen janë të sakta.";
+"alerts.accountCannotBeFoundMessage" = "S’arrihet të gjendet llogari në rrjetin Talk9. Sigurohuni që qe eksportuar në Talk9 që prej një pajisjeje ekzistuese dhe se kredencialet e dhëna për hyrjen janë të sakta.";
 "alerts.accountAddedTitle" = "U shtua llogari";
 "alerts.accountNoNetworkTitle" = "Gabim rrjeti";
-"alerts.accountNoNetworkMessage" = "Ndodhi një gabim lidhjeje teksa shtohej llogari Jami te rrjeti i shpërndarë. Ju lutemi, riprovoni. Nëse problemi vazhdon, lidhuni me përgjegjësin e sistemit tuaj.";
+"alerts.accountNoNetworkMessage" = "Ndodhi një gabim lidhjeje teksa shtohej llogari Talk9 te rrjeti i shpërndarë. Ju lutemi, riprovoni. Nëse problemi vazhdon, lidhuni me përgjegjësin e sistemit tuaj.";
 "alerts.accountDefaultErrorTitle" = "Gabim lidhjeje";
 "alerts.accountDefaultErrorMessage" = "Ndodhi një gabim teksa krijohej llogaria.";
 "alerts.profileTakePhoto" = "Bëni një foto";
 "alerts.profileUploadPhoto" = "Ngarkoni foto";
 "alerts.accountLinkedTitle" = "Po lidhet llogaria";
-"alerts.dbFailedTitle" = "Ndodhi një gabim gjatë nisjes së Jami-t";
+"alerts.dbFailedTitle" = "Ndodhi një gabim gjatë nisjes së Talk9-t";
 "alerts.dbFailedMessage" = "Ju lutemi, mbylleni aplikacionin dhe provoni ta rihapni";
 "alerts.confirmBlockContact" = "Doni të bllokohet ky kontakt? Edhe historiku i bisedës me këtë kontakt do të fshihet përgjithmonëy.";
 "alerts.confirmDeleteConversation" = "Doni të hiqet përgjithmonë kjo bisedë?";
@@ -355,8 +355,8 @@
 "accountPage.other" = "Tjetër";
 "accountPage.removeAccountMessage" = "Nëse llogaria s’është kopjeruajtur, apo shtuar te një pajisje tjetër, ajo dhe emri i përdoruesit regjistruar për të do të HUMBIN NË MËNYRË TË PAKTHYESHME.";
 "accountPage.inviteFriends" = "Ftoni shokë";
-"accountPage.contactMeOnJamiTitle" = "Lidhuni me mua në Jami!";
-"accountPage.contactMeOnJamiContant" = "Lidhuni me mua duke përdorur “%s” në platformën e komunikimeve të shpërndara Jami: https://talk9.co";
+"accountPage.contactMeOnJamiTitle" = "Lidhuni me mua në Talk9!";
+"accountPage.contactMeOnJamiContant" = "Lidhuni me mua duke përdorur “%s” në platformën e komunikimeve të shpërndara Talk9: https://talk9.co";
 "accountPage.passwordPlaceholder" = "Jepni fjalëkalim llogarie";
 "accountPage.usernamePlaceholder" = "Jepni emrin e dëshiruar të përdoruesit";
 "accountPage.registerNameErrorMessage" = "Emri i përdoruesit s’mund të kihet.";
@@ -373,7 +373,7 @@
 "accountPage.enableBoothMode" = "Aktivizo Mënyrën Kabinë";
 "accountPage.disableBoothMode" = "Çaktivizo Mënyrën Kabinë";
 "accountPage.disableBoothModeExplanation" = "Ju lutemi, jepni fjalëkalimin e llogarisë";
-"accountPage.boothModeExplanation" = "Në mënyrën kabinë, historiku i bisedës s’ruhet dhe funksionet e Jami-t kufizohen në bërje thirrjesh. Kur aktivizoni mënyrën kabinë, krejt bisedat tuaja do të hiqen.";
+"accountPage.boothModeExplanation" = "Në mënyrën kabinë, historiku i bisedës s’ruhet dhe funksionet e Talk9-t kufizohen në bërje thirrjesh. Kur aktivizoni mënyrën kabinë, krejt bisedat tuaja do të hiqen.";
 "accountPage.noBoothMode" = "Që të aktivizohet mënyra Kabinë, së pari mbroni me fjalëkalim llogarinë.";
 "accountPage.boothModeAlertMessage" = "Pas aktivizimit të mënyrës kabinë, do të hiqen krejt bisedat.";
 "accountPage.peerDiscovery" = "Aktivizo pikasje ortakësh vendorë";
@@ -388,7 +388,7 @@
 "accountPage.upnpEnabled" = "Përdor UPnP";
 "accountPage.security" = "Siguri";
 "accountPage.enableSRTP" = "Fshehtëzo rrjedha media (SRTP)";
-"accountPage.registerNameExplanation" = "Regjistroni një emër përdoruesi, për të ndihmuar të tjerët t’ju gjejnë kollaj dje të lidhen me ju në Jami.";
+"accountPage.registerNameExplanation" = "Regjistroni një emër përdoruesi, për të ndihmuar të tjerët t’ju gjejnë kollaj dje të lidhen me ju në Talk9.";
 "accountPage.profileHeader" = "Profil";
 "accountPage.profileNameNotSelected" = "S’u përzgjodh emër";
 "accountPage.accountHeader" = "Llogari";
@@ -397,7 +397,7 @@
 "accountPage.editProfile" = "Përpunoni Profil";
 "accountPage.manageAccount" = "Administroni llogari";
 "accountPage.encryptAccount" = "Llogari e mbrojtur me fjalëkalim";
-"accountPage.passwordExplanation" = "Një llogari Jami krijohet dhe depozitohet lokalisht vetëm në këtë pajisje, si një arkiv që përmban kyçet e veta të llogarisë. Hyrja në arkiv, në daçi, mund të mbrohet me fjalëkalim.";
+"accountPage.passwordExplanation" = "Një llogari Talk9 krijohet dhe depozitohet lokalisht vetëm në këtë pajisje, si një arkiv që përmban kyçet e veta të llogarisë. Hyrja në arkiv, në daçi, mund të mbrohet me fjalëkalim.";
 "accountPage.passwordsDoNotMatch" = "Fjalëkalimet nuk përputhen.";
 "accountPage.passwordCreated" = "U krijua fjalëkalim";
 "accountPage.passwordUpdated" = "U përditësua fjalëkalim";
@@ -406,10 +406,10 @@
 "accountPage.generatingPin" = "Po prodhohet PIN…";
 "accountPage.passwordForPin" = "Llogaria është e mbrojtur me fjalëkalim. Që të prodhohet një kod PIN, jepni fjalëkalimin.";
 "accountPage.pinExplanationTitle" = "Në pajisjen tjetër";
-"accountPage.pinExplanationMessage" = "Instaloni dhe nisni Jami-n. Përzgjidhni “Importo prej pajisje tjetër” dhe skanoni kodin QR. Ndryshe jepeni kodin PIN dorazi.";
+"accountPage.pinExplanationMessage" = "Instaloni dhe nisni Talk9-n. Përzgjidhni “Importo prej pajisje tjetër” dhe skanoni kodin QR. Ndryshe jepeni kodin PIN dorazi.";
 "accountPage.pinError" = "Ndodhi një gabim teksa prodhohej kod PIN.";
 "accountPage.notificationTitle" = "Njoftime";
-"accountPage.notificationError" = "Njoftimet për Jami-n janë të çaktivizuara. Që të mund të përdorni këtë veçori, aktivizojeni te rregullimet e pajisjes.";
+"accountPage.notificationError" = "Njoftimet për Talk9-n janë të çaktivizuara. Që të mund të përdorni këtë veçori, aktivizojeni te rregullimet e pajisjes.";
 "accountPage.callsFromUnknownContacts" = "Lejo thirrje prej kontaktesh të panjohur.";
 "accountPage.accountSettingsExplanation" = "Këto rregullimet do të aplikohen vetëm te kjo llogari.";
 "accountPage.appSettings" = "Rregullime aplikacioni";
@@ -433,7 +433,7 @@
 "accountPage.typingIndicatorExplanation" = "Trego kur shtypen mesazhe.";
 
 // Backup Account
-"backupAccount.explanation" = "Kjo llogari Jami ekziston vetëm në këtë pajisje. Llogaria do të humbë, nëse humbet kjo pajisje, ose nëse çinstalohet aplikacioni. Rekomandohet të bëni një kopjeruajtje të kësaj llogarie.";
+"backupAccount.explanation" = "Kjo llogari Talk9 ekziston vetëm në këtë pajisje. Llogaria do të humbë, nëse humbet kjo pajisje, ose nëse çinstalohet aplikacioni. Rekomandohet të bëni një kopjeruajtje të kësaj llogarie.";
 "backupAccount.title" = "Kopjeruaje llogarinë";
 "backupAccount.creating" = "Po krijohet kopjeruajtje";
 "backupAccount.archiveName" = "Përzgjidhni një emër për arkivin.";
@@ -563,7 +563,7 @@
 "migrateAccount.migrateAnother" = "Migroni Llogari Tjetër";
 
 // About Jami
-"aboutJami.declaration1" = "Jami, një paketë GNU, është software i lirë për komunikim universal dhe të shpërndarë “peer-to-peer”, që respekton liritë dhe privatësinë e përdoruesve të tij. Vizitoni";
+"aboutJami.declaration1" = "Talk9, një paketë GNU, është software i lirë për komunikim universal dhe të shpërndarë “peer-to-peer”, që respekton liritë dhe privatësinë e përdoruesve të tij. Vizitoni";
 "aboutJami.declaration2" = "që të mësoni më tepër.";
 "aboutJami.noWarranty1" = "Ky program vjen absolutisht pa asnjë garanci. Për hollësi, shihni";
 "aboutJami.noWarranty2" = "version 3, ose të mëvonshëm.";
@@ -573,7 +573,7 @@
 "aboutJami.media" = "Media";
 "aboutJami.communityManagement" = "Administrim Bashkësie";
 "aboutJami.specialThanks" = "Falënderime të posaçme për";
-"aboutJami.info" = "Kjo është një listë e personave që kanë bërë një investim thelbësor në kohë, me përfundime të dobishme, te Jami. Cilido kontribues i tillë që dëshiron të shtohet te lista duhet të lidhet me ne.";
+"aboutJami.info" = "Kjo është një listë e personave që kanë bërë një investim thelbësor në kohë, me përfundime të dobishme, te Talk9. Cilido kontribues i tillë që dëshiron të shtohet te lista duhet të lidhet me ne.";
 "aboutJami.header" = "Do të donim të falënderojmë kontribuesit tanë, përpjekjet e të cilëve përgjatë shumë vitesh e kanë bërë këtë program atë çka është.";
 
 // Accessibility
@@ -581,8 +581,8 @@
 "accessibility.smartListSwitchAccounts" = "Ndërroni llogari";
 "accessibility.smartListConnectedAs" = "Llogaria e tanishme është %@";
 "accessibility.smartListAddAccount" = "Shtoni llogari";
-"accessibility.aboutJamiTitle" = "Mbi Jami-n";
-"accessibility.welcomeToJamiTitle" = "Mirë se vini te Jami";
+"accessibility.aboutJamiTitle" = "Mbi Talk9-n";
+"accessibility.welcomeToJamiTitle" = "Mirë se vini te Talk9";
 "accessibility.createAccountVerifyUsernamePrompt" = "Jepni emër përdoruesi që të shihet në është i lirë.";
 "accessibility.profilePicturePicker" = "Foto profili";
 "accessibility.profilePicturePickerHint" = "Prekeni dy herë, që të bëni një foto, ose të përzgjidhni një foto nga fototeka";

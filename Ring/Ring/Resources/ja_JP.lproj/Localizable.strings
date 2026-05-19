@@ -96,11 +96,11 @@
 "smartlist.noNumber" = "Selected contact does not have any number";
 "smartlist.selectOneNumber" = "Select one of the numbers";
 "smartlist.invitations" = "Invitations";
-"smartlist.aboutJami" = "About Jami";
+"smartlist.aboutJami" = "About Talk9";
 "smartlist.inviteFriends" = "Invite friends";
 "smartlist.accounts" = "Account list";
 "smartlist.disableDonation" = "Not now";
-"smartlist.donationExplanation" = "If you enjoy using Jami and believe in our mission, would you make a donation?";
+"smartlist.donationExplanation" = "If you enjoy using Talk9 and believe in our mission, would you make a donation?";
 
 //Conversation
 "conversation.messagePlaceholder" = "Write to";
@@ -127,13 +127,13 @@
 // Walkthrough
 
 //Welcome Screen
-"welcome.title" = "Share, freely and privately with Jami";
-"welcome.text" = "Jami is a free and universal communication platform which preserves the users' privacy and freedoms";
+"welcome.title" = "Share, freely and privately with Talk9";
+"welcome.text" = "Talk9 is a free and universal communication platform which preserves the users' privacy and freedoms";
 "welcome.haveAccount" = "I already have an account";
 "welcome.linkDevice" = "Import from another device";
 "welcome.linkBackup" = "Import from archive backup";
 "welcome.createAccount" = "Join";
-"welcome.connectToManager" = "Connect to a Jami Account Manager Server";
+"welcome.connectToManager" = "Connect to a Talk9 Account Manager Server";
 
 //Creation Profile Screen
 "createProfile.skipCreateProfile" = "Skip";
@@ -145,8 +145,8 @@
 "createProfile.createYourAvatar" = "Create your avatar";
 
 //Create Account form
-"createAccount.createAccountFormTitle" = "Join Jami";
-"createAccount.chooseStrongPassword" = "Choose strong password you will remember to protect your Jami account.";
+"createAccount.createAccountFormTitle" = "Join Talk9";
+"createAccount.chooseStrongPassword" = "Choose strong password you will remember to protect your Talk9 account.";
 "createAccount.repeatPasswordPlaceholder" = "Confirm password";
 "createAccount.passwordCharactersNumberError" = "6 characters minimum";
 "createAccount.passwordNotMatchingError" = "passwords do not match";
@@ -169,7 +169,7 @@
 "linkToAccount.waitLinkToAccountTitle" = "Account linking";
 "linkToAccount.linkButtonTitle" = "Link";
 "linkToAccount.linkDeviceTitle" = "Link Device";
-"linkToAccount.linkDeviceMessage" = "Choose “Link a new device” from the other Jami app to show the QR code or PIN";
+"linkToAccount.linkDeviceMessage" = "Choose “Link a new device” from the other Talk9 app to show the QR code or PIN";
 "linkToAccount.pinPlaceholder" = "PIN";
 "linkToAccount.pinLabel" = "Enter PIN";
 "linkToAccount.explanationPinMessage" = "To generate the PIN code, go to the account management settings on the device containing the account you want to link to. Select \"Link new device\". You will receive the necessary PIN to complete this form. The PIN is only valid for 10 minutes.";
@@ -181,16 +181,16 @@
 
 //Alerts
 "alerts.accountCannotBeFoundTitle" = "Can't find account";
-"alerts.accountCannotBeFoundMessage" = "Account couldn't be found on the Jami network. Make sure it was exported on Jami from an existing device, and that provided credentials are correct.";
+"alerts.accountCannotBeFoundMessage" = "Account couldn't be found on the Talk9 network. Make sure it was exported on Talk9 from an existing device, and that provided credentials are correct.";
 "alerts.accountAddedTitle" = "Account Added";
 "alerts.accountNoNetworkTitle" = "Can't connect to the network";
-"alerts.accountNoNetworkMessage" = "Could not add account because Jami couldn't connect to the distributed network. Check your device connectivity.";
+"alerts.accountNoNetworkMessage" = "Could not add account because Talk9 couldn't connect to the distributed network. Check your device connectivity.";
 "alerts.accountDefaultErrorTitle" = "Unknown error";
 "alerts.accountDefaultErrorMessage" = "The account couldn't be created.";
 "alerts.profileTakePhoto" = "Take photo";
 "alerts.profileUploadPhoto" = "Upload photo";
 "alerts.accountLinkedTitle" = "Linking account";
-"alerts.dbFailedTitle" = "An error happened when launching Jami";
+"alerts.dbFailedTitle" = "An error happened when launching Talk9";
 "alerts.dbFailedMessage" = "Please close application and try to open it again";
 "alerts.confirmBlockContact" = "Are you sure you want to block this contact? The conversation history with this contact will also be deleted permanently.";
 "alerts.confirmDeleteConversation" = "Are you sure you want to delete this conversation permanently?";
@@ -206,7 +206,7 @@
 "alerts.recordAudioMessage" = "Record an audio message";
 "alerts.uploadFile" = "ファイルの送信";
 "alerts.uploadPhoto" = "ギャラリーを開く";
-"alerts.locationServiceIsDisabled" = "Turn on \"Location Services\" to allow \"Jami\" to determine your location.";
+"alerts.locationServiceIsDisabled" = "Turn on \"Location Services\" to allow \"Talk9\" to determine your location.";
 "alerts.locationSharing" = "Share my location";
 "alerts.alreadylocationSharing" = "Already sharing location with this user";
 "alerts.locationSharingDurationTitle" = "How long should the location sharing be?";
@@ -274,8 +274,8 @@
 "accountPage.removeAccountMessage" = "By clicking \"Remove\" you will remove this account on this device! This action can not be undone. Also, your registered name can be lost.";
 "accountPage.removeAccountButton" = "Remove";
 "accountPage.inviteFriends" = "Invite friends";
-"accountPage.contactMeOnJamiTitle" = "Contact me on Jami!";
-"accountPage.contactMeOnJamiContant" = "Contact me using \"%s\" on the Jami distributed communication platform: https://jami.net";
+"accountPage.contactMeOnJamiTitle" = "Contact me on Talk9!";
+"accountPage.contactMeOnJamiContant" = "Contact me using \"%s\" on the Talk9 distributed communication platform: https://talk9.co";
 "accountPage.passwordPlaceholder" = "Enter account password";
 "accountPage.usernamePlaceholder" = "Enter desired username";
 "accountPage.registerNameErrorMessage" = "Chosen username is not available";
@@ -283,7 +283,7 @@
 "accountPage.usernameRegisterAction" = "Register";
 "accountPage.usernameRegistrationFailed" = "Registration failed. Please check password.";
 "accountPage.createPassword" = "暗号化アカウント";
-"accountPage.createPasswordExplanation" = "あなたのJamiアカウントは,このデバイスであなたのアカウントの鍵を含むアーカイブとしてのみ登録されています.このアーカイブへのアクセスはパスワードで保護できます.";
+"accountPage.createPasswordExplanation" = "あなたのTalk9アカウントは,このデバイスであなたのアカウントの鍵を含むアーカイブとしてのみ登録されています.このアーカイブへのアクセスはパスワードで保護できます.";
 "accountPage.changePassword" = "Change password";
 "accountPage.oldPasswordPlaceholder" = "Enter old password";
 "accountPage.newPasswordPlaceholder" = "Enter new password";
@@ -292,7 +292,7 @@
 "accountPage.enableBoothMode" = "Enable Booth Mode";
 "accountPage.disableBoothMode" = "Disable Booth Mode";
 "accountPage.disableBoothModeExplanation" = "Please provide your account password";
-"accountPage.boothModeExplanation" = "In booth mode conversation history not saved and jami functionality limited by making outgoing calls. When you enable booth mode all your conversations will be removed.";
+"accountPage.boothModeExplanation" = "In booth mode conversation history not saved and Talk9 functionality limited by making outgoing calls. When you enable booth mode all your conversations will be removed.";
 "accountPage.noBoothMode" = "To enable Booth mode encrypt your account first.";
 "accountPage.boothModeAlertMessage" = "After enabling booth mode all your conversations will be removed.";
 "accountPage.peerDiscovery" = "Auto connect on local network";
@@ -334,7 +334,7 @@
 "linkDevice.passwordError" = "The password you entered does not unlock this account";
 "linkDevice.networkError" = "A network error occurred during the export";
 "linkDevice.defaultError" = "An error occurred during the export";
-"linkDevice.explanationMessage" = "To complete the process, you need to open Jami on the new device and choose the option \"Link this device to an account.\" Your pin is valid for 10 minutes";
+"linkDevice.explanationMessage" = "To complete the process, you need to open Talk9 on the new device and choose the option \"Link this device to an account.\" Your pin is valid for 10 minutes";
 "linkDevice.hudMessage" = "Verifying";
 
 //Contact Page
@@ -410,7 +410,7 @@
 "migrateAccount.migrateAnother" = "Migrate Another Account";
 
 //About Jami
-"aboutJami.declaration1" = "Jami, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
+"aboutJami.declaration1" = "Talk9, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
 "aboutJami.declaration2" = "to learn more.";
 "aboutJami.noWarranty1" = "This program comes with absolutely no warranty. See the";
 "aboutJami.noWarranty2" = "version 3 or later for details.";

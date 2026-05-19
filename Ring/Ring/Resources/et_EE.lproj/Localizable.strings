@@ -110,11 +110,11 @@
 "smartlist.noNumber" = "Valitud kontakt ei ole numbrit";
 "smartlist.selectOneNumber" = "Vali üks numbritest";
 "smartlist.invitations" = "Kutsed";
-"smartlist.aboutJami" = "Jami kohta";
+"smartlist.aboutJami" = "Talk9 kohta";
 "smartlist.inviteFriends" = "Kutsu sõpru";
 "smartlist.accounts" = "Arvestused";
 "smartlist.disableDonation" = "Mitte praegu";
-"smartlist.donationExplanation" = "Kui sulle Jami meeldib ja sa usud meie visiooni, siis kas sa oleksid nõus meid rahaliselt toetama?";
+"smartlist.donationExplanation" = "Kui sulle Talk9 meeldib ja sa usud meie visiooni, siis kas sa oleksid nõus meid rahaliselt toetama?";
 "smartlist.inSynchronization" = "vestlus on sünkroniseerimisel";
 "smartlist.newMessage" = "Uus sõnum";
 
@@ -151,13 +151,13 @@
 // Walkthrough
 
 //Welcome Screen
-"welcome.title" = "Jaga vabalt ja privaatselt Jamiga";
-"welcome.text" = "Jami on vaba ja universaalne sideplatvorm, mis kaitseb kasutajate privaatsust ja vabadusi";
+"welcome.title" = "Jaga vabalt ja privaatselt Talk9ga";
+"welcome.text" = "Talk9 on vaba ja universaalne sideplatvorm, mis kaitseb kasutajate privaatsust ja vabadusi";
 "welcome.haveAccount" = "Mul on juba konto.";
 "welcome.linkDevice" = "Impordi muudest seadmetest";
 "welcome.linkBackup" = "Importida arhiivist varustust";
 "welcome.createAccount" = "Liitu";
-"welcome.connectToManager" = "Loo ühendust Jami Kontohaldusserveriga";
+"welcome.connectToManager" = "Loo ühendust Talk9 Kontohaldusserveriga";
 
 //Creation Profile Screen
 "createProfile.skipCreateProfile" = "Lööge";
@@ -169,8 +169,8 @@
 "createProfile.createYourAvatar" = "Loe oma avatari";
 
 //Create Account form
-"createAccount.createAccountFormTitle" = "Liitu Jamiga";
-"createAccount.chooseStrongPassword" = "Vali tugeva parooli, mida sa mäletad, et kaitsta oma Jami kontot.";
+"createAccount.createAccountFormTitle" = "Liitu Talk9ga";
+"createAccount.chooseStrongPassword" = "Vali tugeva parooli, mida sa mäletad, et kaitsta oma Talk9 kontot.";
 "createAccount.repeatPasswordPlaceholder" = "Paranduse kinnitamine";
 "createAccount.passwordCharactersNumberError" = "Vähemalt 6 tähtaeg";
 "createAccount.passwordNotMatchingError" = "parool ei vasta";
@@ -193,7 +193,7 @@
 "linkToAccount.waitLinkToAccountTitle" = "Kontode sidemine";
 "linkToAccount.linkButtonTitle" = "Liin";
 "linkToAccount.linkDeviceTitle" = "Seo seade";
-"linkToAccount.linkDeviceMessage" = "Oma teisest Jami rakendusest vali „Seo uus seade“ ning kuva QR-koodi või sisesta PIN-kood";
+"linkToAccount.linkDeviceMessage" = "Oma teisest Talk9 rakendusest vali „Seo uus seade“ ning kuva QR-koodi või sisesta PIN-kood";
 "linkToAccount.pinPlaceholder" = "PIN";
 "linkToAccount.pinLabel" = "Sisesta PIN-aeg";
 "linkToAccount.explanationPinMessage" = "PIN-koodi loomiseks ava kasutajakonto halduse seadistused selles seadmes, kus asub kasutajakonto, mida soovid siduda uue seadmega. Vali „Seo uue seadmega“. Tulemuseks saad selle vormi andmete täitmiseks vajaliku PIN-koodi. Nimetatud kood kehtib vaid 10 minuti jooksul.";
@@ -205,16 +205,16 @@
 
 //Alerts
 "alerts.accountCannotBeFoundTitle" = "Ma ei leia aru.";
-"alerts.accountCannotBeFoundMessage" = "Jaige, et konto ekspordieritakse Jami'le olemasoleva seadmest ja et krediidiandmed on õiged.";
+"alerts.accountCannotBeFoundMessage" = "Jaige, et konto ekspordieritakse Talk9'le olemasoleva seadmest ja et krediidiandmed on õiged.";
 "alerts.accountAddedTitle" = "Konto lisatud";
 "alerts.accountNoNetworkTitle" = "Ma ei saa võrguga ühendust võtta.";
-"alerts.accountNoNetworkMessage" = "Ma ei saanud konto lisada, sest Jami ei saanud ühendust jagatud võrguga.";
+"alerts.accountNoNetworkMessage" = "Ma ei saanud konto lisada, sest Talk9 ei saanud ühendust jagatud võrguga.";
 "alerts.accountDefaultErrorTitle" = "Tundmatu viga";
 "alerts.accountDefaultErrorMessage" = "Konti ei saanud luua.";
 "alerts.profileTakePhoto" = "Võta foto.";
 "alerts.profileUploadPhoto" = "Laadige üles foto";
 "alerts.accountLinkedTitle" = "Sõltumine konto";
-"alerts.dbFailedTitle" = "Jami käivitamisel tekkis viga";
+"alerts.dbFailedTitle" = "Talk9 käivitamisel tekkis viga";
 "alerts.dbFailedMessage" = "Palun sulge taotlus ja proovige uuesti avada.";
 "alerts.confirmBlockContact" = "Kas sa tahad selle kontakti blokeerida?";
 "alerts.confirmDeleteConversation" = "Oled kindel, et tahad seda vestlust püsivalt kustutada?";
@@ -230,7 +230,7 @@
 "alerts.recordAudioMessage" = "Salvestada audiosõnumi";
 "alerts.uploadFile" = "Saada fail";
 "alerts.uploadPhoto" = "Avatud galeriid";
-"alerts.locationServiceIsDisabled" = "Pane \"Lokatsiooni teenused\" sisse, et \"Jami\" saaks su asukohta kindlaks teha.";
+"alerts.locationServiceIsDisabled" = "Pane \"Lokatsiooni teenused\" sisse, et \"Talk9\" saaks su asukohta kindlaks teha.";
 "alerts.locationSharing" = "Jaage minu asukoht.";
 "alerts.alreadylocationSharing" = "Kasutajaga juba jagatakse asukohta";
 "alerts.locationSharingDurationTitle" = "Kui kaua peaks kohtade jagamine olema?";
@@ -298,8 +298,8 @@
 "accountPage.removeAccountMessage" = "Kui klikkate \"Kõikada\", siis kustutate selle konto seadmel!";
 "accountPage.removeAccountButton" = "Võtke välja";
 "accountPage.inviteFriends" = "Kutsu sõpru";
-"accountPage.contactMeOnJamiTitle" = "Võta ühendust Jamiga!";
-"accountPage.contactMeOnJamiContant" = "Võta ühendust minuga Jami jaotatud sideplatvormis \"%s\" kasutades: https://jami.net";
+"accountPage.contactMeOnJamiTitle" = "Võta ühendust Talk9ga!";
+"accountPage.contactMeOnJamiContant" = "Võta ühendust minuga Talk9 jaotatud sideplatvormis \"%s\" kasutades: https://talk9.co";
 "accountPage.passwordPlaceholder" = "Kirjuta konto parool";
 "accountPage.usernamePlaceholder" = "Sisesta soovitud kasutajanimi";
 "accountPage.registerNameErrorMessage" = "Valitud kasutajanimi ei ole kättesaadav";
@@ -307,7 +307,7 @@
 "accountPage.usernameRegisterAction" = "Registreerimine";
 "accountPage.usernameRegistrationFailed" = "Registreerimine ebaõnnestunud.";
 "accountPage.createPassword" = "Salastatud konto";
-"accountPage.createPasswordExplanation" = "Teie Jami konto registreeritakse ainult sellel seadmel, kui arhiiv, mis sisaldab teie konto võtmeid.";
+"accountPage.createPasswordExplanation" = "Teie Talk9 konto registreeritakse ainult sellel seadmel, kui arhiiv, mis sisaldab teie konto võtmeid.";
 "accountPage.changePassword" = "Paraku pardale";
 "accountPage.oldPasswordPlaceholder" = "Sisesta vana parool";
 "accountPage.newPasswordPlaceholder" = "Sisesta uus parool";
@@ -316,7 +316,7 @@
 "accountPage.enableBoothMode" = "Võimalise boodi toiming";
 "accountPage.disableBoothMode" = "Püüa peatada laua";
 "accountPage.disableBoothModeExplanation" = "Palun sisesta oma kasutajakonto salasõna";
-"accountPage.boothModeExplanation" = "Booth-režiimis ei salvestata vestlushistoriat ja Jami funktsioon on piiratud väljapääsude tegemisega.";
+"accountPage.boothModeExplanation" = "Booth-režiimis ei salvestata vestlushistoriat ja Talk9 funktsioon on piiratud väljapääsude tegemisega.";
 "accountPage.noBoothMode" = "Kioskirežiimi kasutamiseks palun esmalt krüpti oma kasutajakonto.";
 "accountPage.boothModeAlertMessage" = "Pärast kabinimoodi aktiveerimist kustutatakse kõik teie vestlused.";
 "accountPage.peerDiscovery" = "Automaatne ühendus kohaliku võrguga";
@@ -358,7 +358,7 @@
 "linkDevice.passwordError" = "Sisestatud parool ei lukusta seda kontot";
 "linkDevice.networkError" = "Ekspordi ajal tekkis võrguühenduse viga";
 "linkDevice.defaultError" = "Ekspordi ajal tekkis viga";
-"linkDevice.explanationMessage" = "Selleks, et protsessi lõpetada, peate avama Jami uuel seadmel ja valima valik \"Ühendage see seadme kontonile\". Teie pin on kehtiv 10 minutit";
+"linkDevice.explanationMessage" = "Selleks, et protsessi lõpetada, peate avama Talk9 uuel seadmel ja valima valik \"Ühendage see seadme kontonile\". Teie pin on kehtiv 10 minutit";
 "linkDevice.hudMessage" = "Kontrollimine";
 
 //Contact Page
@@ -434,7 +434,7 @@
 "migrateAccount.migrateAnother" = "Migraada teise konto";
 
 //About Jami
-"aboutJami.declaration1" = "Jami, GNU tarkvara, on rakendus üldiseks ja hajutatud suhtlemiseks võrdõigusvõrgus, mis austab oma kasutajate vabadusi ja privaatsust. Vaata";
+"aboutJami.declaration1" = "Talk9, GNU tarkvara, on rakendus üldiseks ja hajutatud suhtlemiseks võrdõigusvõrgus, mis austab oma kasutajate vabadusi ja privaatsust. Vaata";
 "aboutJami.declaration2" = "ja leiad lisatavet.";
 "aboutJami.noWarranty1" = "Selle rakendusega ei kaasne ühtegi garantiid. Lisateavet leiad";
 "aboutJami.noWarranty2" = "versioonist 3 või uuemast.";

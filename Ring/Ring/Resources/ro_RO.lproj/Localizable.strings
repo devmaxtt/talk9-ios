@@ -42,7 +42,7 @@
 "global.copy" = "Copiază";
 "global.reply" = "Răspunde";
 "global.search" = "Se caută...";
-"global.supportJami" = "Susține proiectul Jami";
+"global.supportJami" = "Susține proiectul Talk9";
 "global.deleteMessage" = "Șterge mesajul";
 "global.deleteFile" = "Șterge fișierul din aparat";
 "global.editMessage" = "Modifică mesajul";
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "Alege culoarea conversației";
 "swarm.editTextHint" = "Atinge de două ori pentru a modifica";
 "swarm.conversationHeader" = "Conversație";
-"swarm.shareContactMessage" = "Poți adăuga acest contact %1@ pe platforma de comunicare distribuită Jami: https://jami.net";
+"swarm.shareContactMessage" = "Poți adăuga acest contact %1@ pe platforma de comunicare distribuită Talk9: https://talk9.co";
 "swarm.oneToOne" = "Privat";
 "swarm.adminInvitesOnly" = "Grup privat (invitații limitate)";
 "swarm.invitesOnly" = "Grup privat";
@@ -145,11 +145,11 @@
 "smartlist.noNumber" = "Contactul ales nu are niciun număr";
 "smartlist.selectOneNumber" = "Alege unul dintre numere";
 "smartlist.invitations" = "Invitații";
-"smartlist.aboutJami" = "Despre Jami";
+"smartlist.aboutJami" = "Despre Talk9";
 "smartlist.inviteFriends" = "Invită prieteni";
 "smartlist.accounts" = "Conturi";
 "smartlist.disableDonation" = "Nu acum";
-"smartlist.donationExplanation" = "Dacă îți place să folosești Jami și crezi că misiunea noastră este importantă, vrei să faci o donație?";
+"smartlist.donationExplanation" = "Dacă îți place să folosești Talk9 și crezi că misiunea noastră este importantă, vrei să faci o donație?";
 "smartlist.inSynchronization" = "se sincronizează conversația";
 "smartlist.newMessage" = "Mesaj nou";
 
@@ -191,12 +191,12 @@
 // Walkthrough
 
 //Welcome Screen
-"welcome.title" = "Distribuie, în mod liber și privat, cu Jami";
-"welcome.text" = "Jami este o platformă de comunicare liberă și universală care păstrează libertățile și intimitatea.";
+"welcome.title" = "Distribuie, în mod liber și privat, cu Talk9";
+"welcome.text" = "Talk9 este o platformă de comunicare liberă și universală care păstrează libertățile și intimitatea.";
 "welcome.haveAccount" = "Am deja un cont";
 "welcome.linkDevice" = "Importă din alt aparat";
 "welcome.linkBackup" = "Importă din copia de rezervă";
-"welcome.createAccount" = "Creează un cont Jami";
+"welcome.createAccount" = "Creează un cont Talk9";
 "welcome.connectToJAMS" = "Conectează la un server de administrare";
 
 // Creation Profile Screen
@@ -209,7 +209,7 @@
 "createProfile.createProfilePicture" = "Poza de profil";
 
 // Create Account form
-"createAccount.createAccountFormTitle" = "Folosește Jami";
+"createAccount.createAccountFormTitle" = "Folosește Talk9";
 "createAccount.lookingForUsernameAvailability" = "Caut disponibilitatea numelui de utilizator…";
 "createAccount.invalidUsername" = "Numele este greșit. Trebuie introdus numele corect.";
 "createAccount.usernameAlreadyTaken" = "Nume ales deja";
@@ -220,13 +220,13 @@
 "createAccount.timeoutMessage" = "Înscriere în curs a numelui de utilizator. Așteaptă…";
 "createAccount.sipConfigure" = "Configurează un cont SIP existent";
 "createAccount.creatingAccount" = "Se creează contul";
-"createAccount.nameExplanation" = "Poți alege un nume de utilizator pentru a fi ușor de găsit și de contactat pe Jami.";
+"createAccount.nameExplanation" = "Poți alege un nume de utilizator pentru a fi ușor de găsit și de contactat pe Talk9.";
 "createAccount.newAccount" = "Cont nou";
 "createAccount.encryptionEnabled" = "Protecția cu parolă e activată";
 "createAccount.encrypt" = "Protecție cu parolă";
 "createAccount.customize" = "Personalizează";
 "createAccount.encryptTitle" = "Cont protejat cu parolă";
-"createAccount.encryptExplanation" = "Un cont Jami este creat și stocat local numai în acest aparat, sub forma unei arhive care conține cheile contului. Accesul la această arhivă poate fi protejat facultativ cu o parolă.";
+"createAccount.encryptExplanation" = "Un cont Talk9 este creat și stocat local numai în acest aparat, sub forma unei arhive care conține cheile contului. Accesul la această arhivă poate fi protejat facultativ cu o parolă.";
 
 // Link To Account form
 "linkToAccount.importAccount" = "Importă contul";
@@ -246,7 +246,7 @@
 "linkToAccount.alertMessage" = "Oprirea va anula importarea contului.";
 
 // Import from Archive
-"importFromArchive.explanation" = "Importă contul Jami din fișierul arhivei.";
+"importFromArchive.explanation" = "Importă contul Talk9 din fișierul arhivei.";
 "importFromArchive.passwordExplanation" = "Dacă acest cont este protejat cu o parolă, completează următorul spațiu.";
 "importFromArchive.title" = "Importă din arhivă";
 "importFromArchive.buttonTitle" = "Importă";
@@ -262,16 +262,16 @@
 
 // Alerts
 "alerts.accountCannotBeFoundTitle" = "Eroare a contului";
-"alerts.accountCannotBeFoundMessage" = "Contul nu poate fi găsit în rețeaua Jami. Asigură-te că a fost exportat pe Jami dintr-un aparat existent și datele de autentificare sunt corecte.";
+"alerts.accountCannotBeFoundMessage" = "Contul nu poate fi găsit în rețeaua Talk9. Asigură-te că a fost exportat pe Talk9 dintr-un aparat existent și datele de autentificare sunt corecte.";
 "alerts.accountAddedTitle" = "Cont adăugat";
 "alerts.accountNoNetworkTitle" = "Eroare de rețea";
-"alerts.accountNoNetworkMessage" = "A apărut o eroare de conectare în timpul adăugării contului Jami la rețeaua distribuită. Încearcă din nou. Dacă problema persistă, contactează administratorul sistemului.";
+"alerts.accountNoNetworkMessage" = "A apărut o eroare de conectare în timpul adăugării contului Talk9 la rețeaua distribuită. Încearcă din nou. Dacă problema persistă, contactează administratorul sistemului.";
 "alerts.accountDefaultErrorTitle" = "Eroare a contului";
 "alerts.accountDefaultErrorMessage" = "A apărut o eroare la crearea contului.";
 "alerts.profileTakePhoto" = "Fă o poză";
 "alerts.profileUploadPhoto" = "Încarcă o poză";
 "alerts.accountLinkedTitle" = "Se asociază contul";
-"alerts.dbFailedTitle" = "S-a produs o eroare la pornirea lui Jami";
+"alerts.dbFailedTitle" = "S-a produs o eroare la pornirea lui Talk9";
 "alerts.dbFailedMessage" = "Închide aplicația și încearcă să o repornești";
 "alerts.confirmBlockContact" = "Vrei să blochezi acest contact? Conversația cu acest contact va fi ștearsă definitiv.";
 "alerts.confirmDeleteConversation" = "Vrei să ștergi definitiv această conversație?";
@@ -289,7 +289,7 @@
 "alerts.uploadFile" = "Trimite un fișier";
 "alerts.uploadPhoto" = "Deschide galeria";
 "alerts.sendPhoto" = "Trimite poza";
-"alerts.locationServiceIsDisabled" = "Activează „Localizarea” pentru ca Jami să poată stabili poziția ta.";
+"alerts.locationServiceIsDisabled" = "Activează „Localizarea” pentru ca Talk9 să poată stabili poziția ta.";
 "alerts.locationSharing" = "Trimite poziția mea";
 "alerts.alreadylocationSharing" = "Se trimite deja poziția către acest utilizator";
 "alerts.locationSharingDurationTitle" = "Cât timp trebuie să distribui poziția?";
@@ -355,8 +355,8 @@
 "accountPage.other" = "Altele";
 "accountPage.removeAccountMessage" = "Dacă acest cont nu a fost asociat cu alt aparat și nu ai o copie de rezervă, va fi pierdut DEFINITIV împreună cu numele înscris.";
 "accountPage.inviteFriends" = "Invită prieteni";
-"accountPage.contactMeOnJamiTitle" = "Contactează-mă pe Jami!";
-"accountPage.contactMeOnJamiContant" = "Contactează-mă folosind „%s” pe platforma distribuită de comunicare Jami: https://jami.net";
+"accountPage.contactMeOnJamiTitle" = "Contactează-mă pe Talk9!";
+"accountPage.contactMeOnJamiContant" = "Contactează-mă folosind „%s” pe platforma distribuită de comunicare Talk9: https://talk9.co";
 "accountPage.passwordPlaceholder" = "Introdu parola contului";
 "accountPage.usernamePlaceholder" = "Introdu numele de utilizator";
 "accountPage.registerNameErrorMessage" = "Numele nu este disponibil.";
@@ -373,7 +373,7 @@
 "accountPage.enableBoothMode" = "Activează „Modul Cabină”";
 "accountPage.disableBoothMode" = "Dezactivează „Modul Cabină”";
 "accountPage.disableBoothModeExplanation" = "Introdu parola contului";
-"accountPage.boothModeExplanation" = "În „Modul Cabină” cronologia conversațiilor nu e salvată și Jami este limitat la efectuarea de apeluri. Dacă activezi „Modul Cabină”, toate conversațiile tale vor fi șterse.";
+"accountPage.boothModeExplanation" = "În „Modul Cabină” cronologia conversațiilor nu e salvată și Talk9 este limitat la efectuarea de apeluri. Dacă activezi „Modul Cabină”, toate conversațiile tale vor fi șterse.";
 "accountPage.noBoothMode" = "Protejează-ți contul înainte de a activa „Modul Cabină”.";
 "accountPage.boothModeAlertMessage" = "După activarea modului cabină, toate conversațiile vor fi șterse.";
 "accountPage.peerDiscovery" = "Activează descoperirea utilizatorilor locali";
@@ -388,7 +388,7 @@
 "accountPage.upnpEnabled" = "Folosește UPnP";
 "accountPage.security" = "Protecție";
 "accountPage.enableSRTP" = "Cifrează fluxurile Media (SRTP)";
-"accountPage.registerNameExplanation" = "Poți alege un nume de utilizator pentru a fi ușor de găsit și de contactat pe Jami.";
+"accountPage.registerNameExplanation" = "Poți alege un nume de utilizator pentru a fi ușor de găsit și de contactat pe Talk9.";
 "accountPage.profileHeader" = "Profil";
 "accountPage.profileNameNotSelected" = "Niciun nume ales";
 "accountPage.accountHeader" = "Cont";
@@ -397,7 +397,7 @@
 "accountPage.editProfile" = "Modifică profilul";
 "accountPage.manageAccount" = "Gestionează contul";
 "accountPage.encryptAccount" = "Cont protejat cu parolă";
-"accountPage.passwordExplanation" = "Un cont Jami este creat și stocat local numai în acest aparat, sub forma unei arhive care conține cheile contului. Accesul la această arhivă poate fi protejat facultativ cu o parolă.";
+"accountPage.passwordExplanation" = "Un cont Talk9 este creat și stocat local numai în acest aparat, sub forma unei arhive care conține cheile contului. Accesul la această arhivă poate fi protejat facultativ cu o parolă.";
 "accountPage.passwordsDoNotMatch" = "Parolele nu se potrivesc.";
 "accountPage.passwordCreated" = "Parolă creată";
 "accountPage.passwordUpdated" = "Parolă actualizată";
@@ -406,10 +406,10 @@
 "accountPage.generatingPin" = "Se generează codul PIN…";
 "accountPage.passwordForPin" = "Contul este protejat cu parolă. Introdu parola pentru a genera codul PIN.";
 "accountPage.pinExplanationTitle" = "În alt aparat";
-"accountPage.pinExplanationMessage" = "Instalează și pornește Jami, alege „Importă din alt aparat” și scanează codul QR sau introdu manual codul PIN.";
+"accountPage.pinExplanationMessage" = "Instalează și pornește Talk9, alege „Importă din alt aparat” și scanează codul QR sau introdu manual codul PIN.";
 "accountPage.pinError" = "A apărut o eroare în timpul generării codului PIN.";
 "accountPage.notificationTitle" = "Notificări";
-"accountPage.notificationError" = "Notificările pentru Jami sînt dezactivate. Activează-le din reglările aparatului tău.";
+"accountPage.notificationError" = "Notificările pentru Talk9 sînt dezactivate. Activează-le din reglările aparatului tău.";
 "accountPage.callsFromUnknownContacts" = "Primește apeluri necunoscute.";
 "accountPage.accountSettingsExplanation" = "Aceste reglări se vor aplica numai acestui cont";
 "accountPage.appSettings" = "Reglări generale";
@@ -433,7 +433,7 @@
 "accountPage.typingIndicatorExplanation" = "Arată că se scrie un mesaj.";
 
 // Backup Account
-"backupAccount.explanation" = "Acest cont Jami există doar în acest aparat. Contul va fi pierdut dacă acest aparat este pierdut sau dacă aplicația este dezinstalată. Se recomandă efectuarea unei copii de rezervă a acestui cont.";
+"backupAccount.explanation" = "Acest cont Talk9 există doar în acest aparat. Contul va fi pierdut dacă acest aparat este pierdut sau dacă aplicația este dezinstalată. Se recomandă efectuarea unei copii de rezervă a acestui cont.";
 "backupAccount.title" = "Copiază contul";
 "backupAccount.creating" = "Se creează copia de rezervă";
 "backupAccount.archiveName" = "Alege un nume pentru arhivă.";
@@ -563,7 +563,7 @@
 "migrateAccount.migrateAnother" = "Transferă alt cont";
 
 // About Jami
-"aboutJami.declaration1" = "Jami, un pachet GNU, este un program pentru comunicare distribuită și universală care respectă libertatea și intimitatea utilizatorilor săi. Vezi";
+"aboutJami.declaration1" = "Talk9, un pachet GNU, este un program pentru comunicare distribuită și universală care respectă libertatea și intimitatea utilizatorilor săi. Vezi";
 "aboutJami.declaration2" = "pentru a afla mai multe.";
 "aboutJami.noWarranty1" = "Acest program nu oferă absolut nicio garanție. A se vedea";
 "aboutJami.noWarranty2" = "versiunea 3 sau ulterioară.";
@@ -573,7 +573,7 @@
 "aboutJami.media" = "Multimedia";
 "aboutJami.communityManagement" = "Gestionarea comunității";
 "aboutJami.specialThanks" = "Mulțumiri speciale";
-"aboutJami.info" = "Aceasta este o listă de oameni care au făcut o investiție semnificativă de timp, cu rezultate utile, în Jami. Astfel de colaboratori care doresc să fie adăugați pe listă trebuie să ne contacteze.";
+"aboutJami.info" = "Aceasta este o listă de oameni care au făcut o investiție semnificativă de timp, cu rezultate utile, în Talk9. Astfel de colaboratori care doresc să fie adăugați pe listă trebuie să ne contacteze.";
 "aboutJami.header" = "Mulțumim colaboratorilor noștri, ale căror eforturi de-a lungul multor ani au făcut din acest program ceea ce este acum.";
 
 // Accessibility
@@ -581,8 +581,8 @@
 "accessibility.smartListSwitchAccounts" = "Schimbă contul";
 "accessibility.smartListConnectedAs" = "Contul actual este %@";
 "accessibility.smartListAddAccount" = "Adaugă un cont";
-"accessibility.aboutJamiTitle" = "Despre Jami";
-"accessibility.welcomeToJamiTitle" = "Bun venit în Jami";
+"accessibility.aboutJamiTitle" = "Despre Talk9";
+"accessibility.welcomeToJamiTitle" = "Bun venit în Talk9";
 "accessibility.createAccountVerifyUsernamePrompt" = "Introdu un nume de utilizator pentru a verifica dacă este disponibil.";
 "accessibility.profilePicturePicker" = "Poza de profil";
 "accessibility.profilePicturePickerHint" = "Atinge de două ori pentru a face o poză sau ca să alegi una din galerie";

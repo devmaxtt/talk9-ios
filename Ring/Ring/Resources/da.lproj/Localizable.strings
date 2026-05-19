@@ -42,7 +42,7 @@
 "global.copy" = "Kopiér";
 "global.reply" = "Svar";
 "global.search" = "Søger…";
-"global.supportJami" = "Support Jami project";
+"global.supportJami" = "Support Talk9 project";
 "global.deleteMessage" = "Slet besked";
 "global.deleteFile" = "Slet fil fra enhed";
 "global.editMessage" = "Redigere beskeden";
@@ -93,7 +93,7 @@
 "swarm.accessibilityColorPicker" = "Conversation color picker";
 "swarm.editTextHint" = "Double-tap to edit";
 "swarm.conversationHeader" = "Samtale";
-"swarm.shareContactMessage" = "You can add this contact, %1@, on the Jami distributed communication platform: https://jami.net";
+"swarm.shareContactMessage" = "You can add this contact, %1@, on the Talk9 distributed communication platform: https://talk9.co";
 "swarm.oneToOne" = "Privat";
 "swarm.adminInvitesOnly" = "Privatgruppe (undtagen invitationer)";
 "swarm.invitesOnly" = "Privatgruppe";
@@ -145,11 +145,11 @@
 "smartlist.noNumber" = "Den valgte kontakt har ikke noget nummer";
 "smartlist.selectOneNumber" = "Vælg et af numrene";
 "smartlist.invitations" = "Invitationer";
-"smartlist.aboutJami" = "Om Jami";
+"smartlist.aboutJami" = "Om Talk9";
 "smartlist.inviteFriends" = "Invite friends";
 "smartlist.accounts" = "Konti";
 "smartlist.disableDonation" = "Ikke nu";
-"smartlist.donationExplanation" = "If you enjoy using Jami and believe in our mission, do you want to make a donation?";
+"smartlist.donationExplanation" = "If you enjoy using Talk9 and believe in our mission, do you want to make a donation?";
 "smartlist.inSynchronization" = "conversation in synchronization";
 "smartlist.newMessage" = "Ny besked";
 
@@ -191,12 +191,12 @@
 // Walkthrough
 
 //Welcome Screen
-"welcome.title" = "Share, freely and privately with Jami";
-"welcome.text" = "Jami er en gratis og universel kommunikationsplatform som respekterer sine brugeres privatliv og frihed";
+"welcome.title" = "Share, freely and privately with Talk9";
+"welcome.text" = "Talk9 er en gratis og universel kommunikationsplatform som respekterer sine brugeres privatliv og frihed";
 "welcome.haveAccount" = "Jeg har allerede en konto.";
 "welcome.linkDevice" = "Import fra et andet udstyr";
 "welcome.linkBackup" = "Import fra backup";
-"welcome.createAccount" = "Oprette Jami-konto";
+"welcome.createAccount" = "Oprette Talk9-konto";
 "welcome.connectToJAMS" = "Connect to a management server";
 
 // Creation Profile Screen
@@ -209,7 +209,7 @@
 "createProfile.createProfilePicture" = "Create profile picture";
 
 // Create Account form
-"createAccount.createAccountFormTitle" = "Gå med Jami";
+"createAccount.createAccountFormTitle" = "Gå med Talk9";
 "createAccount.lookingForUsernameAvailability" = "Tjekker om brugernavnet er ledigt…";
 "createAccount.invalidUsername" = "Invalid username. Please enter the correct username.";
 "createAccount.usernameAlreadyTaken" = "Brugernavn er allerede taget";
@@ -220,13 +220,13 @@
 "createAccount.timeoutMessage" = "Username registration is in progress. Please wait…";
 "createAccount.sipConfigure" = "Konfigurer eksisterende SIP konto";
 "createAccount.creatingAccount" = "Creating account";
-"createAccount.nameExplanation" = "Du kan vælge et brugernavn for at hjælpe andre med at finde og nå dig på Jami.";
+"createAccount.nameExplanation" = "Du kan vælge et brugernavn for at hjælpe andre med at finde og nå dig på Talk9.";
 "createAccount.newAccount" = "New account";
 "createAccount.encryptionEnabled" = "Password protection enabled";
 "createAccount.encrypt" = "Password protect";
 "createAccount.customize" = "Tilpasning";
 "createAccount.encryptTitle" = "Password protect account";
-"createAccount.encryptExplanation" = "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.";
+"createAccount.encryptExplanation" = "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be protected with a password.";
 
 // Link To Account form
 "linkToAccount.importAccount" = "Importer konto";
@@ -246,7 +246,7 @@
 "linkToAccount.alertMessage" = "Stopping will cancel the import account operation.";
 
 // Import from Archive
-"importFromArchive.explanation" = "Import Jami-konto fra lokale arkiv.";
+"importFromArchive.explanation" = "Import Talk9-konto fra lokale arkiv.";
 "importFromArchive.passwordExplanation" = "If the account is password protected, please fill the following field.";
 "importFromArchive.title" = "Import from archive";
 "importFromArchive.buttonTitle" = "Importér";
@@ -262,16 +262,16 @@
 
 // Alerts
 "alerts.accountCannotBeFoundTitle" = "Kontofejl";
-"alerts.accountCannotBeFoundMessage" = "Unable to find account on the Jami network. Make sure it was exported on Jami from an existing device, and that provided credentials are correct.";
+"alerts.accountCannotBeFoundMessage" = "Unable to find account on the Talk9 network. Make sure it was exported on Talk9 from an existing device, and that provided credentials are correct.";
 "alerts.accountAddedTitle" = "Account added";
 "alerts.accountNoNetworkTitle" = "Netværksfejl";
-"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Jami account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
+"alerts.accountNoNetworkMessage" = "A connectivity error occurred while adding Talk9 account to the distributed network. Please try again. If the problem persists, contact your system administrator.";
 "alerts.accountDefaultErrorTitle" = "Kontofejl";
 "alerts.accountDefaultErrorMessage" = "An error occurred while creating the account.";
 "alerts.profileTakePhoto" = "Tag billede";
 "alerts.profileUploadPhoto" = "Upload foto";
 "alerts.accountLinkedTitle" = "Tilknytter konto";
-"alerts.dbFailedTitle" = "An error happened when launching Jami";
+"alerts.dbFailedTitle" = "An error happened when launching Talk9";
 "alerts.dbFailedMessage" = "Luk venligst applikationen og prøv at starte den igen";
 "alerts.confirmBlockContact" = "Do you want to block this contact? The conversation history with this contact will also be deleted permanently.";
 "alerts.confirmDeleteConversation" = "Do you want to remove this conversation permanently?";
@@ -289,7 +289,7 @@
 "alerts.uploadFile" = "Send fil";
 "alerts.uploadPhoto" = "Åben galleri";
 "alerts.sendPhoto" = "Send photo";
-"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Jami” to determine device location.";
+"alerts.locationServiceIsDisabled" = "Turn on “Location Services” to allow “Talk9” to determine device location.";
 "alerts.locationSharing" = "Del min lokation";
 "alerts.alreadylocationSharing" = "Du deler allerede din lokation med denne bruger";
 "alerts.locationSharingDurationTitle" = "I hvor lang tid vil du dele din lokation?";
@@ -355,8 +355,8 @@
 "accountPage.other" = "Andre";
 "accountPage.removeAccountMessage" = "If the account has not been backed up or added to another device, the account and registered username will be IRREVOCABLY LOST.";
 "accountPage.inviteFriends" = "Invite friends";
-"accountPage.contactMeOnJamiTitle" = "Kontakt mig på Jami!";
-"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Jami distributed communication platform: https://jami.net";
+"accountPage.contactMeOnJamiTitle" = "Kontakt mig på Talk9!";
+"accountPage.contactMeOnJamiContant" = "Contact me using “%s” on the Talk9 distributed communication platform: https://talk9.co";
 "accountPage.passwordPlaceholder" = "Indtast password til kontoen";
 "accountPage.usernamePlaceholder" = "Indtaster ønskede brugernavn";
 "accountPage.registerNameErrorMessage" = "Brugernavnet er ikke tilgængeligt.";
@@ -373,7 +373,7 @@
 "accountPage.enableBoothMode" = "Aktiver Booth- modus";
 "accountPage.disableBoothMode" = "Sluk op på standmodus";
 "accountPage.disableBoothModeExplanation" = "Please provide the account password";
-"accountPage.boothModeExplanation" = "I stand-modus er samtalehistorien ikke gemt og Jami-funktionen begrænset ved at foretage udgående opkald.";
+"accountPage.boothModeExplanation" = "I stand-modus er samtalehistorien ikke gemt og Talk9-funktionen begrænset ved at foretage udgående opkald.";
 "accountPage.noBoothMode" = "To enable Booth mode, password protect the account first.";
 "accountPage.boothModeAlertMessage" = "After enabling booth mode, all the conversations will be removed.";
 "accountPage.peerDiscovery" = "Aktivere lokal peer-opdagelse";
@@ -388,7 +388,7 @@
 "accountPage.upnpEnabled" = "Brug UPnP";
 "accountPage.security" = "Sikkerhed";
 "accountPage.enableSRTP" = "Krypter mediestrømme (SRTP)";
-"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Jami.";
+"accountPage.registerNameExplanation" = "Register a username to help others more easily find and reach you on Talk9.";
 "accountPage.profileHeader" = "Profil";
 "accountPage.profileNameNotSelected" = "Name not selected";
 "accountPage.accountHeader" = "Konto";
@@ -397,7 +397,7 @@
 "accountPage.editProfile" = "Edit Profile";
 "accountPage.manageAccount" = "Håndter konto";
 "accountPage.encryptAccount" = "Password protect account";
-"accountPage.passwordExplanation" = "A Jami account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
+"accountPage.passwordExplanation" = "A Talk9 account is created and stored locally only on this device as an archive containing its account keys. Access to the archive can optionally be password protected.";
 "accountPage.passwordsDoNotMatch" = "Adgangskoderne er ikke ens.";
 "accountPage.passwordCreated" = "Password created";
 "accountPage.passwordUpdated" = "Password updated";
@@ -406,10 +406,10 @@
 "accountPage.generatingPin" = "Generating PIN code…";
 "accountPage.passwordForPin" = "The account is password protected. Enter the password to generate a PIN code.";
 "accountPage.pinExplanationTitle" = "On another device";
-"accountPage.pinExplanationMessage" = "Install and launch Jami. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
+"accountPage.pinExplanationMessage" = "Install and launch Talk9. Select “Import from another device,” and scan the QR code. Alternatively, enter the PIN code manually.";
 "accountPage.pinError" = "An error occurred while generating the PIN code.";
 "accountPage.notificationTitle" = "Notifikationer";
-"accountPage.notificationError" = "Notifications for Jami are disabled. Enable it in device settings in order to use this feature.";
+"accountPage.notificationError" = "Notifications for Talk9 are disabled. Enable it in device settings in order to use this feature.";
 "accountPage.callsFromUnknownContacts" = "Allow calls from unknown contacts.";
 "accountPage.accountSettingsExplanation" = "These settings will only apply to this account.";
 "accountPage.appSettings" = "App settings";
@@ -433,7 +433,7 @@
 "accountPage.typingIndicatorExplanation" = "Viser når der bliver indtastet beskeder.";
 
 // Backup Account
-"backupAccount.explanation" = "This Jami account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
+"backupAccount.explanation" = "This Talk9 account exists only on this device. The account will be lost if this device is lost or if the application is uninstalled. It is recommended to make a backup of this account.";
 "backupAccount.title" = "Backupkonto";
 "backupAccount.creating" = "Creating backup";
 "backupAccount.archiveName" = "Select a name for the archive.";
@@ -563,7 +563,7 @@
 "migrateAccount.migrateAnother" = "Flyt til en anden konto";
 
 // About Jami
-"aboutJami.declaration1" = "Jami, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
+"aboutJami.declaration1" = "Talk9, a GNU package, is software for universal and distributed peer-to-peer communication that respects the freedom and privacy of its users. Visit";
 "aboutJami.declaration2" = "to learn more.";
 "aboutJami.noWarranty1" = "This program comes with absolutely no warranty. See the";
 "aboutJami.noWarranty2" = "version 3 or later for details.";
@@ -573,7 +573,7 @@
 "aboutJami.media" = "Medier";
 "aboutJami.communityManagement" = "Community Management";
 "aboutJami.specialThanks" = "Særlig tak til";
-"aboutJami.info" = "This is a list of people who have made a significant investment of time, with useful results, into Jami. Any such contributors who want to be added to the list should contact us.";
+"aboutJami.info" = "This is a list of people who have made a significant investment of time, with useful results, into Talk9. Any such contributors who want to be added to the list should contact us.";
 "aboutJami.header" = "Vi vil gerne takke vores bidragsydere, hvis indsats gennem mange år har gjort dette software til det, det er i dag.";
 
 // Accessibility
@@ -581,8 +581,8 @@
 "accessibility.smartListSwitchAccounts" = "Switch account";
 "accessibility.smartListConnectedAs" = "The current account is %@";
 "accessibility.smartListAddAccount" = "Tilføj konto";
-"accessibility.aboutJamiTitle" = "Om Jami";
-"accessibility.welcomeToJamiTitle" = "Velkommen til Jami";
+"accessibility.aboutJamiTitle" = "Om Talk9";
+"accessibility.welcomeToJamiTitle" = "Velkommen til Talk9";
 "accessibility.createAccountVerifyUsernamePrompt" = "Enter username to check availability.";
 "accessibility.profilePicturePicker" = "Profilbillede";
 "accessibility.profilePicturePickerHint" = "Double-tap to take a picture or select a picture from the library";
