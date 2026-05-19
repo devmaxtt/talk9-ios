@@ -155,6 +155,21 @@ extension String {
         return fileIsImage
     }
 
+    func isAudioExtension() -> Bool {
+        let uti = UTTypeCreatePreferredIdentifierForTag(
+            kUTTagClassFilenameExtension,
+            self as CFString,
+            nil)
+
+        if let value = uti?.takeRetainedValue(),
+           UTTypeConformsTo(value, kUTTypeAudio) {
+            return true
+        }
+        // Jami's voice recorder produces .ogg; .opus is also pure audio.
+        let audioExtensions = ["ogg", "opus"]
+        return audioExtensions.contains { $0.compare(self, options: .caseInsensitive) == .orderedSame }
+    }
+
     func toBase64() -> String {
         return Data(self.utf8).base64EncodedString()
     }

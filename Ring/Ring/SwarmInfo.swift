@@ -264,10 +264,13 @@ class SwarmInfo: SwarmInfoProtocol, Identifiable {
             })
             // filter out banned and pending contacts
             if contact.banned || requestIndex != nil { return }
-            // filter out contact that is already added to swarm participants
-            if self.participants.value.filter({ participantInfo in
-                participantInfo.jamiId == contact.hash
-            }).first != nil {
+            // Only skip when the participant is currently active in the swarm
+            // (member/admin). Participants who declined (.invited), left (.left),
+            // were kicked (.banned) or are .unknown should be re-invitable.
+            if self.participants.value.contains(where: { participantInfo in
+                participantInfo.jamiId == contact.hash &&
+                    (participantInfo.role == .member || participantInfo.role == .admin)
+            }) {
                 return
             }
 

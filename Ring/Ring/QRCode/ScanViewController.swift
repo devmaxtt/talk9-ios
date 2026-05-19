@@ -23,8 +23,9 @@ import UIKit
 import AVFoundation
 import AudioToolbox
 import RxSwift
+import PhotosUI
 
-class ScanViewController: UIViewController, StoryboardBased, AVCaptureMetadataOutputObjectsDelegate, ViewModelBased {
+class ScanViewController: UIViewController, StoryboardBased, AVCaptureMetadataOutputObjectsDelegate, ViewModelBased, PHPickerViewControllerDelegate {
     // MARK: outlets
     @IBOutlet weak var header: UIView!
     @IBOutlet weak var scanImage: UIImageView!
@@ -79,6 +80,7 @@ class ScanViewController: UIViewController, StoryboardBased, AVCaptureMetadataOu
             self.bottomMarginTitleConstraint.constant = 35
             self.bottomCloseButtonConstraint.constant = 25
         }
+        self.setupGalleryButton()
         // AVCaptureDevice allows us to reference a physical capture device (video in our case)
         let captureDevice = AVCaptureDevice.default(for: AVMediaType.video)
 
@@ -183,5 +185,88 @@ class ScanViewController: UIViewController, StoryboardBased, AVCaptureMetadataOu
 
     @IBAction func closeScan(_ sender: Any) {
         self.dismiss(animated: true, completion: nil)
+    }
+
+    // MARK: - Gallery QR support
+
+    private func setupGalleryButton() {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        let symbol = UIImage(systemName: "photo.on.rectangle")
+        button.setImage(symbol, for: .normal)
+        button.tintColor = .white
+        button.accessibilityLabel = NSLocalizedString("scan.openGallery",
+                                                     value: "Open photo library",
+                                                     comment: "Accessibility label for the gallery button on the QR scan screen")
+        button.addTarget(self, action: #selector(openPhotoLibrary), for: .touchUpInside)
+        self.header.addSubview(button)
+        NSLayoutConstraint.activate([
+            button.widthAnchor.constraint(equalToConstant: 30),
+            button.heightAnchor.constraint(equalToConstant: 30),
+            button.trailingAnchor.constraint(equalTo: self.header.trailingAnchor, constant: -14),
+            button.centerYAnchor.constraint(equalTo: self.searchTitle.centerYAnchor)
+        ])
+    }
+
+    @objc private func openPhotoLibrary() {
+        var config = PHPickerConfiguration()
+        config.filter = .images
+        config.selectionLimit = 1
+        let picker = PHPickerViewController(configuration: config)
+        picker.delegate = self
+        self.present(picker, animated: true, completion: nil)
+    }
+
+    // MARK: - PHPickerViewControllerDelegate
+
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true, completion: nil)
+        guard let provider = results.first?.itemProvider,
+              provider.canLoadObject(ofClass: UIImage.self) else { return }
+        provider.loadObject(ofClass: UIImage.self) { [weak self] object, _ in
+            guard let self = self, let image = object as? UIImage else { return }
+            DispatchQueue.main.async {
+                self.handleScannedImage(image)
+            }
+        }
+    }
+
+    private func handleScannedImage(_ image: UIImage) {
+        guard let stringValue = self.decodeQRCode(from: image) else {
+            self.presentInvalidQRAlert(message: NSLocalizedString("scan.qrCodeNotFound",
+                                                                  value: "No QR code found in the selected image",
+                                                                  comment: "Shown when the picked image contains no QR code"))
+            return
+        }
+        let jamiUri = JamiURI(from: stringValue)
+        if jamiUri.isJami, let jamiId = jamiUri.hash {
+            AudioServicesPlayAlertSound(systemSoundId)
+            onCodeScanned?(jamiId)
+            self.scannedQrCode = true
+        } else {
+            self.presentInvalidQRAlert(message: "")
+        }
+    }
+
+    private func decodeQRCode(from image: UIImage) -> String? {
+        guard let ciImage = CIImage(image: image) ?? image.cgImage.flatMap({ CIImage(cgImage: $0) }) else {
+            return nil
+        }
+        let detector = CIDetector(ofType: CIDetectorTypeQRCode,
+                                  context: nil,
+                                  options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])
+        let features = detector?.features(in: ciImage) ?? []
+        for feature in features {
+            if let qrFeature = feature as? CIQRCodeFeature, let value = qrFeature.messageString {
+                return value
+            }
+        }
+        return nil
+    }
+
+    private func presentInvalidQRAlert(message: String) {
+        let alert = UIAlertController(title: L10n.Scan.badQrCode, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: L10n.Global.ok, style: .default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
 }

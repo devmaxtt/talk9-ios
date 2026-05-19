@@ -510,6 +510,9 @@
 "notifications.newFile" = "新檔案";
 "notifications.locationSharingStarted" = "傳來的位置分享已開始";
 "notifications.locationSharingStopped" = "傳來的位置分享已停止";
+"notifications.voiceMessage" = "语音消息";
+"notifications.imageMessage" = "图片";
+"notifications.videoMessage" = "视频";
 "dataTransfer.readableStatusDecline" = "拒絕";
 "dataTransfer.readableStatusAccept" = "接聽";
 "dataTransfer.infoMessage" = "按下以開始錄製";

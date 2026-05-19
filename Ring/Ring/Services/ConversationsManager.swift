@@ -652,8 +652,31 @@ extension  ConversationsManager: MessagesAdapterDelegate {
     func newInteraction(conversationId: String, accountId: String, message: SwarmMessageWrap) {
         guard let account = self.accountsService.getAccount(fromAccountId: accountId) else { return }
         let newMessage = MessageModel(with: message, localJamiId: account.jamiId)
-        if newMessage.incoming && newMessage.type == .text && !newMessage.content.isEmpty {
-            cacheMessageForNotification(accountId: accountId, conversationId: conversationId, authorId: newMessage.authorId, body: newMessage.content)
+        if newMessage.incoming {
+            var notificationBody: String?
+            if newMessage.type == .text && !newMessage.content.isEmpty {
+                notificationBody = newMessage.content
+            } else if newMessage.type == .fileTransfer {
+                let pathExt = (newMessage.content as NSString).pathExtension
+                if pathExt.isAudioExtension() {
+                    notificationBody = NSLocalizedString("notifications.voiceMessage",
+                                                        value: "Voice message",
+                                                        comment: "Notification body for an incoming voice message")
+                } else if pathExt.isImageExtension() {
+                    notificationBody = NSLocalizedString("notifications.imageMessage",
+                                                        value: "Image",
+                                                        comment: "Notification body for an incoming image")
+                } else if pathExt.isMediaExtension() {
+                    notificationBody = NSLocalizedString("notifications.videoMessage",
+                                                        value: "Video",
+                                                        comment: "Notification body for an incoming video")
+                } else {
+                    notificationBody = L10n.Notifications.newFile
+                }
+            }
+            if let body = notificationBody {
+                cacheMessageForNotification(accountId: accountId, conversationId: conversationId, authorId: newMessage.authorId, body: body)
+            }
         }
         if newMessage.type == .fileTransfer {
             newMessage.transferStatus = newMessage.incoming ? .awaiting : .success

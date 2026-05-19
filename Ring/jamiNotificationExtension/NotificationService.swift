@@ -702,6 +702,10 @@ class NotificationService: UNNotificationServiceExtension {
                 NSLog("[Talk9-Push] ✓ SHOW  title='%@' body='%@'",
                       bestAttemptContent.title, String(bestAttemptContent.body.prefix(60)))
             }
+            // Tag every real-message notification with a distinct thread so iOS keeps
+            // them visually separated from the "talk9.suppressed" empty cards and the
+            // suppressed cleanup paths cannot accidentally remove them.
+            self.bestAttemptContent.threadIdentifier = "talk9.real"
             contentHandler(self.bestAttemptContent)
         }
         NSLog("[Talk9-Push] ◀ finish done id=%@", requestIdentifier)
@@ -745,9 +749,22 @@ class NotificationService: UNNotificationServiceExtension {
     /// after a short delay. Not guaranteed to fire — iOS may terminate the extension
     /// before the timer elapses. When it does fire, the empty card disappears from
     /// the lock screen and notification center, giving a "self-cleanup" feel.
+    ///
+    /// Defensive: only removes if the notification actually has
+    /// `threadIdentifier == "talk9.suppressed"`. If iOS happens to deliver an
+    /// unrelated (real) notification under the same identifier in the meantime,
+    /// we won't accidentally delete it.
     private func scheduleAutoRemove(identifier: String, after seconds: TimeInterval) {
         DispatchQueue.global().asyncAfter(deadline: .now() + seconds) {
-            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [identifier])
+            UNUserNotificationCenter.current().getDeliveredNotifications { notifications in
+                let matches = notifications
+                    .filter { $0.request.identifier == identifier &&
+                              $0.request.content.threadIdentifier == "talk9.suppressed" }
+                    .map { $0.request.identifier }
+                if !matches.isEmpty {
+                    UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: matches)
+                }
+            }
         }
     }
 
@@ -1222,6 +1239,9 @@ extension NotificationService {
         }
         self.didPresentLocalNotification = true
         setNotificationCount(notification: content)
+        // Tag this real-message notification with a distinct thread so the
+        // "talk9.suppressed" cleanup paths cannot accidentally remove it.
+        content.threadIdentifier = "talk9.real"
         let notificationTrigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.01, repeats: false)
         let notificationRequest = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: notificationTrigger)
         UNUserNotificationCenter.current().add(notificationRequest) { [weak self] (error) in
