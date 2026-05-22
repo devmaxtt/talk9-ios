@@ -138,6 +138,9 @@
 "smartlist.noConversation" = "沒有對話";
 "smartlist.searchBarPlaceholder" = "";
 "smartlist.searchBar" = "搜尋";
+"smartlist.voiceMessage" = "语音消息";
+"smartlist.image" = "图片";
+"smartlist.video" = "视频";
 "smartlist.noNetworkConnectivity" = "沒有網路連接";
 "smartlist.cellularAccess" = "";
 "smartlist.accountsTitle" = "帳號";

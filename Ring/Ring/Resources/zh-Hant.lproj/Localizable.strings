@@ -138,6 +138,9 @@
 "smartlist.noConversation" = "No conversations";
 "smartlist.searchBarPlaceholder" = "Enter name…";
 "smartlist.searchBar" = "搜索";
+"smartlist.voiceMessage" = "語音訊息";
+"smartlist.image" = "圖片";
+"smartlist.video" = "影片";
 "smartlist.noNetworkConnectivity" = "No network connectivity";
 "smartlist.cellularAccess" = "Ensure cellular access is granted in the settings.";
 "smartlist.accountsTitle" = "Accounts";

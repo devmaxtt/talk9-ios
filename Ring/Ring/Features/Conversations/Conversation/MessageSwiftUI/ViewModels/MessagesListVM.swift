@@ -863,6 +863,30 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
         return newContainers.count
     }
 
+    /// Formats the preview text for the SmartList row's "last message" line.
+    /// Text messages → raw content. File transfers → typed label (voice / image /
+    /// video) instead of the raw filename; other file kinds keep their filename.
+    private func previewText(for message: MessageModel) -> String {
+        guard message.type == .fileTransfer else { return message.content }
+        let pathExt = (message.content as NSString).pathExtension
+        if pathExt.isAudioExtension() {
+            return NSLocalizedString("smartlist.voiceMessage",
+                                     value: "Voice message",
+                                     comment: "Preview shown in the conversation list for a voice message")
+        }
+        if pathExt.isImageExtension() {
+            return NSLocalizedString("smartlist.image",
+                                     value: "Image",
+                                     comment: "Preview shown in the conversation list for an image")
+        }
+        if pathExt.isMediaExtension() {
+            return NSLocalizedString("smartlist.video",
+                                     value: "Video",
+                                     comment: "Preview shown in the conversation list for a video")
+        }
+        return message.content
+    }
+
     private func updateLastMessageIfNeeded(fromHistory: Bool, newContainers: [MessageContainerModel]) {
         /*
          Update the last message details if necessary. We do not need to update
@@ -893,7 +917,7 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
             if lastMessage.isMessageDeleted() {
                 self.lastMessage.accept(L10n.Conversation.lastMessageDeleted)
             } else {
-                self.lastMessage.accept(lastMessage.content)
+                self.lastMessage.accept(previewText(for: lastMessage))
             }
         } else {
             // For contact messages, update when the display name is available.

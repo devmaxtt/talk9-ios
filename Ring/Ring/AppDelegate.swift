@@ -884,9 +884,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     private func removePendingNotifications() {
         guard let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
         let pending = defaults.stringArray(forKey: Constants.pendingNotificationRemovalKey) ?? []
-        guard !pending.isEmpty else { return }
-        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: pending)
-        defaults.removeObject(forKey: Constants.pendingNotificationRemovalKey)
+        if !pending.isEmpty {
+            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: pending)
+            defaults.removeObject(forKey: Constants.pendingNotificationRemovalKey)
+        }
+        // Full sweep: also remove any orphaned "talk9.suppressed" notifications.
+        // NSE's per-push cleanup is best-effort (scheduleAutoRemove dies with the
+        // extension process; removeDeliveredNotifications is async). When neither
+        // fires, empty cards accumulate on the lock screen. Catch them all here.
+        UNUserNotificationCenter.current().getDeliveredNotifications { notifications in
+            let orphans = notifications
+                .filter { $0.request.content.threadIdentifier == "talk9.suppressed" }
+                .map { $0.request.identifier }
+            if !orphans.isEmpty {
+                UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: orphans)
+            }
+        }
     }
 
     private func clearBadgeNumber() {

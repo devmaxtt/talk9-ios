@@ -706,6 +706,10 @@ class NotificationService: UNNotificationServiceExtension {
             // them visually separated from the "talk9.suppressed" empty cards and the
             // suppressed cleanup paths cannot accidentally remove them.
             self.bestAttemptContent.threadIdentifier = "talk9.real"
+            // Take advantage of this real-message delivery to sweep any orphaned
+            // suppressed empty cards from previous pushes whose async cleanup never
+            // completed. Cheap insurance against accumulation on the lock screen.
+            removeOldSuppressedNotifications()
             contentHandler(self.bestAttemptContent)
         }
         NSLog("[Talk9-Push] ◀ finish done id=%@", requestIdentifier)
@@ -731,6 +735,10 @@ class NotificationService: UNNotificationServiceExtension {
     /// is shown. threadIdentifier alone groups but does NOT replace — iOS keeps each
     /// card individually on the lock screen. Explicitly removing the older ones
     /// ensures only the latest empty card remains visible.
+    ///
+    /// `removeDeliveredNotifications` is async with no completion handler, so we
+    /// block briefly after issuing the request to give iOS time to actually process
+    /// the removal before the NSE process is potentially terminated.
     private func removeOldSuppressedNotifications() {
         let semaphore = DispatchSemaphore(value: 0)
         UNUserNotificationCenter.current().getDeliveredNotifications { notifications in
@@ -739,10 +747,13 @@ class NotificationService: UNNotificationServiceExtension {
                 .map { $0.request.identifier }
             if !oldIds.isEmpty {
                 UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: oldIds)
+                // Best-effort: let iOS start processing the async removal before
+                // the NSE is reaped after contentHandler returns.
+                Thread.sleep(forTimeInterval: 0.3)
             }
             semaphore.signal()
         }
-        _ = semaphore.wait(timeout: .now() + 0.5)
+        _ = semaphore.wait(timeout: .now() + 1.5)
     }
 
     /// Best-effort: schedule the just-delivered suppressed notification to be removed
