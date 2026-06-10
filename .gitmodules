@@ -1,3 +1,4 @@
 [submodule "daemon"]
 	path = daemon
-	url = https://review.jami.net/jami-daemon
+	url = https://github.com/devmaxtt/daemon-ios.git
+	branch = talk9-ios
