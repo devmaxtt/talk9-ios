@@ -501,6 +501,39 @@ class NotificationService: UNNotificationServiceExtension {
                 finish()
                 return
             }
+            // [TALK9] Phantom-notification suppression — BLACKLIST ONLY.
+            //
+            // Original design used a whitelist (active conversations) + contacts
+            // snapshot, but those produced over-suppression in production:
+            // sceneDidBecomeActive can run before the daemon finishes loading
+            // every conversation, leaving the snapshot PARTIAL — real messages
+            // for convs not yet enumerated would get silently dropped for ~10min
+            // until conversationReady callbacks catch up.
+            //
+            // Pure-blacklist (only suppress what we KNOW was explicitly left) is
+            // safer: it never false-positives a real message. The cost is that
+            // phantom pushes from a peer where we have no left-record may slip
+            // through. Acceptable trade — visible phantom >>> missed real msg.
+            if !convId.isEmpty,
+               let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) {
+                let leftSet = defaults.stringArray(forKey: Constants.talk9LeftConversationsKey) ?? []
+                if leftSet.contains(convId) {
+                    log("[Talk9-Notif] gitMessage: convId='\(convId.prefix(8))' is in the left-suppression set — suppressing")
+                    break // routes to finish()'s !decryptYieldedRealMessage SUPPRESS branch
+                }
+            }
+            // [TALK9] Burst-dedup. Server (after disabling its own coalescing)
+            // forwards every DHT alert as-is. A single voice message produces
+            // 4 alerts within ~9s, same to + same conversation key + same
+            // peerId, only value_id differs — so server can't dedup. NSE has
+            // to: collapse pushes for (convId, peerId) seen within the dedup
+            // window to one banner. The first push wins (shows real content),
+            // the followers go through the SUPPRESS path so iOS shows nothing
+            // for them (rather than 4 banners or a 4-stack on the lock screen).
+            if shouldSuppressAsBurstDuplicate(convId: convId, peerId: peerId) {
+                log("[Talk9-Notif] gitMessage: burst-dup within \(Int(Constants.talk9DedupWindowSeconds))s of prior push for convId='\(convId.prefix(8))' peerId='\(peerId.prefix(16))' — suppressing")
+                break
+            }
             self.decryptYieldedRealMessage = true
             // Store sender ID so finish() can show a fallback notification if daemon sync times out
             self.pendingSenderId = peerId
@@ -668,6 +701,11 @@ class NotificationService: UNNotificationServiceExtension {
                 removeOldSuppressedNotifications()
                 contentHandler(makeSuppressedContent())
                 scheduleRemoval(identifier: requestIdentifier)
+                // [TALK9] Aggressive: yank the just-shown empty card NOW (~400ms)
+                // instead of after 5s, so it barely appears on the lock screen.
+                // scheduleAutoRemove kept as a 5s fallback in case iOS already
+                // reaped NSE before the aggressive remove finished.
+                aggressiveImmediateRemoval(identifier: requestIdentifier)
                 scheduleAutoRemove(identifier: requestIdentifier, after: 5.0)
                 return
             } else if shouldSuppressCompletely {
@@ -676,6 +714,7 @@ class NotificationService: UNNotificationServiceExtension {
                 removeOldSuppressedNotifications()
                 contentHandler(makeSuppressedContent())
                 scheduleRemoval(identifier: requestIdentifier)
+                aggressiveImmediateRemoval(identifier: requestIdentifier)
                 scheduleAutoRemove(identifier: requestIdentifier, after: 5.0)
                 return
             } else if !decryptYieldedRealMessage {
@@ -688,6 +727,7 @@ class NotificationService: UNNotificationServiceExtension {
                 removeOldSuppressedNotifications()
                 contentHandler(makeSuppressedContent())
                 scheduleRemoval(identifier: requestIdentifier)
+                aggressiveImmediateRemoval(identifier: requestIdentifier)
                 scheduleAutoRemove(identifier: requestIdentifier, after: 5.0)
                 return
             } else if bestAttemptContent.title.trimmingCharacters(in: .whitespaces).isEmpty {
@@ -719,11 +759,15 @@ class NotificationService: UNNotificationServiceExtension {
     /// Single-space title prevents iOS from falling back to the original APNs alert.
     /// Passive interruption + zero relevance + shared threadIdentifier collapse
     /// repeated suppressed notifications into a single group in the notification center.
+    /// Explicit sound=nil and badge=0 belt-and-suspenders the silencing in case
+    /// .passive isn't respected on a particular iOS version / settings combo.
     private func makeSuppressedContent() -> UNMutableNotificationContent {
         let content = UNMutableNotificationContent()
         content.title = " "
         content.body = ""
         content.threadIdentifier = "talk9.suppressed"
+        content.sound = nil
+        content.badge = 0
         if #available(iOS 15.0, *) {
             content.interruptionLevel = .passive
             content.relevanceScore = 0
@@ -779,6 +823,47 @@ class NotificationService: UNNotificationServiceExtension {
         }
     }
 
+    /// [TALK9] Aggressively remove a just-delivered suppressed notification
+    /// while the NSE process is still alive. Polls iOS up to `maxAttempts`
+    /// times because the time between contentHandler being called and iOS
+    /// actually inserting the notification into the delivered list varies —
+    /// a fixed 100ms wait was too short in production (empty cards persisted
+    /// for ~6 min when the NSE was reaped before the single one-shot check).
+    ///
+    /// Total worst-case NSE time spent here: ~1.4s (well within the 30s budget).
+    /// On success, exits as soon as iOS confirms delivery + removal.
+    ///
+    /// Defensive: same threadIdentifier check as scheduleAutoRemove — never
+    /// touches a notification that isn't ours.
+    private func aggressiveImmediateRemoval(identifier: String) {
+        let maxAttempts = 6
+        let perAttemptWait: TimeInterval = 0.2
+        for attempt in 0..<maxAttempts {
+            Thread.sleep(forTimeInterval: perAttemptWait)
+            var removed = false
+            let semaphore = DispatchSemaphore(value: 0)
+            UNUserNotificationCenter.current().getDeliveredNotifications { notifications in
+                let matches = notifications
+                    .filter { $0.request.identifier == identifier &&
+                              $0.request.content.threadIdentifier == "talk9.suppressed" }
+                    .map { $0.request.identifier }
+                if !matches.isEmpty {
+                    UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: matches)
+                    removed = true
+                }
+                semaphore.signal()
+            }
+            _ = semaphore.wait(timeout: .now() + 0.5)
+            if removed {
+                NSLog("[Talk9-Push] aggressiveImmediateRemoval succeeded on attempt %d", attempt + 1)
+                // Give iOS a beat to actually process the removal before NSE is reaped.
+                Thread.sleep(forTimeInterval: 0.2)
+                return
+            }
+        }
+        NSLog("[Talk9-Push] aggressiveImmediateRemoval exhausted %d attempts — relying on scheduleAutoRemove + app-launch sweep", maxAttempts)
+    }
+
     /// Stores an APNs notification identifier in shared UserDefaults so the main app
     /// can call removeDeliveredNotifications when it becomes active.
     /// The extension process may be killed before async removal completes, so we
@@ -791,6 +876,54 @@ class NotificationService: UNNotificationServiceExtension {
         }
         defaults.set(pending, forKey: Constants.pendingNotificationRemovalKey)
     }
+
+    /// [TALK9] Atomic check-and-set for the burst-dedup table. Returns true
+    /// when this push should be SUPPRESSED because we already showed a banner
+    /// for the same (convId, peerId) within `talk9DedupWindowSeconds`.
+    ///
+    /// Concurrency: multiple NSE instances may run in parallel (one per push).
+    /// They each call this method nearly simultaneously. The implementation:
+    ///   1. Acquires the static class-level lock (in-process atomicity).
+    ///   2. Reads the timestamp dict from App-Group UserDefaults.
+    ///   3. Looks up the (convId|peerId) key — if the last-seen timestamp is
+    ///      within the window, returns true (suppress this push).
+    ///   4. Else, writes the new timestamp + housekeeping prune of entries
+    ///      older than 1 hour, returns false (let this push through as the
+    ///      first / winning banner).
+    ///
+    /// Cross-process atomicity caveat: NSLock is per-process. Two NSE
+    /// instances in two separate processes could both pass the check before
+    /// either writes. Acceptable: the worst case is 2 banners instead of 1
+    /// (still much better than 4), and the very next push falls inside the
+    /// window once either write lands.
+    private func shouldSuppressAsBurstDuplicate(convId: String, peerId: String) -> Bool {
+        guard !peerId.isEmpty,
+              let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else {
+            return false
+        }
+        let key = "\(convId)|\(peerId)"
+        let now = Date().timeIntervalSince1970
+        let window = Constants.talk9DedupWindowSeconds
+
+        Self.dedupLock.lock()
+        defer { Self.dedupLock.unlock() }
+
+        var table = defaults.dictionary(forKey: Constants.talk9RecentPushTimestampsKey) as? [String: Double] ?? [:]
+        if let lastSeen = table[key], (now - lastSeen) < window {
+            return true
+        }
+        table[key] = now
+        // Housekeeping: prune entries older than 1 hour so the dict doesn't
+        // grow unbounded over many days of pushes.
+        let pruneCutoff = now - 3600
+        table = table.filter { $0.value >= pruneCutoff }
+        defaults.set(table, forKey: Constants.talk9RecentPushTimestampsKey)
+        return false
+    }
+
+    /// Static lock so all NSE instances in this process serialize their
+    /// dedup writes. (See note on cross-process limitations above.)
+    private static let dedupLock = NSLock()
 
     private func appIsActive() -> Bool {
         return checkDarwinNotificationResponse(

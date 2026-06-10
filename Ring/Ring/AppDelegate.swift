@@ -410,6 +410,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         guard let account = self.accountService.currentAccount else { return }
         self.presenceService.subscribeBuddies(withAccount: account.id, withContacts: self.contactsService.contacts.value, subscribe: true)
         self.startConnectionTimers()
+        // [TALK9] Refresh the NSE suppression set from daemon's view of removed
+        // conversations. Catches convs the user left before this fix was added.
+        self.conversationsService.seedLeftConversationsSuppressionSet(accountId: account.id)
+        // [TALK9] Snapshot active convs into shared UserDefaults so the NSE
+        // whitelist check can drop phantom pushes for convs the daemon has
+        // already purged after a sync (where the left set no longer has them).
+        self.conversationsService.refreshActiveConversationsSet(accountId: account.id)
+        // [TALK9] DISABLED: startup-time syncConversation was triggering daemon
+        // SSL_connect crashes on cold start. Issuing many concurrent fetchNewCommits
+        // (each opens an SSL handshake) while the daemon is still initializing JAMS
+        // auth corrupts BoringSSL state intermittently. Reactive sync (notification
+        // tap path in handleConversationNotification) still works for the targeted
+        // conv. Long-term fix: gate on a daemon-ready signal + per-conv throttle.
+        // DispatchQueue.global().asyncAfter(deadline: .now() + 2.0) { [weak self] in
+        //     self?.conversationsService.syncConversation(accountId: account.id, conversationId: "")
+        // }
     }
 
     func sceneWillResignActive() {
@@ -908,9 +924,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
 
         UIApplication.shared.applicationIconBadgeNumber = 0
-        let center = UNUserNotificationCenter.current()
-        center.removeAllDeliveredNotifications()
-        center.removeAllPendingNotificationRequests()
+        // [TALK9] DO NOT call removeAllDeliveredNotifications() / removeAllPendingNotificationRequests()
+        // here. iOS 15+ prewarming silently invokes application(_:didFinishLaunching:) without
+        // any user interaction; the old aggressive clear would then wipe every real notification
+        // off the lock screen, making users believe their notifications "disappeared on their own".
+        // Per-suppressed-card cleanup is handled by removePendingNotifications() in
+        // sceneDidBecomeActive (which only fires on actual scene activation).
     }
 
 }
@@ -995,6 +1014,16 @@ extension AppDelegate {
         // SwarmMessageReceived → newInteraction → insertMessages() to silently drop the
         // message because it can't find the conversation model.
         processPendingPushDataWhenReady(conversationId: conversationId, accountId: accountId)
+
+        // [TALK9] Force an active pull for the targeted conversation. Reactive
+        // fetchNewCommits only fires when the DHT push reaches a running daemon —
+        // if A was killed when B sent, the push lands in NSE cache but no fetch
+        // is triggered on app open. This proactive call closes that gap.
+        if !conversationId.isEmpty {
+            DispatchQueue.global().asyncAfter(deadline: .now() + 2.0) { [weak self] in
+                self?.conversationsService.syncConversation(accountId: accountId, conversationId: conversationId)
+            }
+        }
 
         if !conversationId.isEmpty {
             self.appCoordinator.openConversation(conversationId: conversationId, accountId: accountId)

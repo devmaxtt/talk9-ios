@@ -103,6 +103,27 @@ class ContactsService {
             }
             self.contacts.accept(values)
         }
+        // [TALK9] Mirror the contacts list to shared UserDefaults so the
+        // notification extension can suppress phantom pushes from deleted contacts.
+        Self.writeCurrentContactsSnapshot(self.contacts.value)
+    }
+
+    /// [TALK9] Persist `contacts` (their Jami hashes, excluding banned entries)
+    /// to App-Group UserDefaults. NSE reads this set to suppress pushes whose
+    /// peerId is no longer a recognized contact.
+    static func writeCurrentContactsSnapshot(_ contacts: [ContactModel]) {
+        guard let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
+        let hashes = contacts.compactMap { contact -> String? in
+            guard !contact.banned else { return nil }
+            return contact.hash.isEmpty ? nil : contact.hash
+        }
+        // [TALK9] CRITICAL: never overwrite a non-empty snapshot with empty.
+        // Contacts may not be loaded yet from the daemon when this runs at
+        // startup. Writing [] would make every real message from a real contact
+        // look "deleted" to the NSE check and get suppressed until the next
+        // successful contacts load.
+        guard !hashes.isEmpty else { return }
+        defaults.set(hashes, forKey: Constants.talk9CurrentContactsKey)
     }
     /**
      Create a conversations for a linked account. If a conversation is swarm, conversationReady signal will be received and conversation for contact should be removed from the db.
@@ -150,6 +171,15 @@ class ContactsService {
         return Observable.create { [weak self] observable in
             guard let self = self else { return Disposables.create { } }
             self.contactsAdapter.removeContact(withURI: jamiId, accountId: accountId, ban: ban)
+            // [TALK9] Drop from NSE's contact snapshot immediately so any phantom
+            // push from this peer (e.g., a peer whose daemon hasn't yet synced our
+            // removal) gets suppressed without waiting for the next full refresh.
+            if let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) {
+                var ids = Set(defaults.stringArray(forKey: Constants.talk9CurrentContactsKey) ?? [])
+                if ids.remove(jamiId) != nil {
+                    defaults.set(Array(ids), forKey: Constants.talk9CurrentContactsKey)
+                }
+            }
             observable.on(.completed)
             return Disposables.create { }
         }

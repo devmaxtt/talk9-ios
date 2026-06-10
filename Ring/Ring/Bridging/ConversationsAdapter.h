@@ -55,6 +55,14 @@
 
 - (void)removeConversationMemberFor:(NSString*)accountId conversationId:(NSString*)conversationId memberId:(NSString*)memberId;
 
+/// [TALK9] Proactively pull latest commits from all known peer devices.
+/// Pass empty conversationId to sync every conversation for the account.
+- (void)syncConversationFor:(NSString*)accountId conversationId:(NSString*)conversationId;
+
+/// [TALK9] Return conversation IDs the local user has left/removed.
+/// Used to seed the NSE phantom-notification suppression set at app startup.
+- (NSArray<NSString*>*)getRemovedConversations:(NSString*)accountId;
+
 - (void)removeConversation:(NSString*) accountId conversationId:(NSString*) conversationId;
 
 - (NSString*)startConversation:(NSString*) accountId;

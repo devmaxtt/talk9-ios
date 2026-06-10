@@ -150,6 +150,31 @@ public class Constants: NSObject {
     public static let talk9RegisteredPhonePrefix = "talk9_registered_phone_"
     public static let talk9LastMessageKeyPrefix = "talk9_last_msg_"
     public static let pendingNotificationRemovalKey = "talk9_pending_notification_removal"
+    // [TALK9] Set of conversation IDs the local user has left or removed.
+    // Main app writes; NSE reads to suppress phantom pushes from peers whose
+    // daemon hasn't yet synced the local leave commit.
+    public static let talk9LeftConversationsKey = "talk9_left_conversations"
+    // [TALK9] Whitelist of conversation IDs the local user currently participates
+    // in. NSE suppresses any .gitMessage push whose convId is NOT in this set —
+    // catches phantom pushes for convs the daemon has already cleaned up after a
+    // sync, where the per-leave "left set" no longer has the convId either.
+    public static let talk9ActiveConversationsKey = "talk9_active_conversations"
+    // [TALK9] Snapshot of the current contacts list (Jami IDs). NSE uses this
+    // to suppress phantom pushes from peers the user has explicitly deleted —
+    // catches the case where daemon's push carries an empty convId (legacy/sync
+    // events) so the conv-id-based check above can't fire.
+    public static let talk9CurrentContactsKey = "talk9_current_contacts"
+    // [TALK9] Dict<String, Double> mapping "convId|peerId" → last-seen timestamp
+    // (since 1970). NSE uses this to dedup the 4 alert pushes a single voice
+    // message generates within ~9s (server-confirmed: same to + same conversation
+    // key, only value_id differs — so server cannot dedup at its layer). NSE
+    // collapses them to one banner via a sliding time window.
+    public static let talk9RecentPushTimestampsKey = "talk9_recent_push_timestamps"
+    // [TALK9] Dedup time window in seconds. Server reported voice file-transfer
+    // events span ~9s and text-message chunks can spread 10+s. 12s gives a
+    // safety margin without blocking a back-and-forth chat (typical typing
+    // cadence is ≥15s between consecutive messages from the same person).
+    public static let talk9DedupWindowSeconds: TimeInterval = 12.0
 
     @objc public static let documentsPath: URL? = {
         return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier)?.appendingPathComponent("Documents")

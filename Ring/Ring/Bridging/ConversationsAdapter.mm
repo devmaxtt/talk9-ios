@@ -313,6 +313,14 @@ static id <MessagesAdapterDelegate> _messagesDelegate;
     libjami::removeConversationMember(std::string([accountId UTF8String]), std::string([conversationId UTF8String]), std::string([memberId UTF8String]));
 }
 
+- (void)syncConversationFor:(NSString*)accountId conversationId:(NSString*)conversationId {
+    libjami::syncConversation(std::string([accountId UTF8String]), std::string([conversationId UTF8String]));
+}
+
+- (NSArray<NSString*>*)getRemovedConversations:(NSString*)accountId {
+    return [Utils vectorToArray: libjami::getRemovedConversations(std::string([accountId UTF8String]))];
+}
+
 - (void)removeConversation:(NSString*) accountId conversationId:(NSString*) conversationId {
     removeConversation(std::string([accountId UTF8String]), std::string([conversationId UTF8String]));
 }

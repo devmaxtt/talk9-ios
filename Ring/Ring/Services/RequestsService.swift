@@ -244,6 +244,12 @@ class RequestsService {
                 _ = self.createProfile(with: participantURI.uriString!, alias: request.name, photo: photo, accountId: request.accountId)
             }
             self.requestsAdapter.acceptConversationRequest(accountId, conversationId: conversationId)
+            // [TALK9] If this conv was previously in the "left" suppression set
+            // (re-invite scenario), un-suppress it so future pushes surface again.
+            ConversationsService.unmarkConversationAsLeft(conversationId: conversationId)
+            // [TALK9] Add to active whitelist immediately so pushes arriving in
+            // the brief window before the daemon finishes cloning aren't dropped.
+            ConversationsService.markConversationAsActive(conversationId: conversationId)
             self.removeRequest(with: conversationId, accountId: accountId)
             self.requestAccepted(conversationId: conversationId, withAccount: accountId)
             observable.on(.completed)

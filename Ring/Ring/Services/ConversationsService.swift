@@ -354,13 +354,18 @@ class ConversationsService {
                 }
             }
 
+            // Newest message currently held, captured BEFORE we mutate the array so we
+            // can tell whether the incoming batch is genuinely newer (a fresh message)
+            // or just older history / an initial load.
+            let previousNewest = conversation.messages.first
+
             if fromLoaded {
                 // If the incoming batch contains messages NEWER than the current newest,
                 // insert them at the front so they appear at the visual bottom (newest area).
                 // This fixes the case where reloadConversationsAndRequests delivers the
                 // notification message via conversationLoaded instead of SwarmMessageReceived.
                 let insertAtFront = newMessages.first.map { newest in
-                    conversation.messages.first.map { newest.receivedDate > $0.receivedDate } ?? true
+                    previousNewest.map { newest.receivedDate > $0.receivedDate } ?? true
                 } ?? false
                 if insertAtFront {
                     conversation.messages.insert(contentsOf: newMessages, at: 0)
@@ -373,7 +378,25 @@ class ConversationsService {
 
             self.sortIfNeeded()
 
-            if !fromLoaded {
+            // Increment the unread badge for genuinely new incoming messages.
+            //   fromLoaded == false → SwarmMessageReceived (real-time delivery).
+            //   fromLoaded == true  → message delivered via reload/conversationLoaded that
+            //     is newer than what we already had (previousNewest exists and is older).
+            //     Without this, that path updated only the conversation preview but never
+            //     the unread count, so a message arriving while the app sits on the smart
+            //     list silently refreshed the preview without marking the row unread.
+            // The initial load case (previousNewest == nil) is intentionally skipped to
+            // avoid double-counting with the daemon's countInteractions in addSwarm/
+            // conversationReady.
+            let isNewIncomingBatch: Bool
+            if fromLoaded {
+                isNewIncomingBatch = previousNewest.map { prev in
+                    newMessages.first.map { $0.receivedDate > prev.receivedDate } ?? false
+                } ?? false
+            } else {
+                isNewIncomingBatch = true
+            }
+            if isNewIncomingBatch {
                 let incomingMessages = newMessages.filter({ $0.authorId != localJamiId && !$0.authorId.isEmpty })
                 conversation.updateUnreadMessages(count: incomingMessages.count)
             }
@@ -413,6 +436,10 @@ class ConversationsService {
     }
 
     func conversationReady(conversationId: String, accountId: String, accountURI: String) {
+        // [TALK9] Keep NSE's active-whitelist in sync the moment a conv becomes
+        // ready locally (covers freshly cloned conversations, accepted invites,
+        // and sync-discovered convs on other devices).
+        Self.markConversationAsActive(conversationId: conversationId)
         serialOperationQueue.async { [weak self] in
             guard let self = self else { return }
             // Process the conversation
@@ -476,6 +503,10 @@ class ConversationsService {
     }
 
     func conversationRemoved(conversationId: String, accountId: String) {
+        // [TALK9] Drop from NSE active whitelist + record in the left set in case
+        // a peer's daemon still emits phantom DHT events for this convId.
+        Self.unmarkConversationAsActive(conversationId: conversationId)
+        Self.markConversationAsLeft(conversationId: conversationId)
         serialOperationQueue.async { [weak self] in
             guard let self = self else { return }
             guard let index = self.conversations.value.firstIndex(where: { conversationModel in
@@ -544,6 +575,93 @@ class ConversationsService {
 
     func removeConversation(conversationId: String, accountId: String) {
         self.conversationsAdapter.removeConversation(accountId, conversationId: conversationId)
+        // [TALK9] Persist the left/removed convId in shared UserDefaults so the
+        // notification extension can suppress phantom pushes from peers whose
+        // daemon hasn't yet synced our leave commit. Also drop it from the
+        // active whitelist immediately so phantom pushes are silenced even
+        // when the daemon has already purged the local convInfo entry.
+        Self.markConversationAsLeft(conversationId: conversationId)
+        Self.unmarkConversationAsActive(conversationId: conversationId)
+    }
+
+    /// [TALK9] Adds `conversationId` to the shared "left conversations" set in
+    /// App Group UserDefaults. NSE reads this set in its `.gitMessage` decrypt
+    /// path and suppresses any push whose convId matches.
+    static func markConversationAsLeft(conversationId: String) {
+        guard !conversationId.isEmpty,
+              let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
+        var ids = Set(defaults.stringArray(forKey: Constants.talk9LeftConversationsKey) ?? [])
+        guard ids.insert(conversationId).inserted else { return }
+        defaults.set(Array(ids), forKey: Constants.talk9LeftConversationsKey)
+    }
+
+    /// [TALK9] Removes `conversationId` from the suppression set — used when the
+    /// user accepts a re-invite and re-joins a previously-left conversation, so
+    /// future pushes from that conv surface again instead of being silenced.
+    static func unmarkConversationAsLeft(conversationId: String) {
+        guard !conversationId.isEmpty,
+              let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
+        var ids = Set(defaults.stringArray(forKey: Constants.talk9LeftConversationsKey) ?? [])
+        guard ids.remove(conversationId) != nil else { return }
+        defaults.set(Array(ids), forKey: Constants.talk9LeftConversationsKey)
+    }
+
+    /// [TALK9] Seed the suppression set from the daemon's existing knowledge of
+    /// removed conversations. Run on app startup so convs the user left BEFORE
+    /// this fix was deployed also get covered.
+    func seedLeftConversationsSuppressionSet(accountId: String) {
+        guard !accountId.isEmpty,
+              let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
+        let removed = (self.conversationsAdapter.getRemovedConversations(accountId) as? [String]) ?? []
+        guard !removed.isEmpty else { return }
+        var ids = Set(defaults.stringArray(forKey: Constants.talk9LeftConversationsKey) ?? [])
+        for id in removed where !id.isEmpty {
+            ids.insert(id)
+        }
+        defaults.set(Array(ids), forKey: Constants.talk9LeftConversationsKey)
+    }
+
+    /// [TALK9] Snapshot the daemon's currently-active conversation IDs into shared
+    /// UserDefaults. NSE uses this as a whitelist: any incoming .gitMessage push
+    /// whose convId is NOT in the active set gets suppressed. This catches phantom
+    /// pushes for convs the daemon has fully purged after sync (where the left set
+    /// no longer has the convId either).
+    ///
+    /// Call this on app startup AND any time a conversation is added or removed.
+    func refreshActiveConversationsSet(accountId: String) {
+        guard !accountId.isEmpty,
+              let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
+        let active = (self.conversationsAdapter.getSwarmConversations(forAccount: accountId) as? [String]) ?? []
+        // [TALK9] CRITICAL: never overwrite a non-empty snapshot with an empty
+        // one. On cold start the daemon may not be done loading conversations
+        // when sceneDidBecomeActive fires; writing [] here would make every
+        // real message look "unknown" to the NSE whitelist and get suppressed
+        // until conversationReady callbacks slowly repopulate the set.
+        guard !active.isEmpty else { return }
+        defaults.set(active, forKey: Constants.talk9ActiveConversationsKey)
+    }
+
+    /// [TALK9] Add `conversationId` to the active whitelist immediately, before
+    /// daemon-side processing completes. Used after `acceptConversationRequest`
+    /// so any push arriving in the brief window between accept and clone completion
+    /// isn't dropped by the whitelist check.
+    static func markConversationAsActive(conversationId: String) {
+        guard !conversationId.isEmpty,
+              let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
+        var ids = Set(defaults.stringArray(forKey: Constants.talk9ActiveConversationsKey) ?? [])
+        guard ids.insert(conversationId).inserted else { return }
+        defaults.set(Array(ids), forKey: Constants.talk9ActiveConversationsKey)
+    }
+
+    /// [TALK9] Remove `conversationId` from the active whitelist immediately on
+    /// leave/remove, so phantom pushes from the just-left conv are silenced
+    /// without waiting for the next full refresh.
+    static func unmarkConversationAsActive(conversationId: String) {
+        guard !conversationId.isEmpty,
+              let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
+        var ids = Set(defaults.stringArray(forKey: Constants.talk9ActiveConversationsKey) ?? [])
+        guard ids.remove(conversationId) != nil else { return }
+        defaults.set(Array(ids), forKey: Constants.talk9ActiveConversationsKey)
     }
 
     func startConversation(accountId: String) -> String {
@@ -1018,6 +1136,15 @@ class ConversationsService {
 
     func removeConversationMember(accountId: String, conversationId: String, memberId: String) {
         self.conversationsAdapter.removeConversationMember(for: accountId, conversationId: conversationId, memberId: memberId)
+    }
+
+    /// [TALK9] Proactively pull the latest swarm commits from known peer devices.
+    /// Pass an empty `conversationId` to sync every conversation on the account.
+    /// Use after the daemon transitions from dead/background to alive, so messages
+    /// that arrived while we were offline get fetched without waiting for the
+    /// peer to resend or for the local user to send first.
+    func syncConversation(accountId: String, conversationId: String) {
+        self.conversationsAdapter.syncConversation(for: accountId, conversationId: conversationId)
     }
 
     // MARK: typing indicator
