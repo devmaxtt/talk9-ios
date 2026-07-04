@@ -206,6 +206,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             self.startDaemon()
             self.setUpTestDataIfNeed()
             DispatchQueue.main.async {
+                // [TALK9] Prewarm guard. iOS 15+ can prewarm-launch the app:
+                // didFinishLaunching runs but no scene ever becomes active. The
+                // daemon still starts here and registers accounts on the DHT from
+                // a background process the user never opened — consuming DHT
+                // values before the NSE can decrypt them (decrypt=.unknown →
+                // suppressed/empty notifications instead of real banners).
+                // When launching straight into .background (prewarm or a silent
+                // background relaunch), keep accounts inactive: the NSE owns
+                // pushes. appMovedForeground (ConversationsManager) restores the
+                // active state when the user actually opens the app, and the
+                // VoIP path re-activates accounts for incoming calls.
+                if UIApplication.shared.applicationState == .background {
+                    self.log.debug("[Talk9-Diag] background launch (prewarm?) — keeping accounts inactive")
+                    self.accountService.setAccountsActive(active: false)
+                }
                 self.prepareAccounts()
             }
         }
@@ -217,7 +232,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                                                name: NSNotification.Name(rawValue: NotificationName.disablePushNotifications.rawValue),
                                                object: nil)
 
-        self.clearBadgeNumber()
+        // [TALK9] Badge is cleared in sceneDidBecomeActive, NOT here: iOS 15+
+        // prewarming invokes didFinishLaunching with no user interaction, so
+        // clearing here silently wiped the badge before the user ever saw it.
         if let path = self.certificatePath() {
             setenv("CA_ROOT_FILE", path, 1)
         }
@@ -410,6 +427,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         guard let account = self.accountService.currentAccount else { return }
         self.presenceService.subscribeBuddies(withAccount: account.id, withContacts: self.contactsService.contacts.value, subscribe: true)
         self.startConnectionTimers()
+        // [TALK9] Drain pushes that arrived while the app was backgrounded.
+        // The NSE saves every push payload to notificationData, but the only
+        // drains were (a) handleNotification — requires the app to be foreground
+        // at the moment the push arrives — and (b) the banner-tap path. Opening
+        // the app from the ICON left the entries stranded: the daemon never got
+        // the DHT-fetch nudge, so the message behind the banner didn't arrive
+        // until a retry trigger or a relogin. processPendingPushDataWhenReady
+        // handles the cold-start case (defers feeding the daemon until this
+        // account's conversations are loaded) and is a no-op when nothing is
+        // pending.
+        self.processPendingPushDataWhenReady(conversationId: "", accountId: account.id)
         // [TALK9] Refresh the NSE suppression set from daemon's view of removed
         // conversations. Catches convs the user left before this fix was added.
         self.conversationsService.seedLeftConversationsSuppressionSet(accountId: account.id)

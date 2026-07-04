@@ -255,6 +255,16 @@ class NotificationService: UNNotificationServiceExtension {
     // message was already treated (processed by another extension instance) — suppress.
     private var didStartDaemon = false
 
+    // [TALK9] Set when finish() hands an incoming call to CallKit (presentCall).
+    // The APNs placeholder must then be suppressed — CallKit already presents the
+    // call UI, a stray "Talk9 / New message" banner on top of it is noise.
+    private var didPresentCall = false
+
+    // [TALK9] finish() can be reached from two racing places: the didReceive Task
+    // (after the dispatch-group wait) and serviceExtensionTimeWillExpire.
+    // contentHandler must only be consumed once — later calls are no-ops.
+    private var didFinish = ManagedAtomic<Bool>(false)
+
     // Set to true for pushes that must never show any notification (resubscribe, app active).
     // When false and decryption fails, we fall back to the original APNs "New message" title
     // instead of delivering a blank no-title notification.
@@ -502,11 +512,14 @@ class NotificationService: UNNotificationServiceExtension {
             })(peerId, "\(hasVideo)")
             return
         case .gitMessage(let convId, let peerId):
-            // No sender ID — nothing useful to show, suppress immediately.
+            // No sender ID — nothing useful to show for THIS value. Skip it, but
+            // do NOT finish() here: the HTTP stream may carry several values
+            // (OpenDHT replication) and a later one can be the real message. An
+            // early finish() consumes contentHandler with a suppressed card and
+            // the real banner would be silently dropped.
             guard !peerId.trimmingCharacters(in: .whitespaces).isEmpty else {
-                log("[Talk9-Notif] gitMessage: peerId is empty — suppressing notification")
-                finish()
-                return
+                log("[Talk9-Notif] gitMessage: peerId is empty — skipping this value")
+                break
             }
             // [TALK9] Unknown-sender filtering. When the account rejects unknown
             // peers (DHT.PublicInCalls=false), suppress ONLY brand-new
@@ -689,6 +702,14 @@ class NotificationService: UNNotificationServiceExtension {
     }
 
     private func finish() {
+        // [TALK9] Idempotence: only the first caller wins (didReceive Task vs
+        // serviceExtensionTimeWillExpire race). A second pass would re-deliver
+        // contentHandler and re-run the whole cleanup/removal machinery.
+        guard self.didFinish.compareExchange(expected: false,
+                                             desired: true,
+                                             ordering: .relaxed).exchanged else {
+            return
+        }
         removeNotificationExtensionQueryListener()
         if self.accountIsActive.compareExchange(expected: true, desired: false, ordering: .relaxed).original {
             self.adapterService.stop(accountId: self.accountId)
@@ -699,6 +720,7 @@ class NotificationService: UNNotificationServiceExtension {
         self.notificationQueue.sync {
             if !self.pendingCalls.isEmpty, let info = self.pendingCalls.first?.value {
                 self.presentCall(info: info)
+                self.didPresentCall = true
             } else {
                 for notifications in pendingLocalNotifications {
                     for notification in notifications.value {
@@ -710,7 +732,19 @@ class NotificationService: UNNotificationServiceExtension {
         }
         self.httpStreamHandler.cancelStreaming()
         if let contentHandler = contentHandler {
-            if didPresentLocalNotification {
+            if didPresentCall {
+                // [TALK9] Call handed to CallKit (reportNewIncomingVoIPPushPayload) —
+                // it presents the full-screen call UI. Delivering bestAttemptContent
+                // here would add a stray "Talk9 / New message" placeholder banner
+                // (bestAttemptContent starts as a copy of the server's APNs alert).
+                NSLog("[Talk9-Push] ✗ SUPPRESS — call handed to CallKit, dropping placeholder banner")
+                removeOldSuppressedNotifications()
+                contentHandler(makeSuppressedContent())
+                scheduleRemoval(identifier: requestIdentifier)
+                aggressiveImmediateRemoval(identifier: requestIdentifier)
+                scheduleAutoRemove(identifier: requestIdentifier, after: 5.0)
+                return
+            } else if didPresentLocalNotification {
                 NSLog("[Talk9-Push] ✓ SHOW  title='%@' body='%@'",
                       bestAttemptContent.title, String(bestAttemptContent.body.prefix(60)))
             } else if didStartDaemon {
