@@ -928,53 +928,69 @@ class NotificationService: UNNotificationServiceExtension {
         defaults.set(pending, forKey: Constants.pendingNotificationRemovalKey)
     }
 
-    /// [TALK9] Atomic check-and-set for the burst-dedup table. Returns true
-    /// when this push should be SUPPRESSED because we already showed a banner
+    /// [TALK9] Atomic check-and-set for the burst-dedup gate. Returns true
+    /// when this push should be SUPPRESSED because a banner was already shown
     /// for the same (convId, peerId) within `talk9DedupWindowSeconds`.
     ///
-    /// Concurrency: multiple NSE instances may run in parallel (one per push).
-    /// They each call this method nearly simultaneously. The implementation:
-    ///   1. Acquires the static class-level lock (in-process atomicity).
-    ///   2. Reads the timestamp dict from App-Group UserDefaults.
-    ///   3. Looks up the (convId|peerId) key — if the last-seen timestamp is
-    ///      within the window, returns true (suppress this push).
-    ///   4. Else, writes the new timestamp + housekeeping prune of entries
-    ///      older than 1 hour, returns false (let this push through as the
-    ///      first / winning banner).
-    ///
-    /// Cross-process atomicity caveat: NSLock is per-process. Two NSE
-    /// instances in two separate processes could both pass the check before
-    /// either writes. Acceptable: the worst case is 2 banners instead of 1
-    /// (still much better than 4), and the very next push falls inside the
-    /// window once either write lands.
+    /// Concurrency: iOS can run several NSE instances in PARALLEL PROCESSES
+    /// (one per push of the burst). The previous UserDefaults + NSLock version
+    /// was only atomic in-process — two processes could both pass the check
+    /// before either wrote, yielding 2 banners. This version uses POSIX
+    /// open(O_CREAT|O_EXCL) on a marker file in the App Group container,
+    /// which IS atomic across processes:
+    ///   - creation succeeds → first push of the burst: show the banner
+    ///   - marker exists, mtime within the window → follower: suppress
+    ///   - marker exists, mtime expired → refresh mtime, show. (Two processes
+    ///     can still race THIS branch, but the residual window is the few ms
+    ///     around setAttributes versus the old whole read-modify-write.)
     private func shouldSuppressAsBurstDuplicate(convId: String, peerId: String) -> Bool {
-        guard !peerId.isEmpty,
-              let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else {
+        guard !peerId.isEmpty, let dir = Self.dedupMarkerDirectory() else {
             return false
         }
-        let key = "\(convId)|\(peerId)"
-        let now = Date().timeIntervalSince1970
-        let window = Constants.talk9DedupWindowSeconds
-
-        Self.dedupLock.lock()
-        defer { Self.dedupLock.unlock() }
-
-        var table = defaults.dictionary(forKey: Constants.talk9RecentPushTimestampsKey) as? [String: Double] ?? [:]
-        if let lastSeen = table[key], (now - lastSeen) < window {
+        // convId/peerId are hex identifiers — safe to use in a filename.
+        let marker = dir.appendingPathComponent("\(convId)_\(peerId)")
+        let fd = open(marker.path, O_CREAT | O_EXCL | O_WRONLY, 0o644)
+        if fd >= 0 {
+            close(fd)
+            Self.pruneDedupMarkers(in: dir)
+            return false
+        }
+        if let attrs = try? FileManager.default.attributesOfItem(atPath: marker.path),
+           let mtime = attrs[.modificationDate] as? Date,
+           Date().timeIntervalSince(mtime) < Constants.talk9DedupWindowSeconds {
             return true
         }
-        table[key] = now
-        // Housekeeping: prune entries older than 1 hour so the dict doesn't
-        // grow unbounded over many days of pushes.
-        let pruneCutoff = now - 3600
-        table = table.filter { $0.value >= pruneCutoff }
-        defaults.set(table, forKey: Constants.talk9RecentPushTimestampsKey)
+        // Expired (or unreadable) marker — refresh and let this push through.
+        try? FileManager.default.setAttributes([.modificationDate: Date()],
+                                               ofItemAtPath: marker.path)
         return false
     }
 
-    /// Static lock so all NSE instances in this process serialize their
-    /// dedup writes. (See note on cross-process limitations above.)
-    private static let dedupLock = NSLock()
+    private static func dedupMarkerDirectory() -> URL? {
+        guard let container = FileManager.default
+                .containerURL(forSecurityApplicationGroupIdentifier: Constants.appGroupIdentifier) else {
+            return nil
+        }
+        let dir = container.appendingPathComponent("Library/Caches/talk9-push-dedup",
+                                                   isDirectory: true)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir
+    }
+
+    /// Housekeeping: markers older than an hour are useless — remove them so
+    /// the directory doesn't grow unbounded over days of pushes.
+    private static func pruneDedupMarkers(in dir: URL) {
+        let cutoff = Date().addingTimeInterval(-3600)
+        guard let files = try? FileManager.default
+                .contentsOfDirectory(at: dir,
+                                     includingPropertiesForKeys: [.contentModificationDateKey]) else { return }
+        for file in files {
+            if let mtime = (try? file.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate,
+               mtime < cutoff {
+                try? FileManager.default.removeItem(at: file)
+            }
+        }
+    }
 
     private func appIsActive() -> Bool {
         return checkDarwinNotificationResponse(

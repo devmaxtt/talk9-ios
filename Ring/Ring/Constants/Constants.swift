@@ -164,12 +164,6 @@ public class Constants: NSObject {
     // catches the case where daemon's push carries an empty convId (legacy/sync
     // events) so the conv-id-based check above can't fire.
     public static let talk9CurrentContactsKey = "talk9_current_contacts"
-    // [TALK9] Dict<String, Double> mapping "convId|peerId" → last-seen timestamp
-    // (since 1970). NSE uses this to dedup the 4 alert pushes a single voice
-    // message generates within ~9s (server-confirmed: same to + same conversation
-    // key, only value_id differs — so server cannot dedup at its layer). NSE
-    // collapses them to one banner via a sliding time window.
-    public static let talk9RecentPushTimestampsKey = "talk9_recent_push_timestamps"
     // [TALK9] Dedup time window in seconds. Server reported voice file-transfer
     // events span ~9s and text-message chunks can spread 10+s. 12s gives a
     // safety margin without blocking a back-and-forth chat (typical typing

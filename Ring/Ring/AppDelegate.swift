@@ -419,6 +419,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // subscription (refCount ≥ 1) prevents a full untrack, keeping the DHT listener alive
         // so iOS receives the peer's next presence announcement and retries ICE.
         self.subscribeAllConversationParticipants(accountId: account.id, subscribe: true)
+        // [TALK9] RC3: resume-from-suspend may not emit a fresh REGISTERED event,
+        // so also sweep here. Gated on an already-registered account — during a
+        // cold start this runs before the daemon is ready and the REGISTERED
+        // observer performs the sweep instead (issuing fetches mid-JAMS-init is
+        // the exact BoringSSL crash the old startup sync died of).
+        if account.status == .registered {
+            self.performThrottledActiveSync(accountId: account.id)
+        }
     }
 
     func sceneDidBecomeActive() {
@@ -445,15 +453,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // whitelist check can drop phantom pushes for convs the daemon has
         // already purged after a sync (where the left set no longer has them).
         self.conversationsService.refreshActiveConversationsSet(accountId: account.id)
-        // [TALK9] DISABLED: startup-time syncConversation was triggering daemon
-        // SSL_connect crashes on cold start. Issuing many concurrent fetchNewCommits
-        // (each opens an SSL handshake) while the daemon is still initializing JAMS
-        // auth corrupts BoringSSL state intermittently. Reactive sync (notification
-        // tap path in handleConversationNotification) still works for the targeted
-        // conv. Long-term fix: gate on a daemon-ready signal + per-conv throttle.
-        // DispatchQueue.global().asyncAfter(deadline: .now() + 2.0) { [weak self] in
-        //     self?.conversationsService.syncConversation(accountId: account.id, conversationId: "")
-        // }
+        // [TALK9] Startup-time syncConversation(accountId, "") used to live here
+        // but crashed the daemon on cold start (concurrent fetchNewCommits SSL
+        // handshakes during JAMS init corrupted BoringSSL). Its replacement is
+        // performThrottledActiveSync(): gated on REGISTERED, staggered per
+        // conversation, triggered from the registrationStateChanged observer
+        // and sceneWillEnterForeground.
     }
 
     func sceneWillResignActive() {
@@ -587,7 +592,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             }
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] accountId in
-                guard let self = self, self.pendingSwarmBootstrapOnRegistered else { return }
+                guard let self = self else { return }
+                // [TALK9] RC3: every REGISTERED (cold start included) gets one
+                // throttled active sync — the safe replacement for the disabled
+                // startup-time sync. See performThrottledActiveSync().
+                self.performThrottledActiveSync(accountId: accountId)
+                guard self.pendingSwarmBootstrapOnRegistered else { return }
                 self.pendingSwarmBootstrapOnRegistered = false
                 self.log.debug("[Talk9-ICE][Retry] ✅ REGISTERED — re-bootstrap starting  retries=\(self.syncRetryCount)/\(self.maxSyncRetries)  account=\(accountId)")
                 // 0. Re-apply Talk9 TURN/bootstrap one final time now that the daemon is
@@ -673,6 +683,53 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             self.log.debug("[Talk9-ICE][Retry] Trigger5 — call \(callId) failed pjsipCode=\(code), resetting retry counter + re-registering")
             self.syncRetryCount = 0
             self.reRegisterAccountForSyncRetry()
+        }
+    }
+
+    // [TALK9] RC3 — timestamp of the last active-sync sweep (main thread only).
+    private var lastActiveSyncAt = Date.distantPast
+
+    /// [TALK9] RC3 — throttled ACTIVE conversation sync (passive-receive gap fix).
+    /// An already-synced conversation has no proactive pull anywhere: incoming
+    /// messages rely on the live swarm connection or a push reaching a running
+    /// daemon. If the peer was offline while we were, nothing self-heals until
+    /// relogin. The original startup-time `syncConversation(accountId, "")` was
+    /// disabled because issuing many concurrent fetchNewCommits SSL handshakes
+    /// while the daemon was still initializing JAMS auth corrupted BoringSSL
+    /// (cold-start crash). This is the fix prescribed by that comment: gate on
+    /// REGISTERED (JAMS auth complete, TURN cache refreshed) and stagger the
+    /// fetches per conversation instead of one fan-out-everything call.
+    /// The daemon dedups overlapping fetches per conversation (conv->pending),
+    /// so a sweep racing the reactive paths is safe.
+    private func performThrottledActiveSync(accountId: String, allowRetry: Bool = true) {
+        // Registration can flap (network changes, re-register cycles) — don't
+        // restart the sweep more than once a minute.
+        guard Date().timeIntervalSince(lastActiveSyncAt) > 60 else { return }
+        let conversationIds = conversationsService.conversations.value
+            .filter { $0.accountId == accountId && !$0.id.isEmpty }
+            .map { $0.id }
+        guard !conversationIds.isEmpty else {
+            // On a cold start REGISTERED can beat the async DB load, leaving the
+            // list empty. One deferred retry is enough — if it is still empty
+            // then, there is genuinely nothing to sync. The throttle timestamp
+            // is deliberately NOT set here so the retry passes it.
+            if allowRetry {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) { [weak self] in
+                    self?.performThrottledActiveSync(accountId: accountId, allowRetry: false)
+                }
+            }
+            return
+        }
+        lastActiveSyncAt = Date()
+        log.debug("[Talk9-Diag] active sync sweep: \(conversationIds.count) conversations for account \(accountId)")
+        // 3 s head start lets the post-REGISTERED bootstrap settle; 0.4 s stagger
+        // keeps the number of simultaneous SSL handshakes bounded.
+        for (index, convId) in conversationIds.enumerated() {
+            let delay = 3.0 + 0.4 * Double(index)
+            DispatchQueue.global().asyncAfter(deadline: .now() + delay) { [weak self] in
+                self?.conversationsService.syncConversation(accountId: accountId,
+                                                            conversationId: convId)
+            }
         }
     }
 
