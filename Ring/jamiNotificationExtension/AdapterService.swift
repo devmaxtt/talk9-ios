@@ -172,6 +172,17 @@ class AdapterService {
         return adapter.nameServer(forAccountId: accountId)
     }
 
+    // [TALK9] Whether this account accepts calls/messages from non-contacts.
+    func allowsIncomingCallsFromUnknown(accountId: String) -> Bool {
+        return adapter.allowsIncomingCallsFromUnknown(for: accountId)
+    }
+
+    // [TALK9] Active (non-banned) contacts read straight off disk; each entry
+    // has keys "id" (contact Jami id) and "conversationId" (1:1 swarm id).
+    func getContacts(accountId: String) -> [[String: String]] {
+        return adapter.getContactsFromStorage(accountId)
+    }
+
     private func fileAlreadyDownloaded(fileName: String, accountId: String, conversationId: String) -> Bool {
         guard let url = getFileUrlFor(fileName: fileName, accountId: accountId, conversationId: conversationId) else {
             return false

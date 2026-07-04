@@ -43,4 +43,8 @@
 - (NSArray<NSDictionary<NSString*,NSString*>*>*)getConversationMembers:(NSString*) accountId conversationId:(NSString*) conversationId;
 - (NSDictionary *)getAccountDetails:(NSString *)accountID;
 
+// [TALK9] Incoming-call/message filtering for unknown (non-contact) peers.
+- (BOOL)allowsIncomingCallsFromUnknownFor:(NSString*)accountId;
+- (NSArray<NSDictionary<NSString*, NSString*>*>*)getContactsFromStorage:(NSString*)accountId;
+
 @end

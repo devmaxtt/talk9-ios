@@ -29,6 +29,7 @@
 #define MSGPACK_DISABLE_LEGACY_NIL
 #import "opendht/crypto.h"
 #import "opendht/default_types.h"
+#import "opendht/infohash.h"
 #import "yaml-cpp/yaml.h"
 
 #import "json/json.h"
@@ -78,7 +79,15 @@ NSString* const ocsp = @"ocsp";
 NSString* const nameCache = @"namecache";
 NSString* const defaultNameServer = @"app.talk9.co";
 std::string const nameServerConfiguration = "RingNS.uri";
+// [TALK9] Account flag: "allow incoming calls from unknown contacts".
+// Daemon default is true (jamiaccount_config.h: dhtPublicInCalls {true}).
+std::string const dhtPublicInConfiguration = "DHT.PublicInCalls";
 NSString* const accountConfig = @"config.yml";
+NSString* const contactsFile = @"contacts";
+
+// [TALK9] Defined below; forward-declared so the Adapter methods can use them.
+static bool allowsIncomingCallsFromUnknown(std::string accountId);
+static NSArray<NSDictionary<NSString*, NSString*>*>* readActiveContacts(std::string accountId);
 constexpr auto ID_TIMEOUT = std::chrono::hours(24);
 
 std::map<std::string, std::shared_ptr<CallbackWrapperBase>> confHandlers;
@@ -298,6 +307,14 @@ static NSDictionary* pendingPushData = nil;
     return [Utils mapToDictionary:accDetails];
 }
 
+- (BOOL)allowsIncomingCallsFromUnknownFor:(NSString*)accountId {
+    return allowsIncomingCallsFromUnknown(std::string([accountId UTF8String]));
+}
+
+- (NSArray<NSDictionary<NSString*, NSString*>*>*)getContactsFromStorage:(NSString*)accountId {
+    return readActiveContacts(std::string([accountId UTF8String]));
+}
+
 - (NSDictionary<NSString*, NSString*>*)decrypt:(NSString*)keyPath
                                        accountId:(NSString*)accountId
                                        treated:(NSString*)treatedMessagesPath
@@ -494,6 +511,76 @@ std::string getNameServer(std::string accountId) {
         }
     } catch (const std::exception& e) {}
     return nameServer;
+}
+
+// [TALK9] Read the daemon's "DHT.PublicInCalls" flag straight off disk.
+// In the notification extension accounts are NOT auto-loaded (NO_AUTOLOAD),
+// so we cannot ask the daemon — we parse the account config.yml ourselves,
+// the same way getNameServer() above does. Daemon default is true.
+static bool allowsIncomingCallsFromUnknown(std::string accountId) {
+    auto accountConfigPath = [[[Constants documentsPath] URLByAppendingPathComponent: @(accountId.c_str())] URLByAppendingPathComponent: accountConfig].path.UTF8String;
+    try {
+        std::ifstream file = std::ifstream(accountConfigPath, std::ios_base::in);
+        if (!file.is_open()) {
+            return true;
+        }
+        YAML::Node node = YAML::Load(file);
+        file.close();
+        auto value = node[dhtPublicInConfiguration];
+        if (!value) {
+            return true;
+        }
+        return value.as<bool>();
+    } catch (const std::exception& e) {
+        return true;
+    }
+}
+
+// [TALK9] Mirror of the daemon's internal jami::Contact struct, so we can
+// decode the msgpack "contacts" file directly from disk (account not loaded
+// in the NSE). Only the fields we need are declared.
+namespace {
+struct StoredContact {
+    int64_t added {0};
+    int64_t removed {0};
+    bool confirmed {false};
+    bool banned {false};
+    std::string conversationId {};
+    MSGPACK_DEFINE_MAP(added, removed, confirmed, banned, conversationId)
+};
+}
+
+// Returns one dictionary per active (non-banned, currently-added) contact with
+// keys "id" (contact Jami id) and "conversationId" (its 1:1 swarm id).
+static NSArray<NSDictionary<NSString*, NSString*>*>* readActiveContacts(std::string accountId) {
+    NSMutableArray<NSDictionary<NSString*, NSString*>*>* result = [NSMutableArray array];
+    auto path = [[[Constants documentsPath] URLByAppendingPathComponent: @(accountId.c_str())] URLByAppendingPathComponent: contactsFile].path.UTF8String;
+    std::ifstream file(path, std::ios_base::in | std::ios_base::binary);
+    if (!file.is_open()) {
+        return result;
+    }
+    std::vector<char> buffer((std::istreambuf_iterator<char>(file)),
+                             std::istreambuf_iterator<char>());
+    file.close();
+    if (buffer.empty()) {
+        return result;
+    }
+    std::map<dht::InfoHash, StoredContact> contacts;
+    try {
+        msgpack::object_handle oh = msgpack::unpack(buffer.data(), buffer.size());
+        oh.get().convert(contacts);
+    } catch (const std::exception& e) {
+        return result;
+    }
+    for (const auto& pair : contacts) {
+        if (pair.second.banned) continue;
+        if (pair.second.added <= pair.second.removed) continue;
+        [result addObject:@{
+            @"id": @(pair.first.toString().c_str()),
+            @"conversationId": @(pair.second.conversationId.c_str()),
+        }];
+    }
+    return result;
 }
 
 #pragma mark functions copied from the daemon

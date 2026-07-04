@@ -465,6 +465,13 @@ class NotificationService: UNNotificationServiceExtension {
         NSLog("[Talk9-Push]   decrypt result=%@", String(describing: result))
         switch result {
         case .call(let peerId, let hasVideo):
+            // [TALK9] Drop calls from unknown peers when the account disallows
+            // them (DHT.PublicInCalls=false). Leaving decryptYieldedRealMessage
+            // false routes finish() to its SUPPRESS branch so nothing is shown.
+            guard self.shouldAcceptIncomingCall(peerId: peerId) else {
+                log("[Talk9-Notif] call from \(peerId.prefix(16)): account rejects unknown callers and peer is not a contact — suppressing")
+                break
+            }
             self.decryptYieldedRealMessage = true
             ({ [weak self] (peerId, hasVideo) in
                 guard let self = self else {
@@ -500,6 +507,16 @@ class NotificationService: UNNotificationServiceExtension {
                 log("[Talk9-Notif] gitMessage: peerId is empty — suppressing notification")
                 finish()
                 return
+            }
+            // [TALK9] Unknown-sender filtering. When the account rejects unknown
+            // peers (DHT.PublicInCalls=false), suppress ONLY brand-new
+            // unsolicited 1:1 requests from strangers. shouldAcceptIncomingMessage
+            // always allows any conversation that already exists locally (groups
+            // AND accepted 1:1s), so a group message from a non-contact member is
+            // never silenced — preserving the blacklist-only philosophy below.
+            if !self.shouldAcceptIncomingMessage(convId: convId, peerId: peerId) {
+                log("[Talk9-Notif] gitMessage: sender \(peerId.prefix(16)) is not a contact and conv '\(convId.prefix(8))' has no local history — account rejects unknown senders — suppressing")
+                break
             }
             // [TALK9] Phantom-notification suppression — BLACKLIST ONLY.
             //
@@ -1200,6 +1217,58 @@ extension NotificationService {
         if !FileManager.default.fileExists(atPath: path) { return nil }
 
         return VCardUtils.getNameFromVCard(filePath: path)
+    }
+
+    // MARK: - [TALK9] Unknown-peer filtering
+
+    /// Whether `peerId` is one of this account's active (non-banned) contacts.
+    private func isKnownContact(_ peerId: String, in contacts: [[String: String]]) -> Bool {
+        let target = peerId.normalizedJamiId
+        return contacts.contains { ($0["id"]?.normalizedJamiId) == target }
+    }
+
+    /// Whether the local conversation store already has history for `convId`.
+    /// True for any established conversation (group OR accepted 1:1); false for
+    /// a brand-new unsolicited request the daemon has not cloned yet. Fails
+    /// open (returns true) if the documents path is unavailable.
+    private func conversationExistsOnDisk(convId: String) -> Bool {
+        guard let documents = Constants.documentsPath else { return true }
+        let base = documents.appendingPathComponent(self.accountId)
+        let fileManager = FileManager.default
+        let repo = base.appendingPathComponent("conversations").appendingPathComponent(convId)
+        let data = base.appendingPathComponent("conversation_data").appendingPathComponent(convId)
+        return fileManager.fileExists(atPath: repo.path) || fileManager.fileExists(atPath: data.path)
+    }
+
+    /// Whether an incoming CALL from `peerId` should be shown. Mirrors the
+    /// daemon's "allow calls from unknown contacts" account flag: when enabled
+    /// everything is accepted, otherwise only known contacts are.
+    private func shouldAcceptIncomingCall(peerId: String) -> Bool {
+        if self.adapterService.allowsIncomingCallsFromUnknown(accountId: self.accountId) { return true }
+        let contacts = self.adapterService.getContacts(accountId: self.accountId)
+        return self.isKnownContact(peerId, in: contacts)
+    }
+
+    /// Whether an incoming MESSAGE should be shown. Group-safe: only suppresses
+    /// brand-new unsolicited 1:1 requests from non-contacts. Established
+    /// conversations (groups and accepted 1:1s) are always accepted, so group
+    /// messages from non-contact members are never silenced.
+    private func shouldAcceptIncomingMessage(convId: String, peerId: String) -> Bool {
+        if self.adapterService.allowsIncomingCallsFromUnknown(accountId: self.accountId) { return true }
+        let contacts = self.adapterService.getContacts(accountId: self.accountId)
+        if self.isKnownContact(peerId, in: contacts) { return true }
+        if !convId.isEmpty && self.conversationExistsOnDisk(convId: convId) { return true }
+        return false
+    }
+}
+
+private extension String {
+    /// Normalizes a Jami id/uri for comparison: strips the `ring:`/`jami:`
+    /// scheme prefix and lowercases (daemon contact ids are lowercase hex).
+    var normalizedJamiId: String {
+        return self.replacingOccurrences(of: "ring:", with: "")
+            .replacingOccurrences(of: "jami:", with: "")
+            .lowercased()
     }
 }
 

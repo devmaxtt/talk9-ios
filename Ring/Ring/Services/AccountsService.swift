@@ -483,6 +483,11 @@ class AccountsService: AccountAdapterDelegate {
             defaultDetails[ConfigKey.turnUsername.rawValue]     = "talk9"
             defaultDetails[ConfigKey.turnPassword.rawValue]     = "933843261b0b14a74befabb98c9ac017"
             defaultDetails[ConfigKey.turnRealm.rawValue]        = "talk9"
+            // [TALK9] Reject calls/messages from unknown (non-contact) peers by
+            // default. The notification extension reads this flag to drop call
+            // notifications and unsolicited stranger messages. Users can re-enable
+            // it in account settings if they want to be reachable by anyone.
+            defaultDetails[ConfigKey.dhtPublicIn.rawValue]      = "false"
             // ─────────────────────────────────────────────────────────────────────
             return defaultDetails
         } catch {
