@@ -215,9 +215,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 // When launching straight into .background (prewarm or a silent
                 // background relaunch), keep accounts inactive: the NSE owns
                 // pushes. appMovedForeground (ConversationsManager) restores the
-                // active state when the user actually opens the app, and the
-                // VoIP path re-activates accounts for incoming calls.
-                if UIApplication.shared.applicationState == .background {
+                // active state when the user actually opens the app.
+                // A VoIP cold launch ALSO lands here with .background (answering
+                // from the lock screen never foregrounds the app), and the
+                // previewPendingCall activation fired before the daemon existed —
+                // so never deactivate while a call is in flight, or the account
+                // never registers and the 15 s unhandeled-call timeout kills the
+                // call. Post-call cleanup is updateBackgroundState's job.
+                if UIApplication.shared.applicationState == .background
+                    && !self.presentingCallScreen
+                    && !self.callsProvider.hasActiveCalls() {
                     self.log.debug("[Talk9-Diag] background launch (prewarm?) — keeping accounts inactive")
                     self.accountService.setAccountsActive(active: false)
                 }
