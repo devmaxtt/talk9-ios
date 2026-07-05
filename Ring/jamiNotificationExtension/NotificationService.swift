@@ -835,10 +835,11 @@ class NotificationService: UNNotificationServiceExtension {
                 NSLog("[Talk9-Push] ✓ SHOW  title='%@' body='%@'",
                       bestAttemptContent.title, String(bestAttemptContent.body.prefix(60)))
             }
-            // Tag every real-message notification with a distinct thread so iOS keeps
-            // them visually separated from the "talk9.suppressed" empty cards and the
-            // suppressed cleanup paths cannot accidentally remove them.
-            self.bestAttemptContent.threadIdentifier = "talk9.real"
+            // Tag real-message banners with a per-conversation thread so iOS
+            // groups them by chat on the lock screen, while staying outside the
+            // "talk9.suppressed" namespace the cleanup paths filter on.
+            let convThread = (bestAttemptContent.userInfo[Constants.NotificationUserInfoKeys.conversationID.rawValue] as? String) ?? ""
+            self.bestAttemptContent.threadIdentifier = convThread.isEmpty ? "talk9.real" : "talk9.real." + convThread
             // Take advantage of this real-message delivery to sweep any orphaned
             // suppressed empty cards from previous pushes whose async cleanup never
             // completed. Cheap insurance against accumulation on the lock screen.
@@ -1206,6 +1207,18 @@ class NotificationService: UNNotificationServiceExtension {
 
 // MARK: Name retrieval
 extension NotificationService {
+    // [TALK9] R9: name lookups race the NSE's 25 s budget. URLSession.shared's
+    // default 60 s timeout meant a black-holed name server held the dispatch
+    // group until the group wait expired — every banner then arrived ~25 s
+    // late with the generic title. 8 s caps the damage; vCard hits (the common
+    // case) never touch the network at all.
+    private static let nameLookupSession: URLSession = {
+        let config = URLSessionConfiguration.ephemeral
+        config.timeoutIntervalForRequest = 8
+        config.timeoutIntervalForResource = 8
+        return URLSession(configuration: config)
+    }()
+
     private func bestName(accountId: String, contactId: String) -> String {
         if let name = self.names[contactId], !name.isEmpty {
             return name
@@ -1230,8 +1243,7 @@ extension NotificationService {
             self.lookupCompleted(address: address)
             return
         }
-        let defaultSession = URLSession(configuration: .default)
-        let task = defaultSession.dataTask(with: url) {[weak self](data, response, _) in
+        let task = Self.nameLookupSession.dataTask(with: url) {[weak self](data, response, _) in
             guard let self = self else { return }
             var name: String?
             defer {
@@ -1358,7 +1370,7 @@ extension NotificationService {
         // that would cause the 25-second timeout and iOS "hello" fallback).
         let group = self.autoDispatchGroup
         self.autoDispatchGroup.enter(id: taskId)
-        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+        Self.nameLookupSession.dataTask(with: url) { [weak self] data, response, error in
             defer { group.leave(id: taskId) }
             if let error = error {
                 log("[Talk9-Notif] name lookup error: \(error)")
@@ -1634,9 +1646,10 @@ extension NotificationService {
         }
         self.didPresentLocalNotification = true
         setNotificationCount(notification: content)
-        // Tag this real-message notification with a distinct thread so the
-        // "talk9.suppressed" cleanup paths cannot accidentally remove it.
-        content.threadIdentifier = "talk9.real"
+        // Per-conversation thread: groups by chat on the lock screen and stays
+        // outside the "talk9.suppressed" namespace the cleanup paths filter on.
+        let convThread = (content.userInfo[Constants.NotificationUserInfoKeys.conversationID.rawValue] as? String) ?? ""
+        content.threadIdentifier = convThread.isEmpty ? "talk9.real" : "talk9.real." + convThread
         let notificationTrigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.01, repeats: false)
         let notificationRequest = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: notificationTrigger)
         UNUserNotificationCenter.current().add(notificationRequest) { [weak self] (error) in
