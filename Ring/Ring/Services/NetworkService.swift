@@ -41,17 +41,58 @@ class NetworkService {
 
     private var monitor: NWPathMonitor?
     private var lastStatus: NWPath.Status = .requiresConnection
+    // [TALK9] R6: which interface types the current path uses. A WiFi↔cellular
+    // handoff keeps status == .satisfied, so comparing status alone swallowed
+    // the transition — no connectivityChanged reached the daemon and it kept
+    // pushing on dead sockets until the 5-minute foreground timer fired (or
+    // indefinitely during a backgrounded call). Comparing the interface set
+    // catches the handoff.
+    private var lastInterfaceSignature = ""
+    // Trailing debounce for interface-only changes: one handoff fires several
+    // path updates within ~2 s (both interfaces up, then one drops). Emitting
+    // once after the path settles gives the daemon a single reconnect on the
+    // FINAL interface instead of churn on the intermediates.
+    private var pendingInterfaceChange: DispatchWorkItem?
+    private let monitorQueue = DispatchQueue(label: "NetworkMonitor")
 
     init() {
         monitor = NWPathMonitor()
+    }
+
+    private static func interfaceSignature(_ path: NWPath) -> String {
+        var parts = [String]()
+        if path.usesInterfaceType(.wifi) { parts.append("wifi") }
+        if path.usesInterfaceType(.cellular) { parts.append("cell") }
+        if path.usesInterfaceType(.wiredEthernet) { parts.append("wired") }
+        if path.usesInterfaceType(.other) { parts.append("other") }
+        return parts.joined(separator: "+")
     }
 
     func monitorNetworkType() {
         monitor?.pathUpdateHandler = { [weak self] path in
             guard let self = self else { return }
 
-            if self.lastStatus == path.status { return }
+            let signature = NetworkService.interfaceSignature(path)
+
+            if self.lastStatus == path.status {
+                // Same status — only interesting when a satisfied path moved
+                // to a different interface set (WiFi↔cellular handoff).
+                guard path.status == .satisfied,
+                      signature != self.lastInterfaceSignature else { return }
+                self.lastInterfaceSignature = signature
+                print("Network interface changed: \(signature)")
+                self.pendingInterfaceChange?.cancel()
+                let work = DispatchWorkItem { [weak self] in
+                    self?.connectionState.accept(.connected)
+                }
+                self.pendingInterfaceChange = work
+                self.monitorQueue.asyncAfter(deadline: .now() + 2.0, execute: work)
+                return
+            }
+
+            self.pendingInterfaceChange?.cancel()
             self.lastStatus = path.status
+            self.lastInterfaceSignature = signature
 
             switch path.status {
             case .satisfied:
@@ -64,7 +105,6 @@ class NetworkService {
                 break
             }
         }
-        let queue = DispatchQueue(label: "NetworkMonitor")
-        monitor?.start(queue: queue)
+        monitor?.start(queue: monitorQueue)
     }
 }
