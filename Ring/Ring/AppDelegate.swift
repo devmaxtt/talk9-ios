@@ -434,6 +434,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // attempts in one session the watchdog is permanently silenced until the
         // app is killed and relaunched — even if connectivity later recovers.
         syncRetryCount = 0
+        reRegisterBackoff = 30
+        nextReRegisterAllowedAt = Date.distantPast
         self.presenceService.subscribeBuddies(withAccount: account.id, withContacts: self.contactsService.contacts.value, subscribe: true)
         // [TALK9] Also subscribe to presence for ALL conversation participants, not just contacts.
         // The daemon's rotateTrackedMembers() has a bug where it permanently untracks a peer
@@ -507,6 +509,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     // Reset to 0 when a conversation successfully syncs (conversationReady fires).
     private var syncRetryCount = 0
     private let maxSyncRetries = 5
+    // [TALK9] R8: central backoff gate. Every trigger funnels through
+    // reRegisterAccountForSyncRetry, but several of them reset syncRetryCount
+    // (Trigger5/6, foreground return), which made the retry cap toothless: an
+    // unstable network could disable/enable the account every few seconds, and
+    // each cycle is a ~1.5 s + registration-time blind window during which
+    // pushes fed to the disabled account are dropped. The time gate is
+    // independent of the counter: consecutive re-registers spread
+    // 30s→60s→120s→240s→300s, and the ladder only resets on real success
+    // (conversationReady) or a fresh foreground session.
+    private var nextReRegisterAllowedAt = Date.distantPast
+    private var reRegisterBackoff: TimeInterval = 30
     // Conversation IDs already being watched for stuck sync (avoids duplicate subscriptions).
     private var syncWatchedIds: Set<String> = []
     // When true, the next REGISTERED event triggers swarm re-bootstrap.
@@ -535,6 +548,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             .filter { !$0.isEmpty }
             .subscribe(onNext: { [weak self] _ in
                 self?.syncRetryCount = 0
+                // Success also clears the backoff ladder: the next incident
+                // starts again at 30 s.
+                self?.reRegisterBackoff = 30
+                self?.nextReRegisterAllowedAt = Date.distantPast
             })
             .disposed(by: self.disposeBag)
 
@@ -597,6 +614,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Trigger 3 (DEBUG only): manual force button in the debug overlay.
         NotificationCenter.default.addObserver(forName: .debugForceReRegister, object: nil, queue: .main) { [weak self] _ in
             self?.syncRetryCount = 0      // reset limit so manual force always works
+            self?.nextReRegisterAllowedAt = Date.distantPast
             self?.reRegisterAccountForSyncRetry()
         }
         #endif
@@ -759,6 +777,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     /// This triggers JAMS re-authentication and announces iOS as "newly online",
     /// causing Android to initiate a fresh connection (same effect as app restart).
     private func reRegisterAccountForSyncRetry() {
+        let now = Date()
+        guard now >= nextReRegisterAllowedAt else {
+            log.debug("[Talk9-ICE][Retry] backoff gate — next re-register allowed in \(Int(nextReRegisterAllowedAt.timeIntervalSince(now)))s")
+            return
+        }
         guard syncRetryCount < maxSyncRetries else {
             log.warning("[Talk9-ICE][Retry] ❌ retry limit reached (\(maxSyncRetries)) — no more reconnect attempts this session")
             return
@@ -770,6 +793,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             return
         }
 
+        nextReRegisterAllowedAt = now.addingTimeInterval(reRegisterBackoff)
+        reRegisterBackoff = min(reRegisterBackoff * 2, 300)
         syncRetryCount += 1
         log.debug("[Talk9-ICE][Retry] 🔄 attempt \(syncRetryCount)/\(maxSyncRetries)  account=\(account.id)")
         // Force-restore Talk9 TURN/bootstrap before disable — daemon can silently reset
