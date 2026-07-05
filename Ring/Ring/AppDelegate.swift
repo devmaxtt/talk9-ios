@@ -119,9 +119,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     private let disposeBag = DisposeBag()
 
-    private let center = CFNotificationCenterGetDarwinNotifyCenter()
-    private static let shouldHandleNotification = NSNotification.Name("com.savoirfairelinux.jami.shouldHandleNotification")
     private let backgrounTaskQueue = DispatchQueue(label: "backgrounTaskQueue")
+
+    // MARK: - Push handshake (NSE "is the app active?" query)
+    // [TALK9] R11: answered OFF the main thread. The NSE gives the app 0.3 s;
+    // the old chain (CFNotificationCenter darwin callback → NSNotification →
+    // main.async → reply) needed a main run loop turn at every hop, so any
+    // brief main-thread stall made the NSE treat a foreground app as dead and
+    // pop a banner on top of it.
+    private let handshakeQueue = DispatchQueue(label: "talk9.push.handshake", qos: .userInteractive)
+    private var handshakeNotifyToken: Int32 = 0
+    // Queue-confined mirror of "app is backgrounded" — applicationState is
+    // main-thread-only UIKit, so the scene callbacks publish changes here
+    // instead of the handshake reading UIKit off the main thread. Starts true:
+    // until the first willEnterForeground the NSE owns every push (prewarm and
+    // VoIP background launches included).
+    private var appIsInBackgroundForHandshake = true
 
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
         let sceneConfig = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
@@ -249,17 +262,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
 
     func addListenerForNotification() {
-        NotificationCenter.default.addObserver(self, selector: #selector(handleNotification),
-                                               name: AppDelegate.shouldHandleNotification,
-                                               object: nil)
-        CFNotificationCenterAddObserver(self.center,
-                                        nil, { (_, _, _, _, _) in
-                                            // emit signal so notification could be handeled by daemon
-                                            NotificationCenter.default.post(name: AppDelegate.shouldHandleNotification, object: nil, userInfo: nil)
-                                        },
-                                        Constants.notificationReceived,
-                                        nil,
-                                        .deliverImmediately)
+        // notify_register_dispatch delivers straight onto our own queue —
+        // unlike CFNotificationCenter's darwin observer, whose callback only
+        // fires once the MAIN run loop turns.
+        let status = notify_register_dispatch(Constants.notificationReceived as String,
+                                              &handshakeNotifyToken,
+                                              handshakeQueue) { [weak self] _ in
+            self?.handlePushHandshake()
+        }
+        if status != 0 { // NOTIFY_STATUS_OK
+            log.error("AppDelegate: notify_register_dispatch failed (\(status)) — push handshake unavailable")
+        }
     }
 
     func certificatePath() -> String? {
@@ -398,11 +411,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     // MARK: - Scene Lifecycle Methods
 
     func sceneDidEnterBackground() {
+        handshakeQueue.async { [weak self] in self?.appIsInBackgroundForHandshake = true }
         guard let account = self.accountService.currentAccount else { return }
         self.presenceService.subscribeBuddies(withAccount: account.id, withContacts: self.contactsService.contacts.value, subscribe: false)
     }
 
     func sceneWillEnterForeground() {
+        handshakeQueue.async { [weak self] in self?.appIsInBackgroundForHandshake = false }
         self.updateNotificationAvailability()
         guard let account = self.accountService.currentAccount else {
             self.daemonService.connectivityChanged()
@@ -444,7 +459,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         self.startConnectionTimers()
         // [TALK9] Drain pushes that arrived while the app was backgrounded.
         // The NSE saves every push payload to notificationData, but the only
-        // drains were (a) handleNotification — requires the app to be foreground
+        // drains were (a) handlePushHandshake — requires the app to be foreground
         // at the moment the push arrives — and (b) the banner-tap path. Opening
         // the app from the ICON left the entries stranded: the daemon never got
         // the DHT-fetch nudge, so the message behind the banner didn't arrive
@@ -934,20 +949,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         })
     }
 
-    @objc
-    private func handleNotification() {
-        DispatchQueue.main.async {[weak self] in
-            guard let self = self else { return }
-            // If the app is running in the background and there are no waiting calls, the extension should handle the notification.
-            if UIApplication.shared.applicationState == .background && !self.presentingCallScreen && !self.callsProvider.hasActiveCalls() {
-                return
-            }
-            // emit signal that app is active for notification extension
-            CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFNotificationName(Constants.notificationAppIsActive), nil, nil, true)
-
-            for data in Talk9PushQueue.drain() {
-                self.accountService.pushNotificationReceived(data: data)
-            }
+    /// Runs on handshakeQueue. Same policy as before: backgrounded with no
+    /// call in flight → stay silent, the NSE owns the push.
+    private func handlePushHandshake() {
+        // presentingCallScreen / CXCallObserver are written on other threads,
+        // but a stale read here only shifts WHO handles the push (app vs NSE),
+        // and both paths are correct — no synchronization needed.
+        if appIsInBackgroundForHandshake && !presentingCallScreen && !callsProvider.hasActiveCalls() {
+            return
+        }
+        // Reply first — this races the NSE's 0.3 s window; the drain below is
+        // not latency-critical.
+        CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(),
+                                             CFNotificationName(Constants.notificationAppIsActive),
+                                             nil, nil, true)
+        for data in Talk9PushQueue.drain() {
+            self.accountService.pushNotificationReceived(data: data)
         }
     }
 
