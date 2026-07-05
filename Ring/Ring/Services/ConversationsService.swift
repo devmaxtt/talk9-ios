@@ -613,11 +613,19 @@ class ConversationsService {
         guard !accountId.isEmpty,
               let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
         let removed = (self.conversationsAdapter.getRemovedConversations(accountId) as? [String]) ?? []
-        guard !removed.isEmpty else { return }
+        // [TALK9] R4: a conversation the user re-joined after leaving (accepted
+        // a re-invite) can linger in the daemon's removed list, and this seed
+        // used to blacklist it again on every activation — permanently
+        // re-silencing a conversation the user explicitly came back to, undoing
+        // the accept-time unmarkConversationAsLeft. Active membership always
+        // wins over a stale removed record; subtracting also heals entries
+        // poisoned by earlier builds.
+        let active = Set((self.conversationsAdapter.getSwarmConversations(forAccount: accountId) as? [String]) ?? [])
         var ids = Set(defaults.stringArray(forKey: Constants.talk9LeftConversationsKey) ?? [])
-        for id in removed where !id.isEmpty {
+        for id in removed where !id.isEmpty && !active.contains(id) {
             ids.insert(id)
         }
+        ids.subtract(active)
         defaults.set(Array(ids), forKey: Constants.talk9LeftConversationsKey)
     }
 

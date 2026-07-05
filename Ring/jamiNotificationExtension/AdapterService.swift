@@ -78,6 +78,10 @@ class AdapterService {
     enum PeerConnectionRequestType {
         case call(peerId: String, isVideo: Bool)
         case gitMessage(convId: String, peerId: String)
+        // [TALK9] R4: conversation invite (TrustRequest, confirm=false).
+        // peerId may be an account id, a device id (inviter's cert not cached
+        // yet), or empty.
+        case conversationRequest(convId: String, peerId: String)
         case clone
         case unknown
     }
@@ -130,6 +134,11 @@ class AdapterService {
          Extracts the conversation ID from type formatted as "application/im-gitmessage-id/conversationId".
          This type is used for connections requests for messages.
          */
+        if type.contains("application/conversation-request") {
+            let components = type.components(separatedBy: "/")
+            let convId = components.count > 2 ? (components.last ?? "") : ""
+            return PeerConnectionRequestType.conversationRequest(convId: convId, peerId: peerId)
+        }
         if type.contains("application/im-gitmessage-id") {
             let components = type.components(separatedBy: "/")
             if let last = components.last, components.count > 2 {

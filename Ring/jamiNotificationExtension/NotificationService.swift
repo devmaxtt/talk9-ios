@@ -250,6 +250,12 @@ class NotificationService: UNNotificationServiceExtension {
     // so finish() knows to suppress the APNs placeholder duplicate.
     private var didPresentLocalNotification = false
 
+    // [TALK9] R3: set when this push is a burst follower. finish() removes the
+    // predecessor's banner right before delivering ours, so a burst collapses
+    // to one refreshing banner instead of a stack — without ever silencing a
+    // genuinely new second message inside the window.
+    private var replacePreviousBannerId: String?
+
     // Set to true when the daemon is started for this notification.
     // If daemon ran but didPresentLocalNotification is still false, it means the
     // message was already treated (processed by another extension instance) — suppress.
@@ -473,8 +479,17 @@ class NotificationService: UNNotificationServiceExtension {
         log("[Talk9-Notif] decrypt: keyPath=\(keyURL.path) accountId=\(self.accountId) keyExists=\(keyExists)")
         let result = adapterService.decrypt(keyPath: keyURL.path, accountId: self.accountId, messagesPath: treatedMessagesURL.path, value: map)
         NSLog("[Talk9-Push]   decrypt result=%@", String(describing: result))
+        // [TALK9] R3: OpenDHT re-announces values (replication, storage
+        // maintenance), so the same value id can arrive in pushes minutes
+        // apart — far outside the burst window. A value we already acted on
+        // must never ring CallKit or produce a banner a second time.
+        let valueId = map["id"] as? String ?? ""
         switch result {
         case .call(let peerId, let hasVideo):
+            guard self.claimUnseenValue(valueId) else {
+                log("[Talk9-Notif] call value \(valueId.prefix(12)) already handled by an earlier push — suppressing")
+                break
+            }
             // [TALK9] Drop calls from unknown peers when the account disallows
             // them (DHT.PublicInCalls=false). Leaving decryptYieldedRealMessage
             // false routes finish() to its SUPPRESS branch so nothing is shown.
@@ -521,6 +536,10 @@ class NotificationService: UNNotificationServiceExtension {
                 log("[Talk9-Notif] gitMessage: peerId is empty — skipping this value")
                 break
             }
+            guard self.claimUnseenValue(valueId) else {
+                log("[Talk9-Notif] gitMessage value \(valueId.prefix(12)) already handled by an earlier push — suppressing")
+                break
+            }
             // [TALK9] Unknown-sender filtering. When the account rejects unknown
             // peers (DHT.PublicInCalls=false), suppress ONLY brand-new
             // unsolicited 1:1 requests from strangers. shouldAcceptIncomingMessage
@@ -552,17 +571,21 @@ class NotificationService: UNNotificationServiceExtension {
                     break // routes to finish()'s !decryptYieldedRealMessage SUPPRESS branch
                 }
             }
-            // [TALK9] Burst-dedup. Server (after disabling its own coalescing)
-            // forwards every DHT alert as-is. A single voice message produces
-            // 4 alerts within ~9s, same to + same conversation key + same
-            // peerId, only value_id differs — so server can't dedup. NSE has
-            // to: collapse pushes for (convId, peerId) seen within the dedup
-            // window to one banner. The first push wins (shows real content),
-            // the followers go through the SUPPRESS path so iOS shows nothing
-            // for them (rather than 4 banners or a 4-stack on the lock screen).
-            if shouldSuppressAsBurstDuplicate(convId: convId, peerId: peerId) {
-                log("[Talk9-Notif] gitMessage: burst-dup within \(Int(Constants.talk9DedupWindowSeconds))s of prior push for convId='\(convId.prefix(8))' peerId='\(peerId.prefix(16))' — suppressing")
-                break
+            // [TALK9] Burst collapse (R3: replace, don't suppress). A single
+            // voice message fans out as ~4 alerts within ~9s — same conv, same
+            // peer, DIFFERENT value ids — so neither the server nor the
+            // value-id gate above can collapse them. Followers used to take
+            // the SUPPRESS path, which also silenced a genuinely NEW second
+            // message from the same peer (a text at t0 swallowed the voice
+            // message at t+5s — the "voice notification never came" report).
+            // Now a follower REPLACES the predecessor's banner: it records the
+            // previous request id (removed in finish() right before delivery)
+            // and goes silent — a burst still collapses to one banner, content
+            // refreshed, one sound, and no real message is ever dropped.
+            if let predecessorId = burstPredecessorBannerId(convId: convId, peerId: peerId) {
+                log("[Talk9-Notif] gitMessage: burst follower within \(Int(Constants.talk9DedupWindowSeconds))s for convId='\(convId.prefix(8))' peerId='\(peerId.prefix(16))' — will replace banner \(predecessorId.prefix(12))")
+                self.replacePreviousBannerId = predecessorId
+                self.bestAttemptContent.sound = nil
             }
             self.decryptYieldedRealMessage = true
             // Store sender ID so finish() can show a fallback notification if daemon sync times out
@@ -595,6 +618,48 @@ class NotificationService: UNNotificationServiceExtension {
             }
             // peerId empty → title stays empty → finish() suppresses
             self.handleGitMessage(convId: convId, loadAll: convId.isEmpty) // async
+        case .conversationRequest(let convId, let peerId):
+            // [TALK9] R4: conversation invite (TrustRequest, confirm=false).
+            // These used to come through as .gitMessage with an EMPTY peerId,
+            // hit the empty-peer skip and vanish — new invites AND re-invites
+            // produced no banner while the app was dead (the upstream invite
+            // notification path died with the in-NSE daemon).
+            guard self.claimUnseenValue(valueId) else {
+                log("[Talk9-Notif] invite value \(valueId.prefix(12)) already handled by an earlier push — suppressing")
+                break
+            }
+            // Same stranger policy as messages: contacts' (re-)invites always
+            // pass; a stranger's invite is hidden when the account rejects
+            // unknown senders. peerId can be a device id (inviter's cert not
+            // cached yet) or empty — fail open in those cases.
+            if !peerId.isEmpty && !self.shouldAcceptIncomingMessage(convId: convId, peerId: peerId) {
+                log("[Talk9-Notif] invite from \(peerId.prefix(16)): account rejects unknown senders — suppressing")
+                break
+            }
+            // Deliberately NOT consulting the left-conversations blacklist:
+            // an explicit re-invite to a conversation the user left must
+            // surface again (leave → re-invite flow).
+            self.decryptYieldedRealMessage = true
+            self.bestAttemptContent.userInfo = [
+                Constants.NotificationUserInfoKeys.accountID.rawValue: self.accountId,
+                Constants.NotificationUserInfoKeys.participantID.rawValue: peerId,
+                Constants.NotificationUserInfoKeys.conversationID.rawValue: convId
+            ]
+            self.bestAttemptContent.body = NSLocalizedString(
+                "notifications.conversationInvite",
+                value: "Invitation received",
+                comment: "Notification body for an incoming conversation invitation")
+            // Pre-set a non-empty title so the generic FALLBACK branch (which
+            // would overwrite the body with "New message") never triggers; a
+            // resolved vCard or nameserver name upgrades it when available.
+            self.bestAttemptContent.title = "Talk9"
+            if !peerId.isEmpty {
+                if let realName = self.contactProfileName(accountId: self.accountId, contactId: peerId) {
+                    self.bestAttemptContent.title = realName
+                } else {
+                    self.lookupSenderName(peerId: peerId)
+                }
+            }
         case .clone:
             self.decryptYieldedRealMessage = true
             // Should start daemon and wait until clone completed
@@ -737,49 +802,26 @@ class NotificationService: UNNotificationServiceExtension {
                 // it presents the full-screen call UI. Delivering bestAttemptContent
                 // here would add a stray "Talk9 / New message" placeholder banner
                 // (bestAttemptContent starts as a copy of the server's APNs alert).
-                NSLog("[Talk9-Push] ✗ SUPPRESS — call handed to CallKit, dropping placeholder banner")
-                removeOldSuppressedNotifications()
-                contentHandler(makeSuppressedContent())
-                scheduleRemoval(identifier: requestIdentifier)
-                aggressiveImmediateRemoval(identifier: requestIdentifier)
-                scheduleAutoRemove(identifier: requestIdentifier, after: 5.0)
+                deliverSuppressed(contentHandler, reason: "call handed to CallKit, dropping placeholder banner")
                 return
             } else if didPresentLocalNotification {
-                NSLog("[Talk9-Push] ✓ SHOW  title='%@' body='%@'",
-                      bestAttemptContent.title, String(bestAttemptContent.body.prefix(60)))
+                // [TALK9] D1: the content was already shown as a local
+                // notification (UNUserNotificationCenter.add). Falling through
+                // to contentHandler would deliver the SAME title/body again —
+                // one message, two banners. Suppress the remote copy instead.
+                deliverSuppressed(contentHandler, reason: "content already shown as local notification")
+                return
             } else if didStartDaemon {
-                NSLog("[Talk9-Push] ✗ SUPPRESS — daemon ran, already treated by another instance")
-                removeOldSuppressedNotifications()
-                contentHandler(makeSuppressedContent())
-                scheduleRemoval(identifier: requestIdentifier)
-                // [TALK9] Aggressive: yank the just-shown empty card NOW (~400ms)
-                // instead of after 5s, so it barely appears on the lock screen.
-                // scheduleAutoRemove kept as a 5s fallback in case iOS already
-                // reaped NSE before the aggressive remove finished.
-                aggressiveImmediateRemoval(identifier: requestIdentifier)
-                scheduleAutoRemove(identifier: requestIdentifier, after: 5.0)
+                deliverSuppressed(contentHandler, reason: "daemon ran, already treated by another instance")
                 return
             } else if shouldSuppressCompletely {
                 // Resubscribe or app-active — must show nothing at all
-                NSLog("[Talk9-Push] ✗ SUPPRESS — resubscribe / app active")
-                removeOldSuppressedNotifications()
-                contentHandler(makeSuppressedContent())
-                scheduleRemoval(identifier: requestIdentifier)
-                aggressiveImmediateRemoval(identifier: requestIdentifier)
-                scheduleAutoRemove(identifier: requestIdentifier, after: 5.0)
+                deliverSuppressed(contentHandler, reason: "resubscribe / app active")
                 return
             } else if !decryptYieldedRealMessage {
                 // Non-message DHT event (typing/receipt/sync) or already-consumed message.
-                // Server cannot filter (pt field empty in OpenDHT). Apple doesn't allow
-                // true suppression of alert pushes — if we pass empty title/body, iOS
-                // falls back to the original APNs alert payload (server placeholder).
-                // Workaround: see makeSuppressedContent().
-                NSLog("[Talk9-Push] ✗ SUPPRESS — decrypt yielded no real message (non-message DHT event)")
-                removeOldSuppressedNotifications()
-                contentHandler(makeSuppressedContent())
-                scheduleRemoval(identifier: requestIdentifier)
-                aggressiveImmediateRemoval(identifier: requestIdentifier)
-                scheduleAutoRemove(identifier: requestIdentifier, after: 5.0)
+                // Server cannot filter (pt field empty in OpenDHT push payloads).
+                deliverSuppressed(contentHandler, reason: "decrypt yielded no real message (non-message DHT event)")
                 return
             } else if bestAttemptContent.title.trimmingCharacters(in: .whitespaces).isEmpty {
                 // Extension ran but couldn't decrypt or resolve sender name.
@@ -801,9 +843,44 @@ class NotificationService: UNNotificationServiceExtension {
             // suppressed empty cards from previous pushes whose async cleanup never
             // completed. Cheap insurance against accumulation on the lock screen.
             removeOldSuppressedNotifications()
+            // [TALK9] R3 burst collapse: this banner supersedes the burst
+            // predecessor — pull the old card so the burst never stacks.
+            if let predecessorId = replacePreviousBannerId {
+                UNUserNotificationCenter.current()
+                    .removeDeliveredNotifications(withIdentifiers: [predecessorId])
+            }
             contentHandler(self.bestAttemptContent)
         }
         NSLog("[Talk9-Push] ◀ finish done id=%@", requestIdentifier)
+    }
+
+    // [TALK9] R5 root-fix switch. Flip to true ONLY after Apple grants
+    // com.apple.developer.usernotifications.filtering for
+    // m.talk.talk9.jamiNotificationExtension AND the key has been added to both
+    // NotificationService-*.entitlements files — see FILTERING_ENTITLEMENT.md.
+    // With the entitlement, delivering empty content makes iOS drop the push with
+    // no visible card at all. WITHOUT the entitlement the exact same call falls
+    // back to the raw APNs placeholder banner — flipping this early is WORSE
+    // than the legacy suppressed-card machinery.
+    private static let filteringEntitlementGranted = false
+
+    /// [TALK9] Single exit for every suppress path in finish().
+    /// Entitled build: empty content → iOS shows nothing, no cleanup needed.
+    /// Legacy build: minimal "talk9.suppressed" card plus the removal machinery —
+    /// immediate polling removal (~400ms so the card barely appears), a 5 s
+    /// auto-remove fallback in case iOS reaps the NSE first, and a handoff to the
+    /// main app (scheduleRemoval) whose next activation sweeps survivors.
+    private func deliverSuppressed(_ contentHandler: (UNNotificationContent) -> Void, reason: String) {
+        NSLog("[Talk9-Push] ✗ SUPPRESS — %@", reason)
+        if Self.filteringEntitlementGranted {
+            contentHandler(UNMutableNotificationContent())
+            return
+        }
+        removeOldSuppressedNotifications()
+        contentHandler(makeSuppressedContent())
+        scheduleRemoval(identifier: requestIdentifier)
+        aggressiveImmediateRemoval(identifier: requestIdentifier)
+        scheduleAutoRemove(identifier: requestIdentifier, after: 5.0)
     }
 
     /// Builds the minimal-visibility content used by all suppress paths.
@@ -928,42 +1005,101 @@ class NotificationService: UNNotificationServiceExtension {
         defaults.set(pending, forKey: Constants.pendingNotificationRemovalKey)
     }
 
-    /// [TALK9] Atomic check-and-set for the burst-dedup gate. Returns true
-    /// when this push should be SUPPRESSED because a banner was already shown
-    /// for the same (convId, peerId) within `talk9DedupWindowSeconds`.
+    /// [TALK9] Atomic check-and-swap for the burst-collapse gate (R3: replace,
+    /// don't suppress). Returns nil when this push starts a new burst, or the
+    /// PREVIOUS push's request identifier when it is a follower within
+    /// `talk9DedupWindowSeconds` — the caller then replaces that banner
+    /// instead of stacking (old behavior: suppress, which could drop a real
+    /// second message). The marker file's CONTENT is the latest banner's
+    /// request id; its mtime is the window clock.
     ///
-    /// Concurrency: iOS can run several NSE instances in PARALLEL PROCESSES
-    /// (one per push of the burst). The previous UserDefaults + NSLock version
-    /// was only atomic in-process — two processes could both pass the check
-    /// before either wrote, yielding 2 banners. This version uses POSIX
-    /// open(O_CREAT|O_EXCL) on a marker file in the App Group container,
-    /// which IS atomic across processes:
-    ///   - creation succeeds → first push of the burst: show the banner
-    ///   - marker exists, mtime within the window → follower: suppress
-    ///   - marker exists, mtime expired → refresh mtime, show. (Two processes
-    ///     can still race THIS branch, but the residual window is the few ms
-    ///     around setAttributes versus the old whole read-modify-write.)
-    private func shouldSuppressAsBurstDuplicate(convId: String, peerId: String) -> Bool {
+    /// Concurrency: iOS runs several NSE instances in PARALLEL PROCESSES (one
+    /// per push of the burst). open(O_CREAT|O_EXCL) on a marker file in the
+    /// App Group container is atomic across processes:
+    ///   - creation succeeds → burst head: store own id, show with sound
+    ///   - marker fresh → follower: swap own id in, replace the predecessor
+    ///   - marker expired/unreadable → new burst head: swap own id in, show.
+    /// Two parallel followers can both read the same predecessor and briefly
+    /// leave 2 banners (last marker write wins; the next follower removes one
+    /// of them). Worst case is a transient 2-stack — never 4, never a lost
+    /// message.
+    private func burstPredecessorBannerId(convId: String, peerId: String) -> String? {
         guard !peerId.isEmpty, let dir = Self.dedupMarkerDirectory() else {
-            return false
+            return nil
         }
         // convId/peerId are hex identifiers — safe to use in a filename.
         let marker = dir.appendingPathComponent("\(convId)_\(peerId)")
         let fd = open(marker.path, O_CREAT | O_EXCL | O_WRONLY, 0o644)
         if fd >= 0 {
+            if let data = requestIdentifier.data(using: .utf8) {
+                data.withUnsafeBytes { _ = write(fd, $0.baseAddress, $0.count) }
+            }
             close(fd)
             Self.pruneDedupMarkers(in: dir)
-            return false
+            return nil
         }
+        let isFresh: Bool
         if let attrs = try? FileManager.default.attributesOfItem(atPath: marker.path),
            let mtime = attrs[.modificationDate] as? Date,
            Date().timeIntervalSince(mtime) < Constants.talk9DedupWindowSeconds {
+            isFresh = true
+        } else {
+            isFresh = false
+        }
+        let predecessorId = (try? String(contentsOf: marker, encoding: .utf8))?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        // Take over the marker: our banner is now the burst's latest (the
+        // atomic rewrite also refreshes mtime, restarting the window).
+        try? requestIdentifier.data(using: .utf8)?.write(to: marker, options: .atomic)
+        guard isFresh, let predecessorId = predecessorId, !predecessorId.isEmpty else {
+            return nil
+        }
+        return predecessorId
+    }
+
+    /// [TALK9] R3: cross-process claim of a DHT value id — returns true exactly
+    /// once per value; O_CREAT|O_EXCL marker creation is the claim. Value ids
+    /// never legitimately recur after the value expires (minutes), so bare
+    /// marker existence means duplicate — no freshness window needed. Fails
+    /// open: better a duplicate banner than a lost message.
+    private func claimUnseenValue(_ valueId: String) -> Bool {
+        guard !valueId.isEmpty, let dir = Self.seenValueDirectory() else {
             return true
         }
-        // Expired (or unreadable) marker — refresh and let this push through.
-        try? FileManager.default.setAttributes([.modificationDate: Date()],
-                                               ofItemAtPath: marker.path)
+        let marker = dir.appendingPathComponent(valueId)
+        let fd = open(marker.path, O_CREAT | O_EXCL | O_WRONLY, 0o644)
+        if fd >= 0 {
+            close(fd)
+            Self.pruneSeenValueMarkers(in: dir)
+            return true
+        }
         return false
+    }
+
+    private static func seenValueDirectory() -> URL? {
+        guard let container = FileManager.default
+                .containerURL(forSecurityApplicationGroupIdentifier: Constants.appGroupIdentifier) else {
+            return nil
+        }
+        let dir = container.appendingPathComponent("Library/Caches/talk9-push-seen",
+                                                   isDirectory: true)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir
+    }
+
+    /// Same housekeeping as pruneDedupMarkers: DHT values expire within
+    /// minutes, so an hour-old seen-marker can never match a live value again.
+    private static func pruneSeenValueMarkers(in dir: URL) {
+        let cutoff = Date().addingTimeInterval(-3600)
+        guard let files = try? FileManager.default
+                .contentsOfDirectory(at: dir,
+                                     includingPropertiesForKeys: [.contentModificationDateKey]) else { return }
+        for file in files {
+            if let mtime = (try? file.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate,
+               mtime < cutoff {
+                try? FileManager.default.removeItem(at: file)
+            }
+        }
     }
 
     private static func dedupMarkerDirectory() -> URL? {
@@ -1043,15 +1179,11 @@ class NotificationService: UNNotificationServiceExtension {
     }
 
     private func saveDataIfNeeded(data: [String: String]) {
-        guard let userDefaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else {
-            return
-        }
-        var notificationData = [[String: String]]()
-        if let existingData = userDefaults.object(forKey: Constants.notificationData) as? [[String: String]] {
-            notificationData = existingData
-        }
-        notificationData.append(data)
-        userDefaults.set(notificationData, forKey: Constants.notificationData)
+        // [TALK9] R2: file-per-push queue (see Talk9PushQueue in Constants.swift).
+        // The previous UserDefaults array was read-modify-write with no
+        // cross-process lock — parallel NSE instances (one per push of a burst)
+        // racing the app's read→clear drain silently dropped entries.
+        Talk9PushQueue.enqueue(data)
     }
 
     private func requestToDictionary(request: UNNotificationRequest) -> [String: String] {

@@ -359,8 +359,26 @@ static NSDictionary* pendingPushData = nil;
             }
             if (!conversationRequest.conversationId.empty()) {
                 if (conversationRequest.service == "cx.ring") {
-                    // return git message type to start daemon
-                    return @{@"": @"application/im-gitmessage-id"};
+                    // [TALK9] R4: a conversation invite (confirm=false). The old
+                    // empty-peer "application/im-gitmessage-id" return made Swift
+                    // skip the value entirely — invites and re-invites showed no
+                    // banner. Resolve the inviter's account id from the cached
+                    // cert chain when possible (re-invites from contacts) so the
+                    // banner can show a real name; fall back to the device id.
+                    std::string peerId = "";
+                    try {
+                        if (decrypted && decrypted->owner) {
+                            std::string deviceId = decrypted->owner->getId().toString();
+                            auto certPath = [[[Constants documentsPath] URLByAppendingPathComponent:accountId] URLByAppendingPathComponent:certificates].path.UTF8String;
+                            auto crlPath = [[[Constants documentsPath] URLByAppendingPathComponent:accountId] URLByAppendingPathComponent:crls].path.UTF8String;
+                            auto ocspPath = [[[Constants documentsPath] URLByAppendingPathComponent:accountId] URLByAppendingPathComponent:ocsp].path.UTF8String;
+                            peerId = getPeerId(deviceId, certPath, crlPath, ocspPath);
+                            if (peerId.empty()) peerId = deviceId;
+                        }
+                    } catch (...) {}
+                    NSString* type = [NSString stringWithFormat:@"application/conversation-request/%s",
+                                      conversationRequest.conversationId.c_str()];
+                    return @{@(peerId.c_str()): type};
                 }
             }
             NSLog(@"[Talk9-Decrypt] TrustRequest no match, returning unknown");
