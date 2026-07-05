@@ -945,12 +945,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             // emit signal that app is active for notification extension
             CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFNotificationName(Constants.notificationAppIsActive), nil, nil, true)
 
-            guard let userDefaults = UserDefaults(suiteName: Constants.appGroupIdentifier),
-                  let notificationData = userDefaults.object(forKey: Constants.notificationData) as? [[String: String]] else {
-                return
-            }
-            userDefaults.set([[String: String]](), forKey: Constants.notificationData)
-            for data in notificationData {
+            for data in Talk9PushQueue.drain() {
                 self.accountService.pushNotificationReceived(data: data)
             }
         }
@@ -1160,10 +1155,8 @@ extension AppDelegate {
     }
 
     private func processPendingPushData() {
-        guard let userDefaults = UserDefaults(suiteName: Constants.appGroupIdentifier),
-              let notificationData = userDefaults.object(forKey: Constants.notificationData) as? [[String: String]],
-              !notificationData.isEmpty else { return }
-        userDefaults.set([[String: String]](), forKey: Constants.notificationData)
+        let notificationData = Talk9PushQueue.drain()
+        guard !notificationData.isEmpty else { return }
 
         var accountIds = Set<String>()
         for data in notificationData {

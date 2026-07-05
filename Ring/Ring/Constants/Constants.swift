@@ -131,6 +131,78 @@ Elys
 VeroJeanLuc
 """
 
+// [TALK9] R2: cross-process-safe queue for push payloads awaiting a daemon.
+// The NSE writes one uniquely-named file per push; the main app and the share
+// extension drain the directory. Replaces the read-modify-write array under
+// Constants.notificationData in shared UserDefaults, which lost entries under
+// concurrency: a drainer loads [A], a parallel NSE instance writes [A,B], the
+// drainer writes [] back — B was never fed to any daemon. A burst (one voice
+// message = 4 pushes = 4 parallel NSE processes) hit that window reliably.
+enum Talk9PushQueue {
+    private static var directory: URL? {
+        guard let caches = Constants.cachesPath else { return nil }
+        let dir = caches.appendingPathComponent("talk9-push-queue", isDirectory: true)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir
+    }
+
+    /// Enqueue one push payload. Unique filename (epoch-ms + UUID) means there
+    /// is no shared state to clobber; the atomic write means a drain never
+    /// sees a half-written file.
+    static func enqueue(_ data: [String: String]) {
+        guard let dir = directory,
+              let payload = try? JSONSerialization.data(withJSONObject: data) else { return }
+        let name = "\(Int64(Date().timeIntervalSince1970 * 1000))_\(UUID().uuidString)"
+        try? payload.write(to: dir.appendingPathComponent(name), options: .atomic)
+        prune(dir)
+    }
+
+    /// Remove and return all queued payloads, oldest first. Also drains any
+    /// leftovers from the legacy UserDefaults array (entries written by a
+    /// pre-update NSE survive the app update). Concurrent drainers (main app
+    /// vs share extension) may race: deletion is the claim, so each entry is
+    /// consumed at most once.
+    static func drain() -> [[String: String]] {
+        var entries = [[String: String]]()
+        if let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier),
+           let legacy = defaults.object(forKey: Constants.notificationData) as? [[String: String]],
+           !legacy.isEmpty {
+            defaults.set([[String: String]](), forKey: Constants.notificationData)
+            entries.append(contentsOf: legacy)
+        }
+        guard let dir = directory,
+              let files = try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil) else {
+            return entries
+        }
+        for file in files.sorted(by: { $0.lastPathComponent < $1.lastPathComponent }) {
+            // Only touch files matching our "<epoch-ms>_<uuid>" naming — skips
+            // Foundation's atomic-write temp files and filesystem noise.
+            guard let prefix = file.lastPathComponent.split(separator: "_").first,
+                  Int64(prefix) != nil,
+                  let payload = try? Data(contentsOf: file) else { continue }
+            do { try FileManager.default.removeItem(at: file) } catch { continue }
+            if let dict = (try? JSONSerialization.jsonObject(with: payload)) as? [String: String] {
+                entries.append(dict)
+            }
+        }
+        return entries
+    }
+
+    /// Queue files older than a day reference DHT values that expired long
+    /// ago; drop them so the directory cannot grow unbounded while the app
+    /// stays unopened.
+    private static func prune(_ dir: URL) {
+        let cutoff = Date().addingTimeInterval(-24 * 3600)
+        guard let files = try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: [.contentModificationDateKey]) else { return }
+        for file in files {
+            if let mtime = (try? file.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate,
+               mtime < cutoff {
+                try? FileManager.default.removeItem(at: file)
+            }
+        }
+    }
+}
+
 public class Constants: NSObject {
     @objc public static let notificationReceived = "m.talk.talk9.notificationExtension.receivedNotification" as CFString
     @objc public static let notificationAppIsActive = "m.talk.talk9.appActive" as CFString

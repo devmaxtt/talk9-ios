@@ -592,13 +592,7 @@ extension AdapterService {
                                              nil,
                                              nil,
                                              true)
-        guard let userDefaults = UserDefaults(suiteName: Constants.appGroupIdentifier),
-              let notificationData = userDefaults.object(forKey: Constants.notificationData) as? [[String: String]] else {
-            return
-        }
-        userDefaults.set([[String: String]](), forKey: Constants.notificationData)
-        if notificationData.isEmpty { return }
-        for data in notificationData {
+        for data in Talk9PushQueue.drain() {
             self.pushNotificationReceived(data: data)
         }
     }
