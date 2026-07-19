@@ -65,11 +65,16 @@ talk9-ios/
 ├── Ring/RingUITests/        # UI 自动化测试
 ├── Ring/fastlane/           # Fastlane 自动化配置
 ├── Ring/API.md              # Talk9 注册门户 API 文档
-├── jamiNotificationExtension/ # 通知服务扩展
-├── jamiShareExtension/      # 分享扩展
+├── Ring/jamiNotificationExtension/ # 通知服务扩展（NSE，注意在 Ring/ 下而非仓库根）
+├── Ring/jamiShareExtension/ # 分享扩展（同样在 Ring/ 下）
 ├── daemon/                  # C++ 守护进程（子模块）
-└── xcframework/             # 预编译 XCFramework
+├── xcframework/             # 预编译 XCFramework
+└── NOTIFICATIONS.md         # ⚠️ 通知/推送/离线消息维护手册 —— 动通知代码前必读
 ```
+
+> **通知系统专项提示**：凡涉及推送、NSE、横幅、离线消息、重连、CallKit 唤醒的任务，
+> 先通读根目录 `NOTIFICATIONS.md` —— 其中的"已验证事实"直接采信（勿重新推导），
+> "红线"逐条遵守（每条背后都是已修复过的线上 bug），排障按其 §6 方法论执行。
 
 ---
 
@@ -157,6 +162,8 @@ Ring/RingUITests/         # UI 测试
 
 ## 相关文档
 
+- `NOTIFICATIONS.md` — **通知系统维护手册**：架构事实、红线、修复账本（含提交哈希）、真机回归链路、排障方法论
+- `Ring/jamiNotificationExtension/FILTERING_ENTITLEMENT.md` — 空卡根治方案（Apple filtering entitlement）rollout 步骤
 - `Ring/API.md` — Talk9 注册门户 API（OTP 注册、密码重置流程）
 - `README.md` — 完整构建说明
 - `compile-ios.sh` — Daemon 编译脚本说明
