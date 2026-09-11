@@ -214,7 +214,7 @@ public class Constants: NSObject {
     @objc public static let updatedConversations = "updatedConversations"
     @objc public static let queriedAccountId = "queriedAccountId"
     @objc public static let shareExtensionActiveAccounts = "shareExtensionActiveAccounts"
-    @objc public static let appGroupIdentifier = "group.m.talk.talk9"
+    @objc public static let appGroupIdentifier = "group.m.talk.talk9.shared"
     @objc public static let notificationsCount = "notificationsCount"
     @objc public static let appIdentifier = "m.talk.talk9"
 

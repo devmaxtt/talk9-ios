@@ -27,3 +27,5 @@ Ring/Carthage/
 
 # VSCode
 .vscode/
+# understand-anything generated knowledge graph
+.ua/

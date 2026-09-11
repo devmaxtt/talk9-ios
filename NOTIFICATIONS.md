@@ -42,7 +42,7 @@
 | `Ring/Ring/Services/CallsProviderService.swift` | CallKit、unhandeled call 15s 超时 |
 | `Ring/jamiShareExtension/AdapterService.swift` | 第三个队列 drain 方（易被遗忘！） |
 
-App Group（`group.m.talk.talk9`）状态清单：
+App Group（`group.m.talk.talk9.shared`）状态清单：
 
 | 位置 | 用途 | 写入方 → 读取方 |
 |---|---|---|
