@@ -64,9 +64,9 @@ struct WelcomeView: View, StateEmittingView {
     @ViewBuilder
     func alertView() -> some View {
         switch viewModel.creationState {
-        case .initial, .unknown, .success:
+        case .initial, .unknown:
             EmptyView()
-        case .started:
+        case .started, .success:
             loadingView()
         case .timeOut:
             timeOutAlert()
