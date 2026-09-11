@@ -169,3 +169,61 @@ class JamiURI {
         return nil
     }
 }
+
+/// A link that opens a specific screen in the app, e.g. `talk9://user/<jamiId>`.
+enum DeepLink: Equatable {
+    /// Open the one-to-one conversation with an account, creating a temporary one
+    /// when the peer is not a contact yet.
+    case user(jamiId: String)
+    /// Open an existing swarm conversation.
+    case conversation(conversationId: String)
+
+    static let scheme = "talk9"
+    static let webHost = "talk9.co"
+
+    /// Accepts both the custom scheme and the universal link declared in the
+    /// apple-app-site-association file, e.g. `talk9://user/<id>` and
+    /// `https://talk9.co/u/<id>`.
+    init?(url: URL) {
+        let segments = url.path.split(separator: "/").map { $0.lowercased() }
+        let route: String?
+        let identifier: String?
+
+        switch url.scheme?.lowercased() {
+        case DeepLink.scheme:
+            // `talk9://user/<id>` parses as host "user" and path "/<id>".
+            route = url.host?.lowercased()
+            identifier = segments.first
+        case "https" where url.host?.lowercased() == DeepLink.webHost:
+            // `https://talk9.co/u/<id>` carries both parts in the path.
+            route = segments.first
+            identifier = segments.dropFirst().first
+        default:
+            return nil
+        }
+
+        guard let identifier = identifier, DeepLink.isValidIdentifier(identifier) else {
+            return nil
+        }
+
+        switch route {
+        case "user", "u", "call":
+            // `call` deliberately lands on the conversation instead of dialling:
+            // opening a link must never place a call on the user's behalf.
+            self = .user(jamiId: identifier)
+        case "conversation", "c":
+            self = .conversation(conversationId: identifier)
+        default:
+            // `/i/` (group invites) is declared in the AASA file but not handled
+            // yet — accepting an invite needs more than opening a screen.
+            return nil
+        }
+    }
+
+    /// Both account ids and swarm conversation ids are 40 hexadecimal characters.
+    /// Kept stricter than `String.isSHA1()`, which matches on a substring and would
+    /// accept a padded identifier coming from an untrusted link.
+    private static func isValidIdentifier(_ value: String) -> Bool {
+        return value.count == 40 && value.allSatisfy { $0.isHexDigit }
+    }
+}

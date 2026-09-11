@@ -42,6 +42,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         if let userActivity = connectionOptions.userActivities.first {
             self.scene(scene, continue: userActivity)
         }
+
+        if let url = connectionOptions.urlContexts.first?.url {
+            self.openDeepLink(url)
+        }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -75,8 +79,30 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         appDelegate.sceneDidEnterBackground()
     }
 
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url else { return }
+        self.openDeepLink(url)
+    }
+
+    /// Routes a `talk9://` link. Unrecognised links are ignored rather than
+    /// dropping the user on an arbitrary screen.
+    private func openDeepLink(_ url: URL) {
+        guard let deepLink = DeepLink(url: url),
+              let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
+        appDelegate.handle(deepLink: deepLink)
+    }
+
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
+
+        // Universal links arrive here rather than through openURLContexts.
+        if userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+           let url = userActivity.webpageURL {
+            self.openDeepLink(url)
             return
         }
 

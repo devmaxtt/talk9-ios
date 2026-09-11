@@ -81,6 +81,11 @@ final class AppCoordinator: Coordinator, StateableResponsive {
     }
     private var pendingNavigation: PendingNavigation?
 
+    // Holds a `talk9://user/<id>` link that arrived before the main interface was
+    // ready. Kept apart from PendingNavigation because opening a conversation with
+    // a peer who is not a contact yet goes through openNewConversation instead.
+    private var pendingNewConversation: String?
+
     init(injectionBag: InjectionBag) {
         self.injectionBag = injectionBag
         self.stateSubject
@@ -222,6 +227,11 @@ final class AppCoordinator: Coordinator, StateableResponsive {
     }
 
     private func processPendingNavigation() {
+        if let jamiId = pendingNewConversation, let coordinator = conversationsCoordinator {
+            pendingNewConversation = nil
+            coordinator.openNewConversation(jamiId: jamiId)
+            return
+        }
         guard let pending = pendingNavigation,
               let coordinator = conversationsCoordinator else { return }
         pendingNavigation = nil
@@ -252,6 +262,17 @@ extension AppCoordinator {
             return
         }
         conversationCoordinator.openConversationFromNotificationFor(participantId: participantID, accountId: accountId)
+    }
+
+    /// Opens the one-to-one conversation with `jamiId`, creating a temporary one when
+    /// the peer is not a contact yet — the case a deep link has to handle and
+    /// openConversation(participantID:) does not.
+    func openNewConversation(jamiId: String) {
+        guard let conversationCoordinator = conversationsCoordinator else {
+            pendingNewConversation = jamiId
+            return
+        }
+        conversationCoordinator.openNewConversation(jamiId: jamiId)
     }
 
     func joinCall(callURI: String, isAudioOnly: Bool) {

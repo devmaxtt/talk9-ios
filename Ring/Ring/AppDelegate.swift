@@ -1221,6 +1221,17 @@ extension AppDelegate {
         }
     }
 
+    /// Entry point for `talk9://` links, from both a cold start and a warm resume.
+    func handle(deepLink: DeepLink) {
+        switch deepLink {
+        case .user(let jamiId):
+            self.appCoordinator.openNewConversation(jamiId: jamiId)
+        case .conversation(let conversationId):
+            guard let accountId = self.accountService.currentAccount?.id else { return }
+            self.appCoordinator.openConversation(conversationId: conversationId, accountId: accountId)
+        }
+    }
+
     func findContactAndStartCall(hash: String, isVideo: Bool) {
         if callsProvider.hasActiveCalls() {
             return
