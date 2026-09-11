@@ -695,57 +695,64 @@ class NotificationService: UNNotificationServiceExtension {
         // extension process crashes iOS falls back to the raw APNs "hello" placeholder.
         // Instead, always read from the shared cache written by the main app daemon.
         log("[Talk9-Notif] handleGitMessage: using cache (no daemon), convId='\(pendingConvId)' sender=\(pendingSenderId.prefix(16))")
-        let waitId = UUID().uuidString
-        // Capture the group directly so defer always runs even if self is deallocated.
-        // If self were nil at the asyncAfter closure, the old guard-before-defer pattern
-        // would skip the leave(), leaking the group entry and causing a 25-second timeout
-        // — after which iOS would fall back to showing the raw APNs "hello" placeholder.
-        let group = autoDispatchGroup
-        autoDispatchGroup.enter(id: waitId)
-        DispatchQueue.global().asyncAfter(deadline: .now() + 2.0) { [weak self] in
-            defer { group.leave(id: waitId) }
-            guard let self = self else { return }
-            guard !self.pendingSenderId.isEmpty,
-                  let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
-            // Only accept cache entries written within 2 seconds before this extension
-            // instance started (covers clock skew / daemon-faster-than-extension races).
-            // The old 10s grace was too large: it would pick up already-read messages if
-            // the user received one within the preceding 10s and then a new push arrived.
-            let freshThreshold = self.extensionStartTime - 2.0
-            var cachedBody: String?
 
-            func freshBody(from entry: [AnyHashable: Any]?) -> String? {
-                guard let entry = entry,
-                      let body = entry["body"] as? String, !body.isEmpty,
-                      let ts = entry["ts"] as? TimeInterval,
-                      ts >= freshThreshold else { return nil }
-                return body
-            }
+        // [TALK9] B1: read the cache synchronously. The previous 2 s asyncAfter was a
+        // guaranteed no-op — three independent reasons, all verified in-tree. If you
+        // are ever tempted to reinstate a wait here, disprove all three first:
+        //
+        //   1. Reaching handleGitMessage implies appIsActive() == false: the
+        //      app-active branch of processNotificationRequest returns long before
+        //      this point. The main app process is therefore dead.
+        //   2. `talk9_last_msg_*` has exactly ONE writer — the main app daemon
+        //      (ConversationsManager). Neither the NSE nor the share extension ever
+        //      writes it. Dead app => nobody can write during the wait.
+        //   3. freshThreshold is `extensionStartTime - 2.0`, i.e. only entries
+        //      written BEFORE this instance started are accepted. Anything a wait
+        //      could catch would be rejected by the freshness check anyway.
+        //
+        // => the value read at t+2s is byte-identical to the one read at t+0.
+        // Cost of the removed wait: every banner delayed 2 s, and during a burst
+        // (one voice message = ~4 pushes = 4 parallel NSE processes, see
+        // NOTIFICATIONS.md §2.1) four processes each burned 2 s of the 30 s budget
+        // and held their 24 MB memory allowance for nothing.
+        guard !pendingSenderId.isEmpty,
+              let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
+        // Only accept cache entries written within 2 seconds before this extension
+        // instance started (covers clock skew / daemon-faster-than-extension races).
+        // The old 10s grace was too large: it would pick up already-read messages if
+        // the user received one within the preceding 10s and then a new push arrived.
+        let freshThreshold = extensionStartTime - 2.0
+        var cachedBody: String?
 
-            // 1. Try per-conversation key (convId present in push payload)
-            if !self.pendingConvId.isEmpty {
-                let convKey = Constants.talk9LastMessageKeyPrefix + self.accountId + "_" + self.pendingConvId
-                if let body = freshBody(from: defaults.dictionary(forKey: convKey)) {
-                    cachedBody = body
-                    log("[Talk9-Notif] cache: fresh conv key '\(body.prefix(40))'")
-                }
-            }
-            // 2. Fall back to per-sender key (convId empty or conv key missed)
-            if cachedBody == nil {
-                let senderKey = Constants.talk9LastMessageKeyPrefix + "sender_" + self.accountId + "_" + self.pendingSenderId
-                if let body = freshBody(from: defaults.dictionary(forKey: senderKey)) {
-                    cachedBody = body
-                    log("[Talk9-Notif] cache: fresh sender key '\(body.prefix(40))'")
-                }
-            }
-            if let body = cachedBody {
-                self.bestAttemptContent.body = body
-            } else {
-                log("[Talk9-Notif] cache: miss or stale after 2s — showing 'New message'")
+        func freshBody(from entry: [AnyHashable: Any]?) -> String? {
+            guard let entry = entry,
+                  let body = entry["body"] as? String, !body.isEmpty,
+                  let ts = entry["ts"] as? TimeInterval,
+                  ts >= freshThreshold else { return nil }
+            return body
+        }
+
+        // 1. Try per-conversation key (convId present in push payload)
+        if !pendingConvId.isEmpty {
+            let convKey = Constants.talk9LastMessageKeyPrefix + accountId + "_" + pendingConvId
+            if let body = freshBody(from: defaults.dictionary(forKey: convKey)) {
+                cachedBody = body
+                log("[Talk9-Notif] cache: fresh conv key '\(body.prefix(40))'")
             }
         }
-        return
-
+        // 2. Fall back to per-sender key (convId empty or conv key missed)
+        if cachedBody == nil {
+            let senderKey = Constants.talk9LastMessageKeyPrefix + "sender_" + accountId + "_" + pendingSenderId
+            if let body = freshBody(from: defaults.dictionary(forKey: senderKey)) {
+                cachedBody = body
+                log("[Talk9-Notif] cache: fresh sender key '\(body.prefix(40))'")
+            }
+        }
+        if let body = cachedBody {
+            bestAttemptContent.body = body
+        } else {
+            log("[Talk9-Notif] cache: miss or stale — showing 'New message'")
+        }
     }
 
     private func verifyTasksStatus() {

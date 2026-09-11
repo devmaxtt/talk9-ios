@@ -97,6 +97,12 @@ App Group（`group.m.talk.talk9`）状态清单：
     → 非消息事件的空卡抑制机制是结构性的，根治只能靠 filtering entitlement（见
     `Ring/jamiNotificationExtension/FILTERING_ENTITLEMENT.md`）或服务端 silent 降级。
 14. 判断 resubscribe 保活推送靠 `data["timeout"] != nil && != "<null>"` 的字符串巧合（D3，脆弱）。
+15. **`talk9_last_msg_*` 正文缓存只有一个写入方**：主 app 的 `ConversationsManager`
+    （NSE 与分享扩展都只读）。又因为 NSE 只有在**主 app 进程已死**时才会走到读缓存那一步
+    （app 活着会在 `processNotificationRequest` 的 `appIsActive()` 分支提前 return），
+    **在 NSE 里等待该缓存被更新永远等不到**；何况新鲜度阈值 `extensionStartTime - 2.0`
+    本身只接受扩展启动**之前**写入的条目，等待在语义上就是自相矛盾的。
+    → 2026-09 据此删除 `handleGitMessage` 的固定 2s 等待（见 §4 B1）。
 
 ## 3. 红线（违反即回归已修复的线上 bug）
 
@@ -133,6 +139,7 @@ App Group（`group.m.talk.talk9`）状态清单：
 | `a21cb1a5` | R11 | 握手应答出主线程（notify_register_dispatch） |
 | `64fe15e6` | R9+分组 | threadIdentifier=talk9.real.<convId>、名字解析 8s 限时 |
 | `4bb08442` | R8 | 重注册指数退避门 30s→300s |
+| _(未提交)_ | B1 | 删除 `handleGitMessage` 的固定 2s 缓存等待（论证见 §2.15），横幅提前 2s |
 
 客户问题映射：**#2 退群重邀无通知 → R4**；**#3 语音通知时有时无 → R3**（均待真机确认）。
 
@@ -149,7 +156,35 @@ App Group（`group.m.talk.talk9`）状态清单：
 - **D3**：`isResubscribe` 字符串巧合判定（换显式类型字段需双端同步）。
 - **D4**：AppDelegate 5 处 block 观察者 token 丢弃（`subscribeConversationSyncRetry` 二次调用会双倍触发）。
 - **D5**：`talk9_active_conversations` 死白名单（写入方+注释声称 NSE 在读，实际零读取）。
-- 小项：`bestAttemptContent` 三线程写无同步；`handleGitMessage` 固定 2s 正文缓存等待（刻意保留）。
+- 小项：`bestAttemptContent` 三线程写无同步。
+  （原列在此处的「`handleGitMessage` 固定 2s 等待（刻意保留）」已于 2026-09-04 删除 —— 见 B1）
+
+## 4bis. 2026-09-04 复审：新增发现（B1 已修，其余待决）
+
+一次只读复审，逐条核对 §4 开放项并全仓库 grep 验证。**结论：§4 所有开放项均仍然存在**，
+另发现以下 5 项（按是否影响用户排序）。未做的几项都已写明论证与取舍，将来要动直接接续。
+
+| 项 | 位置 | 状态 | 判断 |
+|---|---|---|---|
+| **B1** | `NotificationService.handleGitMessage` | ✅ 已修 | 固定 2s 等待是保证空转，论证见 §2.15。收益：横幅提前 2s，burst 时 4 个进程各省 2s 预算与内存占用 |
+| **B2** | `finish()` SHOW 分支的 `removeOldSuppressedNotifications()` | ❌ 建议不做 | 在投递真实横幅**之前**同步清扫（典型 50–350ms，最坏 1.8s）。挪到 `contentHandler` 之后可提速，但会削弱「每条真实消息顺手扫一次空卡」这条兜底路径 —— 几百毫秒不值得换 |
+| **A1** | `scheduleRemoval()` | ⚠️ 可做，用户零收益 | **违反红线 9**：跨进程 UserDefaults 读-改-写，并行 NSE 会互相覆盖。但 `AppDelegate.removePendingNotifications()` 里的全量 sweep 与 per-id 删除**在同一函数内相隔 5 行**，且所有抑制卡的 `threadIdentifier` 恒为 `talk9.suppressed` ⟹ per-id 列表是全量 sweep 的严格子集，丢 id **不产生任何用户可见后果**。删掉它的价值是不给后人留红线违规范本，兼提前完成 FILTERING_ENTITLEMENT.md 第 7 步清理 |
+| **C1** | `Constants.talk9ActiveConversationsKey` + `ConversationsService` 三函数 + 5 处调用点 | ⚠️ 建议做 | D5 实锤：写入方 5 处（`AppDelegate:479`、`ConversationsService:442/508/584`、`RequestsService:252`），**NSE 零读取**。危害不在浪费，而在 `Constants.swift` 与 `ConversationsService` 的注释仍宣称「NSE 用它做白名单」（还标了 CRITICAL），与 `processMap` 里那段「为何废除白名单改用纯黑名单」的注释**直接矛盾** —— 排查「消息没横幅」的人会被引向一个不存在的机制 |
+| **C2** | `skipDaemonSync`、`didStartDaemon`、`jamiTaskId`/`verifyTasksStatus` | ⚠️ 建议做 | §2.4 所述 daemon 残骸的具体实例：`skipDaemonSync` 声明后从未读写；`didStartDaemon` 恒 false ⟹ `finish()` 的 `else if didStartDaemon` 是**永不可达分支**；`jamiTaskId` **从未 enter** ⟹ `verifyTasksStatus()` 唯一的动作是 leave 一个不存在的 id（`AutoDispatchGroup.leave` 对未 enter 的 id 是 no-op），连带 `waitForCloning`/`syncCompleted`/`itemsToPresent` 整套也是死的 |
+
+**关于空卡堆积的根因（复审修正）**：A1 的 id 丢失**不是**空卡堆积的原因（全量 sweep 兜住了）。
+真实链条是 —— NSE 三件清理全是尽力而为（`aggressiveImmediateRemoval` 在 `contentHandler` 之后
+才跑、`scheduleAutoRemove` 随进程死、异步删除无完成回调），全部输给进程回收后，
+**唯一可靠的全量 sweep 只在 `sceneDidBecomeActive` 触发** ⟹ 用户不打开 app 的期间空卡必然累积。
+这是结构性的，再加第六件清理机器也堵不住，**只有 R5 能根治**。
+
+**R5 状态**：代码侧 100% 就绪（`deliverSuppressed` 单一出口 + `filteringEntitlementGranted = false`），
+FILTERING_ENTITLEMENT.md 连英文 justification 都备好。唯一卡点是**有没有人去 Apple 提交那张表**。
+在所有待办里杠杆最大，且不是写代码能推进的。
+
+**新加分项（未立项）**：Communication Notifications（iOS 15+ `INSendMessageIntent`
++ `UNNotificationContent.updating(from:)`）目前完全没用 —— 接上后横幅可显示发送者头像、
+系统按人分组、支持「专注模式」人物白名单。属产品级提升，非修 bug。
 
 ## 5. 真机回归五链路（改通知代码后必跑）
 
