@@ -17,6 +17,7 @@
  */
 
 import Foundation
+import AVFoundation
 import RxSwift
 import RxRelay
 import RxCocoa
@@ -885,13 +886,16 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
     /// Formats the preview text for the SmartList row's "last message" line.
     /// Text messages → raw content. File transfers → typed label (voice / image /
     /// video) instead of the raw filename; other file kinds keep their filename.
+    /// Formatted durations of voice messages, keyed by file name. A file's duration
+    /// never changes once it is on disk, and reading it costs an I/O hit, so the
+    /// cache is shared across conversations.
+    private static let voiceDurationCache = ThreadSafeDictionary<String, String>()
+
     private func previewText(for message: MessageModel) -> String {
         guard message.type == .fileTransfer else { return message.content }
         let pathExt = (message.content as NSString).pathExtension
         if pathExt.isAudioExtension() {
-            return NSLocalizedString("smartlist.voiceMessage",
-                                     value: "Voice message",
-                                     comment: "Preview shown in the conversation list for a voice message")
+            return Self.voiceMessagePreview(for: message)
         }
         if pathExt.isImageExtension() {
             return NSLocalizedString("smartlist.image",
@@ -904,6 +908,65 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
                                      comment: "Preview shown in the conversation list for a video")
         }
         return message.content
+    }
+
+    /// "🎤 Voice message (0:30)", with a "You:" prefix when we sent it.
+    /// The duration is only present once cached; `appendVoiceDurationIfNeeded`
+    /// fills it in afterwards. Mirrors Android's SmartListViewHolder —
+    /// see ANDROID_PARITY.md §1.5.
+    private static func voiceMessagePreview(for message: MessageModel) -> String {
+        let label = NSLocalizedString("smartlist.voiceMessage",
+                                      value: "Voice message",
+                                      comment: "Preview shown in the conversation list for a voice message")
+        let prefix = message.incoming
+            ? ""
+            : NSLocalizedString("smartlist.youPrefix", value: "You:",
+                                comment: "Marks a conversation list preview as sent by us") + " "
+        let base = "\(prefix)🎤 \(label)"
+        guard let duration = voiceDurationCache[message.content] else { return base }
+        return "\(base) (\(duration))"
+    }
+
+    /// Resolves a voice message's duration off the main thread and re-publishes the
+    /// preview with it appended.
+    ///
+    /// Kept out of `previewText` because it touches disk, and the file may not have
+    /// finished downloading — `getFileUrlForSwarm` returns nil until it exists, and
+    /// the next message that arrives retries. Tied to `lastMessageDisposeBag`, so a
+    /// newer last message cancels a pending lookup instead of overwriting it.
+    private func appendVoiceDurationIfNeeded(to preview: String, for message: MessageModel) {
+        guard message.type == .fileTransfer,
+              (message.content as NSString).pathExtension.isAudioExtension(),
+              Self.voiceDurationCache[message.content] == nil,
+              let conversation = self.conversation else { return }
+
+        let fileName = message.content
+        let accountId = conversation.accountId
+        let conversationId = conversation.id
+        let transferService = self.dataTransferService
+
+        Single<String?>.create { observer in
+            let url = transferService.getFileUrlForSwarm(fileName: fileName,
+                                                         accountID: accountId,
+                                                         conversationID: conversationId)
+            observer(.success(url.flatMap { MessagesListVM.audioDuration(at: $0) }))
+            return Disposables.create()
+        }
+        .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .utility))
+        .observe(on: MainScheduler.instance)
+        .subscribe(onSuccess: { [weak self] duration in
+            guard let self = self, let duration = duration else { return }
+            Self.voiceDurationCache[fileName] = duration
+            self.lastMessage.accept("\(preview) (\(duration))")
+        })
+        .disposed(by: self.lastMessageDisposeBag)
+    }
+
+    /// Duration of an audio file as "m:ss", or nil if it cannot be read.
+    private static func audioDuration(at url: URL) -> String? {
+        let seconds = Int(CMTimeGetSeconds(AVURLAsset(url: url).duration).rounded())
+        guard seconds > 0 else { return nil }
+        return String(format: "%d:%02d", seconds / 60, seconds % 60)
     }
 
     private func updateLastMessageIfNeeded(fromHistory: Bool, newContainers: [MessageContainerModel]) {
@@ -936,7 +999,9 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
             if lastMessage.isMessageDeleted() {
                 self.lastMessage.accept(L10n.Conversation.lastMessageDeleted)
             } else {
-                self.lastMessage.accept(previewText(for: lastMessage))
+                let preview = previewText(for: lastMessage)
+                self.lastMessage.accept(preview)
+                self.appendVoiceDurationIfNeeded(to: preview, for: lastMessage)
             }
         } else {
             // For contact messages, update when the display name is available.
