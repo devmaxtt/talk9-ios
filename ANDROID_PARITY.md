@@ -22,8 +22,9 @@
 | §1.4 未读分隔线 | ✅ 已实作（**待真机验证**） | `MessagesListVM.swift`、`MessagesListView.swift` |
 | §1.3 群组成员系统讯息 | ⚠️ iOS 已有，剩文案决策 | 见 §1.3 更正 |
 | §1.2 被移出群组 + self-ban | ✅ 已实作 + 验证（**待真机验证**） | `ConversationModel.swift`、`ConversationViewModel.swift`、`MessagesListVM/View.swift` |
-| §1.5 语音列表预览带时长 | ⬜ 未开始 | — |
-| §1.6 语音通知带时长 | ⬜ 未开始（需先读 NOTIFICATIONS.md） | — |
+| §1.5 语音列表预览带时长 | ✅ 已实作（**待真机验证**） | `MessagesListVM.swift` |
+| §1.6 语音通知带时长 | ⛔ **架构性阻断，已停止尝试** | 论证见 §1.6 |
+| **D2 通知子系统**（非 Android 对齐） | ✅ 已修 + 编译验证 | `AppDelegate.swift`、`NOTIFICATIONS.md` §4ter |
 | §1.8 OTPq 整合 | ⬜ 待产品决策 | — |
 | §1.9 国码动态拉取 | ⬜ 待产品决策 | — |
 
@@ -190,9 +191,43 @@ current 版本读 `CFBundleShortVersionString`。请求失败静默略过，不�
 
 通知标题为寄件者名，内容为 `🎤 + 时长`（比照 WhatsApp）。群组则为 `寄件者名: 🎤 …`。
 
-> ⚠️ 动 NSE 前 **必读 `NOTIFICATIONS.md`**。语音讯息在 iOS 侧会 fan-out 成约 4 条推送
-> （见 `NotificationService.swift:575` 与 :715 的注释），时长要在既有的去重逻辑里取，
-> 不要另起一条解密路径。
+### ⛔ 2026-09-14 结论：此项在现行 iOS 架构下**做不到**，已停止尝试
+
+不是「还没做」，是**架构性阻断**。三个已验证的事实各自独立地封死了这条路：
+
+| # | 事实 | 代码证据 |
+|---|---|---|
+| 1 | **NSE 绝不能启动 daemon**（红线，启动会 EXC_BAD_ACCESS 并回落成原始 APNs 占位横幅） | `NOTIFICATIONS.md` §2.4 |
+| 2 | 因此 NSE 跑的时候，**语音档案根本没下载到本地** —— 没有档案就没有时长可读 | 同上推论 |
+| 3 | NSE 的 body 只有两个来源：主 app 预写的 `talk9_last_msg_` **文字**缓存，或 fallback `"New message"`。没有任何栏位能携带时长 | `NotificationService.swift:715-755` |
+
+**那能不能让主 app 写缓存时就带上时长？** 也不行：
+
+```
+ConversationsManager.newInteraction()
+  → newMessage.transferStatus = .awaiting        ← 还没下载
+  → notificationBody = "Voice message"
+  → cacheMessageForNotification(body:)           ← 此刻写缓存
+  → dataTransferService.downloadFile(...)        ← 下载在【最后】才开始
+```
+
+写缓存的时间点，档案必然还不存在（`ConversationsManager.swift:652-695`）。
+
+**Android 为什么可以**：它的通知由 `NotificationServiceImpl` 在**档案已落地后**发出，
+`getVoiceMessageDuration(audioFile)` 读的是本地既有档案。iOS 的 NSE 模型没有这个时间点。
+
+**若将来仍要做，只有三条路**（都不是「对齐 Android」能涵盖的）：
+
+1. 服务端在 push payload 带上时长栏位 —— 最干净，但需后端配合
+2. R5 filtering entitlement 落地后重新评估整个 NSE 模型
+3. 主 app 在背景时，于传输完成事件里用同一 identifier 覆盖已发出的通知 ——
+   属于新增机制而非对齐，且只覆盖 app 未被杀死的场景
+
+按 `NOTIFICATIONS.md` §6⑤（修在根因层）与 §6⑧（大重构列为建议），这三条都应立项讨论，
+不该用症状层补丁硬凑。
+
+> 附带说明：会话列表的语音时长（§1.5）**不受此限制**，因为那是在 app 内渲染、
+> 档案通常已下载完成，且可非同步补上 —— 已于 2026-09-14 实作。
 
 ### 1.7 开发者模式 + 进阶设定锁定
 

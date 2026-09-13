@@ -229,6 +229,24 @@ Swift 的 `Set` 并发读写是未定义行为。加清空操作会提高撞上�
 - 单账号冷启动：Trigger1a/1b 日志照常出现，无重复触发
 - 切换账号数次后无记忆体增长
 
+### 附：「语音通知带时长」已判定不可行（勿重复尝试）
+
+Android 的语音通知会显示 `🎤 + 时长`，曾被列为 iOS 待补项。**2026-09-14 判定架构性阻断**：
+
+1. NSE 不能启动 daemon（§2.4）⟹ NSE 运行时语音档案根本没下载到本地，无时长可读；
+2. NSE 的 body 只有两个来源 —— 主 app 预写的 `talk9_last_msg_` **文字**缓存，或 fallback
+   `"New message"`（`NotificationService.swift:715-755`），没有栏位能携带时长；
+3. 让主 app 写缓存时带上时长也不行：`ConversationsManager.newInteraction()` 里
+   `transferStatus = .awaiting` → 写缓存 → **最后**才 `downloadFile()`，
+   写缓存那一刻档案必然不存在（`ConversationsManager.swift:652-695`）。
+
+Android 能做是因为它的通知在档案落地**之后**才发出；iOS 的 NSE 模型没有这个时间点。
+
+将来若仍要做，只有三条路，都需立项而非补丁：服务端 push payload 带时长栏位 /
+R5 落地后重估 NSE 模型 / app 在背景时于传输完成事件覆盖已发出的通知。
+
+完整论证见 `ANDROID_PARITY.md` §1.6。
+
 ## 5. 真机回归五链路（改通知代码后必跑）
 
 1. **锁屏冷启动接听**：杀 app → 锁屏来电 → 直接接听 → 通话建立（R1；修复前 15s 静默挂断）。
