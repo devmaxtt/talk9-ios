@@ -252,6 +252,8 @@
 		260AE63A29C0C81300D66D5E /* CallProviderDelegateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260AE63929C0C81300D66D5E /* CallProviderDelegateTests.swift */; };
 		260AE63E29C2305800D66D5E /* MockCalls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260AE63D29C2305800D66D5E /* MockCalls.swift */; };
 		260AE64029C23AEC00D66D5E /* CallsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260AE63F29C23AEC00D66D5E /* CallsHelper.swift */; };
+		26A0B1C22026091300ABCD04 /* DevMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A0B1C22026091300ABCD03 /* DevMode.swift */; };
+		26A0B1C22026091300ABCD02 /* AppUpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26A0B1C22026091300ABCD01 /* AppUpdateChecker.swift */; };
 		260AE64329C8F58800D66D5E /* Data+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260AE64229C8F58800D66D5E /* Data+Helpers.swift */; };
 		260AE64529C8FD2500D66D5E /* VCardUtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260AE64429C8FD2500D66D5E /* VCardUtilsTests.swift */; };
 		260C73F129196B66005C513F /* MessageReplyTargetVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 260C73F029196B66005C513F /* MessageReplyTargetVM.swift */; };
@@ -890,6 +892,8 @@
 		260AE63929C0C81300D66D5E /* CallProviderDelegateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallProviderDelegateTests.swift; sourceTree = "<group>"; };
 		260AE63D29C2305800D66D5E /* MockCalls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockCalls.swift; sourceTree = "<group>"; };
 		260AE63F29C23AEC00D66D5E /* CallsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallsHelper.swift; sourceTree = "<group>"; };
+		26A0B1C22026091300ABCD03 /* DevMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevMode.swift; sourceTree = "<group>"; };
+		26A0B1C22026091300ABCD01 /* AppUpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateChecker.swift; sourceTree = "<group>"; };
 		260AE64229C8F58800D66D5E /* Data+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Helpers.swift"; sourceTree = "<group>"; };
 		260AE64429C8FD2500D66D5E /* VCardUtilsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VCardUtilsTests.swift; sourceTree = "<group>"; };
 		260C73F029196B66005C513F /* MessageReplyTargetVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageReplyTargetVM.swift; sourceTree = "<group>"; };
@@ -3096,6 +3100,8 @@
 				0E99F19F22417A0400CF8BD6 /* JamiURI.swift */,
 				260AE62429B65A4B00D66D5E /* ContactsUtils.swift */,
 				260AE63F29C23AEC00D66D5E /* CallsHelper.swift */,
+				26A0B1C22026091300ABCD03 /* DevMode.swift */,
+				26A0B1C22026091300ABCD01 /* AppUpdateChecker.swift */,
 				BB68E65F2AB1F03000F02AB7 /* ScreenHelper.swift */,
 				2685F90D2A1698B400BFCDA3 /* VideoInputsManager.swift */,
 				26E0731B2A918F7A006B6F03 /* SwiftUIViews.swift */,
@@ -4430,6 +4436,8 @@
 				1A2041911F1FD46300C08435 /* DesignableView.swift in Sources */,
 				261190B62A2928FB00CAE7F8 /* ParticipantView.swift in Sources */,
 				260AE64029C23AEC00D66D5E /* CallsHelper.swift in Sources */,
+				26A0B1C22026091300ABCD04 /* DevMode.swift in Sources */,
+				26A0B1C22026091300ABCD02 /* AppUpdateChecker.swift in Sources */,
 				26454FB72B7FDCB200CFF06C /* AboutViewController.swift in Sources */,
 				268C87F42C1CA93B00593D7C /* EncryptAccountView.swift in Sources */,
 				268C87EE2C1BA74C00593D7C /* EditProfileView.swift in Sources */,

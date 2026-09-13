@@ -21,6 +21,10 @@ struct AboutSwiftUIView: View {
     let dismissHandler = DismissHandler()
     let padding: CGFloat = 20
 
+    /// Tapping the version label repeatedly toggles developer mode (see `DevMode`).
+    @SwiftUI.State private var versionTapCount = 0
+    @SwiftUI.State private var devModeHint: String?
+
     private var aboutContentScrollView: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: padding) {
@@ -30,6 +34,14 @@ struct AboutSwiftUIView: View {
                     Text("Version: \(model.fullVersion)")
                         .font(.caption)
                         .foregroundColor(Color(UIColor.secondaryLabel))
+                        .contentShape(Rectangle())
+                        .onTapGesture { self.registerVersionTap() }
+                    if let hint = devModeHint {
+                        Text(hint)
+                            .font(.caption2)
+                            .foregroundColor(Color(UIColor.secondaryLabel))
+                            .padding(.top, 4)
+                    }
                 }
                 .frame(maxWidth: .infinity)
                 Text(.init(model.declarationText))
@@ -90,6 +102,34 @@ struct AboutSwiftUIView: View {
             }
         }
         .padding(.horizontal)
+    }
+
+    /// Repeated taps on the version label toggle developer mode, which unlocks
+    /// the connectivity settings. Mirrors Android's AboutFragment.
+    private func registerVersionTap() {
+        switch DevMode.registerTap(count: &versionTapCount) {
+        case .ignored:
+            return
+        case .countingDown(let remaining):
+            showDevModeHint(String(format: NSLocalizedString(
+                "devMode.stepsAway",
+                value: "You are %d steps away from developer mode",
+                comment: "Countdown shown while tapping the version label"), remaining))
+        case .enabled:
+            showDevModeHint(NSLocalizedString("devMode.enabled", value: "Developer mode enabled",
+                                              comment: "Confirmation that developer mode is on"))
+        case .disabled:
+            showDevModeHint(NSLocalizedString("devMode.disabled", value: "Developer mode disabled",
+                                              comment: "Confirmation that developer mode is off"))
+        }
+    }
+
+    /// Stands in for Android's toast: the line clears itself after a moment.
+    private func showDevModeHint(_ text: String) {
+        devModeHint = text
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            if devModeHint == text { devModeHint = nil }
+        }
     }
 
     var body: some View {

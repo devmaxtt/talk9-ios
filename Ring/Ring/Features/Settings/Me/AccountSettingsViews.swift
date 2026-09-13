@@ -164,26 +164,42 @@ struct ConnectivitySettingsView: View {
 
     var body: some View {
         List {
-            if model.account.type == .sip {
+            // Read-only unless developer mode is on: a wrong bootstrap or TURN
+            // value silently stops the account connecting. Mirrors Android's
+            // AdvancedAccountFragment. See ANDROID_PARITY.md §1.7.
+            if !DevMode.isEnabled {
                 Section {
-                    ToggleCell(
-                        toggleText: L10n.AccountPage.autoRegistration,
-                        getAction: { model.autoRegistrationEnabled },
-                        setAction: { newValue in model.enableaAtoregister(enable: newValue) }
-                    )
-
-                    NavigationLink(destination: EditExpirationtime(expirationtime: $model.autoRegistrationExpirationTime, onDisappearAction: {
-                        model.setExpirationTime()
-                    })) {
-                        FieldRowView(label: L10n.AccountPage.sipExpirationTime, value: model.autoRegistrationExpirationTime)
-                    }
+                    Text(NSLocalizedString(
+                        "devMode.settingsLocked",
+                        value: "These settings are read-only. Changing them can stop your account from connecting.",
+                        comment: "Shown above connectivity settings when developer mode is off"))
+                        .font(.footnote)
+                        .foregroundColor(Color(UIColor.secondaryLabel))
                 }
+            }
+            Group {
+                if model.account.type == .sip {
+                    Section {
+                        ToggleCell(
+                            toggleText: L10n.AccountPage.autoRegistration,
+                            getAction: { model.autoRegistrationEnabled },
+                            setAction: { newValue in model.enableaAtoregister(enable: newValue) }
+                        )
 
+                        NavigationLink(destination: EditExpirationtime(expirationtime: $model.autoRegistrationExpirationTime, onDisappearAction: {
+                            model.setExpirationTime()
+                        })) {
+                            FieldRowView(label: L10n.AccountPage.sipExpirationTime, value: model.autoRegistrationExpirationTime)
+                        }
+                    }
+
+                }
+                if model.account.type != .sip {
+                    dhtConfigurationView()
+                }
+                connectivityView()
             }
-            if model.account.type != .sip {
-                dhtConfigurationView()
-            }
-            connectivityView()
+            .disabled(!DevMode.isEnabled)
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle(L10n.AccountPage.connectivityAndConfiguration)

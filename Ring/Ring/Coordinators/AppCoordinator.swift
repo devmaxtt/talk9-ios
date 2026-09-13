@@ -63,6 +63,8 @@ final class AppCoordinator: Coordinator, StateableResponsive {
     // MARK: Private members
     private let navigationController = UINavigationController()
     let injectionBag: InjectionBag
+    /// The version check runs once per launch; `start()` can be called more than once.
+    private var didCheckForUpdate = false
 
     private enum InitialState {
         case notStarted
@@ -109,6 +111,7 @@ final class AppCoordinator: Coordinator, StateableResponsive {
 
     func start () {
         self.stateSubject.onNext(AppState.initialLoading)
+        self.checkForAppUpdate()
 
         switch self.initialState {
         case .notStarted:
@@ -183,6 +186,59 @@ final class AppCoordinator: Coordinator, StateableResponsive {
                                                 message: L10n.Alerts.dbFailedMessage,
                                                 preferredStyle: .alert)
         self.present(viewController: alertController, withStyle: .present, withAnimation: false, disposeBag: self.disposeBag)
+    }
+
+    // MARK: - App update
+
+    /// Asks the backend whether this build is still current and prompts if not.
+    /// Runs once per launch; every failure path stays silent (see `AppUpdateChecker`).
+    private func checkForAppUpdate() {
+        guard !self.didCheckForUpdate else { return }
+        self.didCheckForUpdate = true
+
+        AppUpdateChecker.check { [weak self] status in
+            switch status {
+            case .upToDate:
+                break
+            case .optional(let storeURL):
+                self?.presentUpdateAlert(storeURL: storeURL, forced: false)
+            case .required(let storeURL):
+                self?.presentUpdateAlert(storeURL: storeURL, forced: true)
+            }
+        }
+    }
+
+    private func presentUpdateAlert(storeURL: URL, forced: Bool) {
+        let title = forced
+            ? NSLocalizedString("update.requiredTitle", value: "Update Required",
+                                comment: "Title of the blocking update prompt")
+            : NSLocalizedString("update.availableTitle", value: "Update Available",
+                                comment: "Title of the dismissible update prompt")
+        let message = forced
+            ? NSLocalizedString("update.requiredMessage",
+                                value: "This version of Talk9 is no longer supported. Please update to continue.",
+                                comment: "Body of the blocking update prompt")
+            : NSLocalizedString("update.availableMessage",
+                                value: "A new version of Talk9 is available. Update now for the latest features and fixes.",
+                                comment: "Body of the dismissible update prompt")
+
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: NSLocalizedString("update.updateNow", value: "Update Now",
+                                                              comment: "Button opening the App Store listing"),
+                                      style: .default) { [weak self] _ in
+            UIApplication.shared.open(storeURL)
+            // Opening the App Store backgrounds the app and dismisses this alert.
+            // A required update must not be escapable that way, so put it back up.
+            if forced {
+                self?.presentUpdateAlert(storeURL: storeURL, forced: true)
+            }
+        })
+        if !forced {
+            alert.addAction(UIAlertAction(title: NSLocalizedString("update.later", value: "Later",
+                                                                  comment: "Button dismissing the update prompt"),
+                                          style: .cancel))
+        }
+        self.present(viewController: alert, withStyle: .present, withAnimation: false, disposeBag: self.disposeBag)
     }
 
     // MARK: - Private methods
