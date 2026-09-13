@@ -39,6 +39,38 @@ cd Ring && ./fetch-dependencies.sh
 open Ring/Ring.xcodeproj
 ```
 
+### ⚠️ 模拟器构建：daemon 的 simulator slice 可能是空壳
+
+当前仓库中 `xcframework/libjami-core.xcframework` 的两个 slice 状态不对等：
+
+| slice | 大小 | `libjami` 符号数 |
+|---|---|---|
+| `ios-arm64`（真机） | ~868 MB | 9,631 ✅ |
+| `ios-arm64-simulator` | **712 bytes** | **0** ❌ 空的 ar archive |
+
+**症状**：以 `-sdk iphonesimulator` 构建时，`jamiShareExtension` /
+`jamiNotificationExtension` 会在链接阶段失败：
+
+```
+"libjami::start(...)", referenced from: -[Adapter startDaemonInternal] in Adapter.o
+ld: symbol(s) not found for architecture arm64
+error: linker command failed with exit code 1
+```
+
+这个报错**不会指向真正的原因**，容易误判成扩展的链接设定或 Xcode 版本问题
+（Xcode 26 会先尝试链接 `__preview.dylib`，让现场更混乱；`ENABLE_DEBUG_DYLIB=NO`
+能排除该干扰，但解决不了符号缺失）。
+
+**解法**：先补编模拟器版 daemon —— `./compile-ios.sh --platform=iPhoneSimulator`。
+
+**只想验证 Swift 代码能否编译时**，走真机 SDK 更快（daemon 真机 slice 是完整的）：
+
+```bash
+cd Ring && xcodebuild -project Ring.xcodeproj -scheme Ring \
+  -sdk iphoneos -configuration Debug \
+  CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
+```
+
 ---
 
 ## 项目目录结构
@@ -69,7 +101,8 @@ talk9-ios/
 ├── Ring/jamiShareExtension/ # 分享扩展（同样在 Ring/ 下）
 ├── daemon/                  # C++ 守护进程（子模块）
 ├── xcframework/             # 预编译 XCFramework
-└── NOTIFICATIONS.md         # ⚠️ 通知/推送/离线消息维护手册 —— 动通知代码前必读
+├── NOTIFICATIONS.md         # ⚠️ 通知/推送/离线消息维护手册 —— 动通知代码前必读
+└── ANDROID_PARITY.md        # iOS ↔ Android 功能对齐账本 —— 做跨平台对齐前必读
 ```
 
 > **通知系统专项提示**：凡涉及推送、NSE、横幅、离线消息、重连、CallKit 唤醒的任务，
@@ -163,6 +196,7 @@ Ring/RingUITests/         # UI 测试
 ## 相关文档
 
 - `NOTIFICATIONS.md` — **通知系统维护手册**：架构事实、红线、修复账本（含提交哈希）、真机回归链路、排障方法论
+- `ANDROID_PARITY.md` — **功能对齐账本**：Android 有而 iOS 没有的功能、两边已漂移的行为、平台限定项。⚠️ 不要用 Android 仓库的 `IOS_SYNC.md` 当待办清单，它已过期 12 个版本
 - `Ring/jamiNotificationExtension/FILTERING_ENTITLEMENT.md` — 空卡根治方案（Apple filtering entitlement）rollout 步骤
 - `Ring/API.md` — Talk9 注册门户 API（OTP 注册、密码重置流程）
 - `README.md` — 完整构建说明
