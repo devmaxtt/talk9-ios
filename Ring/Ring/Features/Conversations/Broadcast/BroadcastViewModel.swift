@@ -14,7 +14,8 @@ struct BroadcastContact: Identifiable {
 
 class BroadcastViewModel: ObservableObject {
 
-    static let maxRecipients = 50
+    // Mirrors Android's AppConfig.BROADCAST_MAX_RECIPIENTS — keep both in sync.
+    static let maxRecipients = 200
 
     @Published var contacts: [BroadcastContact] = []
     @Published var selected: Set<String> = []
