@@ -394,6 +394,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
 
     func reloadDataFor(account: AccountModel) {
+        // prepareConversationsForAccount below rebuilds every ConversationModel
+        // (ConversationsService.addSwarm constructs new instances), so the Trigger 1b
+        // subscriptions made for the previous set now watch objects that are about to
+        // be discarded. Drop them, and clear the watched-id set along with them:
+        // leaving stale ids in place makes Trigger 1's `insert().inserted` guard skip
+        // the fresh models, and a conversation stuck in `synchronizing` then never
+        // gets its 30 s re-register — it just sits on "Syncing…" forever.
+        // Hopping to main keeps every access to syncWatchedIds on one thread.
+        // See NOTIFICATIONS.md §4 D2.
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.syncWatchedIds.removeAll()
+            self.syncWatchDisposeBag = DisposeBag()
+        }
+
         self.requestsService.loadRequests(withAccount: account.id, accountURI: account.jamiId)
         self.conversationManager?
             .prepareConversationsForAccount(accountId: account.id, accountURI: account.jamiId)
@@ -522,6 +537,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     private var reRegisterBackoff: TimeInterval = 30
     // Conversation IDs already being watched for stuck sync (avoids duplicate subscriptions).
     private var syncWatchedIds: Set<String> = []
+    /// Holds the per-conversation `synchronizing` subscriptions from Trigger 1b.
+    /// Replaced whenever the conversation models are rebuilt, because those
+    /// subscriptions then point at discarded instances. Kept apart from the app-level
+    /// `disposeBag`, which never releases. See NOTIFICATIONS.md §4 D2.
+    private var syncWatchDisposeBag = DisposeBag()
     // When true, the next REGISTERED event triggers swarm re-bootstrap.
     // Set to true after enableAccount(true) in reRegisterAccountForSyncRetry.
     private var pendingSwarmBootstrapOnRegistered = false
@@ -555,8 +575,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             })
             .disposed(by: self.disposeBag)
 
-        // Trigger 1: watch every conversation exactly once.
+        // Trigger 1: watch every conversation exactly once per model generation.
+        // Observed on main so syncWatchedIds is only ever touched from one thread —
+        // `conversations.accept` fires on whichever queue the reload ran on.
         self.conversationsService.conversations
+            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] conversations in
                 guard let self = self else { return }
                 for conv in conversations {
@@ -591,7 +614,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                                 self?.reRegisterAccountForSyncRetry()
                             }
                         })
-                        .disposed(by: self.disposeBag)
+                        .disposed(by: self.syncWatchDisposeBag)
                 }
             })
             .disposed(by: self.disposeBag)

@@ -151,10 +151,13 @@ App Group（`group.m.talk.talk9.shared`）状态清单：
   ② 来电推送 `apns-expiration` 30-45s（防幽灵响铃）；③ 非消息值 silent 降级（配合 R5 二选一）。
 - **R10**（架构）：接收链路零 ack、git DAG 无 gap 检测——`performThrottledActiveSync`
   是现行补偿，别删。
-- **D2**：AppDelegate Trigger1b 对 `conv.synchronizing` 的订阅进 app 级 disposeBag 永不释放
-  （账号切换泄漏旧模型 + `syncWatchedIds` 阻止重建会话再被监视）。
+- ~~**D2**~~：**✅ 已修（2026-09-14）**，见 §4ter。
 - **D3**：`isResubscribe` 字符串巧合判定（换显式类型字段需双端同步）。
-- **D4**：AppDelegate 5 处 block 观察者 token 丢弃（`subscribeConversationSyncRetry` 二次调用会双倍触发）。
+- **D4**：AppDelegate 5 处 block 观察者 token 丢弃。
+  ⚠️ **2026-09-14 修正原判断**：原文写「`subscribeConversationSyncRetry` 二次调用会双倍触发」，
+  但该函数**只有一处真实调用**（`AppDelegate:191`，在 `didFinishLaunching` 内，每进程一次）；
+  另一处 grep 命中在 `:821` 只是注释里提到函数名。**当前不会双倍触发**，
+  降级为防御性清理（谁将来加第二处调用谁中招）。
 - **D5**：`talk9_active_conversations` 死白名单（写入方+注释声称 NSE 在读，实际零读取）。
 - 小项：`bestAttemptContent` 三线程写无同步。
   （原列在此处的「`handleGitMessage` 固定 2s 等待（刻意保留）」已于 2026-09-04 删除 —— 见 B1）
@@ -185,6 +188,46 @@ FILTERING_ENTITLEMENT.md 连英文 justification 都备好。唯一卡点是**�
 **新加分项（未立项）**：Communication Notifications（iOS 15+ `INSendMessageIntent`
 + `UNNotificationContent.updating(from:)`）目前完全没用 —— 接上后横幅可显示发送者头像、
 系统按人分组、支持「专注模式」人物白名单。属产品级提升，非修 bug。
+
+## 4ter. 2026-09-14：D2 已修
+
+**完整失败链**（每步都有代码行号支撑，§6④ 格式）：
+
+```
+切换账号
+ → currentAccountChanged (AppDelegate:387)
+ → reloadDataFor (:399) → prepareConversationsForAccount
+ → getConversationsForAccount → addSwarm (ConversationsService:183)
+ → ConversationModel(withId:) 建立【全新实例】
+ → conversations.accept(新模型)
+ → AppDelegate Trigger1 收到
+ → syncWatchedIds.insert(conv.id).inserted == false  ← 旧 id 仍在 set 内
+ → continue
+ → 【新模型的 Trigger1a / 1b 都没建立】
+ → 会话卡 synchronizing 时，30s 自动 re-register 永不触发
+ → 用户看到「Syncing conversation history…」不再自愈，只能手动 Reset Conversation
+```
+
+附带：旧账号 N 个会话的 `synchronizing` 订阅全挂在 app 级 `disposeBag` 上，每切一次账号累积一批。
+
+**修法**（`AppDelegate.swift`，手术刀最小集）：
+
+1. 新增 `syncWatchDisposeBag`，Trigger1b 的订阅改挂它（不再进永不释放的 app 级 bag）
+2. `reloadDataFor` 开头清空 `syncWatchedIds` + 重建该 bag —— 模型重建了，watch 也必须重建
+3. Trigger1 加 `.observe(on: MainScheduler.instance)`
+
+第 3 点是顺带修的既有隐患，**不属于 D2 本身**：`syncWatchedIds` 原本就跨线程访问
+（`reloadDataFor` 跑在 background queue，Trigger1 回调跟着 `conversations.accept` 的线程），
+Swift 的 `Set` 并发读写是未定义行为。加清空操作会提高撞上的概率，故一并收进 main。
+若要更保守，这一行可单独回退。
+
+**为何不是症状层补丁**（§6⑤）：根因是「模型换代了但 watch 没换代」，
+修在换代点（`reloadDataFor`）上，将来任何新的重载路径只要经过它就自动被覆盖。
+
+**待真机验证**：
+- 多账号：A ↔ B 切换后，A 的卡住会话仍能在 30s 后自动 re-register（看 `[Talk9-ICE][Retry] Trigger1b`）
+- 单账号冷启动：Trigger1a/1b 日志照常出现，无重复触发
+- 切换账号数次后无记忆体增长
 
 ## 5. 真机回归五链路（改通知代码后必跑）
 
