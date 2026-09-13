@@ -163,9 +163,7 @@ class ScanViewController: UIViewController, StoryboardBased, AVCaptureMetadataOu
             // Those coordinates are assigned to our codeFrame
             codeFrame.frame = metaDataCoordinates.bounds
 
-            let jamiUri = JamiURI(from: stringCodeValue)
-
-            if jamiUri.isJami, let jamiId = jamiUri.hash {
+            if let jamiId = self.jamiId(fromScanned: stringCodeValue) {
                 AudioServicesPlayAlertSound(systemSoundId)
                 print("jamiId : " + jamiId)
                 onCodeScanned?(jamiId)
@@ -185,6 +183,31 @@ class ScanViewController: UIViewController, StoryboardBased, AVCaptureMetadataOu
 
     @IBAction func closeScan(_ sender: Any) {
         self.dismiss(animated: true, completion: nil)
+    }
+
+    /// Resolves a scanned code to a Jami id.
+    ///
+    /// Accepts a bare id and a `jami:`/`ring:` uri, plus the Talk9 deep links
+    /// Android shares (`https://talk9.co/id/<x>`, `talk9://id/<x>`). Those carry
+    /// the id in the path, so they have to be unwrapped before `JamiURI`, which
+    /// only understands bare ids and jami uris. See ANDROID_PARITY.md §1.10.
+    ///
+    /// Swarm links resolve to nil: this screen adds a contact, and the callback
+    /// downstream (`showConversationFromQRCode`) takes a contact id only.
+    private func jamiId(fromScanned text: String) -> String? {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if let url = URL(string: trimmed), let link = DeepLink(url: url) {
+            switch link {
+            case .user(let jamiId):
+                return jamiId
+            case .conversation:
+                return nil
+            }
+        }
+
+        let uri = JamiURI(from: trimmed)
+        return uri.isJami ? uri.hash : nil
     }
 
     // MARK: - Gallery QR support
@@ -238,8 +261,7 @@ class ScanViewController: UIViewController, StoryboardBased, AVCaptureMetadataOu
                                                                   comment: "Shown when the picked image contains no QR code"))
             return
         }
-        let jamiUri = JamiURI(from: stringValue)
-        if jamiUri.isJami, let jamiId = jamiUri.hash {
+        if let jamiId = self.jamiId(fromScanned: stringValue) {
             AudioServicesPlayAlertSound(systemSoundId)
             onCodeScanned?(jamiId)
             self.scannedQrCode = true

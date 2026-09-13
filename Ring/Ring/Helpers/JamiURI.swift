@@ -180,6 +180,9 @@ enum DeepLink: Equatable {
 
     static let scheme = "talk9"
     static let webHost = "talk9.co"
+    /// Hosts that carry Talk9 links. Mirrors Android's `ContentUri.isTalk9Host`:
+    /// `www.` for links pasted out of a browser, `app.` for hand-made ones.
+    static let webHosts = [webHost, "www.talk9.co", "app.talk9.co"]
 
     /// Accepts both the custom scheme and the universal link declared in the
     /// apple-app-site-association file, e.g. `talk9://user/<id>` and
@@ -194,7 +197,7 @@ enum DeepLink: Equatable {
             // `talk9://user/<id>` parses as host "user" and path "/<id>".
             route = url.host?.lowercased()
             identifier = segments.first
-        case "https" where url.host?.lowercased() == DeepLink.webHost:
+        case "https" where DeepLink.webHosts.contains(url.host?.lowercased() ?? ""):
             // `https://talk9.co/u/<id>` carries both parts in the path.
             route = segments.first
             identifier = segments.dropFirst().first
@@ -207,11 +210,18 @@ enum DeepLink: Equatable {
         }
 
         switch route {
-        case "user", "u", "call":
+        case "user", "u", "call", "id", "invite":
             // `call` deliberately lands on the conversation instead of dialling:
             // opening a link must never place a call on the user's behalf.
+            //
+            // `id` is the shape Android actually shares (Talk9Link.forContact →
+            // https://talk9.co/id/<contactId>) and `invite` its group variant.
+            // Android routes both to the conversation with that peer, so we match:
+            // without them, every contact link shared from Android was a dead tap
+            // on iOS. See ANDROID_PARITY.md §1.10.
             self = .user(jamiId: identifier)
-        case "conversation", "c":
+        case "conversation", "c", "swarm":
+            // `swarm` is Android's spelling for the same thing.
             self = .conversation(conversationId: identifier)
         default:
             // `/i/` (group invites) is declared in the AASA file but not handled
