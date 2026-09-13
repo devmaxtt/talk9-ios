@@ -30,37 +30,36 @@ extension Date {
     }
 
     func conversationTimestamp() -> String {
-        var dateFormatter: DateFormatter = {
+        let dateFormatter: DateFormatter = {
             let formatter = DateFormatter()
             formatter.dateStyle = .medium
             return formatter
         }()
-        var hourFormatter: DateFormatter = {
+        // .short follows the device's 12/24-hour setting; a hardcoded "HH:mm"
+        // showed 24-hour time to users who had picked 12-hour.
+        let hourFormatter: DateFormatter = {
             let formatter = DateFormatter()
-            formatter.dateFormat = "HH:mm"
+            formatter.timeStyle = .short
             return formatter
         }()
-        let dateToday = Date()
-        var dateString = ""
-        let todayWeekOfYear = Calendar.current.component(.weekOfYear, from: dateToday)
-        let todayDay = Calendar.current.component(.day, from: dateToday)
-        let todayMonth = Calendar.current.component(.month, from: dateToday)
-        let todayYear = Calendar.current.component(.year, from: dateToday)
-        let weekOfYear = Calendar.current.component(.weekOfYear, from: self)
-        let day = Calendar.current.component(.day, from: self)
-        let month = Calendar.current.component(.month, from: self)
-        let year = Calendar.current.component(.year, from: self)
-        if todayDay == day && todayMonth == month && todayYear == year {
-            dateString = hourFormatter.string(from: self)
-        } else if day == todayDay - 1 {
-            dateString = L10n.Smartlist.yesterday
-        } else if todayYear == year && todayWeekOfYear == weekOfYear {
-            dateString = self.dayOfWeek()
-        } else {
-            dateString = dateFormatter.string(from: self)
-        }
+        let calendar = Calendar.current
 
-        return dateString
+        if calendar.isDateInToday(self) {
+            return hourFormatter.string(from: self)
+        }
+        if calendar.isDateInYesterday(self) {
+            return L10n.Smartlist.yesterday
+        }
+        // Day name for the past week. Counting elapsed days rather than comparing
+        // week-of-year keeps Saturday readable on Monday, when the two fall in
+        // different weeks.
+        let daysApart = calendar.dateComponents([.day],
+                                                from: calendar.startOfDay(for: self),
+                                                to: calendar.startOfDay(for: Date())).day ?? 0
+        if (0..<7).contains(daysApart) {
+            return self.dayOfWeek()
+        }
+        return dateFormatter.string(from: self)
     }
 
     func getTimeLabelString() -> String {
