@@ -136,7 +136,9 @@ struct MessagesListView: View {
                 }
                 .layoutPriority(1)
                 .padding(.bottom, messageContainerHeight - 30)
-                if !model.isBlocked {
+                if model.isRemovedFromGroup {
+                    removedFromGroupBanner()
+                } else if !model.isBlocked {
                     MessagePanelView(model: model.messagePanel, isFocused: $isMessageBarFocused)
                         .alignmentGuide(VerticalAlignment.center) { dimensions in
                             DispatchQueue.main.async {
@@ -230,16 +232,24 @@ struct MessagesListView: View {
                     }
                     // messages
                     ForEach(model.messagesModels) { message in
-                        createMessageRowView(for: message)
-                            .id(message.id)
-                            // lazy loading
-                            .onAppear(perform: {
-                                if message == self.model.messagesModels.last {
-                                    DispatchQueue.global(qos: .background).async {
-                                        self.model.loadMore()
-                                    }
+                        VStack(spacing: 0) {
+                            createMessageRowView(for: message)
+                                .id(message.id)
+                            // The list renders newest-first and is flipped, so a
+                            // divider placed *after* its message lands visually
+                            // above it.
+                            if message.id == model.unreadDividerMessageId {
+                                unreadDividerView(count: model.unreadDividerCount)
+                            }
+                        }
+                        // lazy loading
+                        .onAppear(perform: {
+                            if message == self.model.messagesModels.last {
+                                DispatchQueue.global(qos: .background).async {
+                                    self.model.loadMore()
                                 }
-                            })
+                            }
+                        })
                     }
                     .flipped()
                 }
@@ -271,6 +281,47 @@ struct MessagesListView: View {
                 }
             }
         }
+    }
+
+    /// Shown in place of the input bar after the local user is removed from a
+    /// group, so the missing composer reads as a state rather than a glitch.
+    private func removedFromGroupBanner() -> some View {
+        Text(NSLocalizedString("conversation.removedFromGroup",
+                               value: "You were removed from this group",
+                               comment: "Banner replacing the input bar after removal from a group"))
+            .font(.footnote)
+            .foregroundColor(Color(UIColor.secondaryLabel))
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal)
+            .padding(.vertical, 14)
+            .background(Color(UIColor.secondarySystemBackground))
+    }
+
+    /// "N unread messages" separator drawn above the first unread message.
+    /// Visual only — it is recomputed each time the conversation opens.
+    private func unreadDividerView(count: Int) -> some View {
+        let label = count == 1
+            ? NSLocalizedString("conversation.oneUnreadMessage", value: "1 unread message",
+                                comment: "Divider above the first unread message")
+            : String(format: NSLocalizedString("conversation.unreadMessages", value: "%d unread messages",
+                                               comment: "Divider above the first unread message"), count)
+        return HStack(spacing: 8) {
+            Rectangle()
+                .fill(Color(UIColor.separator))
+                .frame(height: 1)
+            Text(label)
+                .font(.caption)
+                .foregroundColor(Color(UIColor.secondaryLabel))
+                .fixedSize()
+            Rectangle()
+                .fill(Color(UIColor.separator))
+                .frame(height: 1)
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(label)
     }
 
     private func createMessageRowView(for message: MessageContainerModel) -> some View {

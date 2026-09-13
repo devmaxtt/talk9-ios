@@ -112,6 +112,15 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
         }
     }
     @Published var numberOfNewMessages: Int = 0
+    /// Message the "N unread messages" divider sits above, nil when nothing is
+    /// unread. Computed once per open so the divider stays put while the user
+    /// reads, and is not persisted. Mirrors Android — see ANDROID_PARITY.md §1.4.
+    @Published var unreadDividerMessageId: String?
+    @Published var unreadDividerCount: Int = 0
+    /// Unread count captured when the conversation opened. Reading it any later
+    /// returns 0: opening a conversation marks its messages read.
+    private var unreadCountOnOpen = 0
+    private var didPlaceUnreadDivider = false
     @Published var screenTapped: Bool = false
     @Published var shouldShowMap: Bool = false
     @Published var coordinates = [LocationSharingAnnotation]()
@@ -132,6 +141,9 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
     }
     @Published var isSyncing: Bool = false
     @Published var isBlocked: Bool = false
+    /// Removed from (or left) this group: the input bar is replaced by a banner
+    /// saying so, instead of silently disappearing. See ANDROID_PARITY.md §1.2.
+    @Published var isRemovedFromGroup: Bool = false
     @Published var syncMessage = ""
     var messagePanelTopY: CGFloat = 0
     private let log = SwiftyBeaver.self
@@ -403,6 +415,13 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
     }
     var conversation: ConversationModel! {
         didSet {
+            // Capture before anything marks the conversation read; the divider
+            // itself is placed once the messages have loaded.
+            self.unreadCountOnOpen = self.conversation?.numberOfUnreadMessages.value ?? 0
+            self.didPlaceUnreadDivider = false
+            self.unreadDividerMessageId = nil
+            self.unreadDividerCount = 0
+
             subscriptionQueue.async { [weak self] in
                 guard let self = self else { return }
                 self.invalidateAndSetupConversationSubscriptions()
@@ -986,6 +1005,12 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
         }
     }
 
+    func updateRemovedFromGroupStatus(removed: Bool) {
+        DispatchQueue.main.async { [weak self] in
+            self?.isRemovedFromGroup = removed
+        }
+    }
+
     private func getMessageIndex(messageId: String) -> Int? {
         return self.messagesModels.firstIndex(where: { $0.id == messageId })
     }
@@ -1298,6 +1323,23 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
             model.shouldDisplayContactInfo = shouldDisplayContactInfo(message: model) && shouldDisplayContactInfoForConversation()
             model.shouldDisplayContactInfoForConversation = shouldDisplayContactInfoForConversation()
         }
+        self.placeUnreadDividerIfNeeded()
+    }
+
+    /// Anchors the unread divider above the oldest unread message, once enough
+    /// history has loaded to find it. `messagesModels[0]` is the newest, so the
+    /// oldest of N unread messages sits at index N-1.
+    ///
+    /// Runs at most once per open: re-running as new messages arrive would drag
+    /// the divider down through messages the user has not read yet.
+    private func placeUnreadDividerIfNeeded() {
+        guard !self.didPlaceUnreadDivider,
+              self.unreadCountOnOpen > 0,
+              self.messagesModels.count >= self.unreadCountOnOpen else { return }
+
+        self.didPlaceUnreadDivider = true
+        self.unreadDividerCount = self.unreadCountOnOpen
+        self.unreadDividerMessageId = self.messagesModels[self.unreadCountOnOpen - 1].id
     }
 
     private let messageGroupingInterval = 10 * 60 // 10 minutes

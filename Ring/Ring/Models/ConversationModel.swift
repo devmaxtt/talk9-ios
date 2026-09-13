@@ -455,6 +455,27 @@ class ConversationModel: Equatable {
         return self.type != .nonSwarm && self.type != .sip && self.type != .jams
     }
 
+    /// True when the local user was removed from (or left) a group swarm.
+    ///
+    /// The daemon signals this two ways and both have to be checked: our own
+    /// role flips to banned/left, or we are dropped from the member list
+    /// outright — on a cold start only the second is visible. Mirrors Android's
+    /// self-ban detection. See ANDROID_PARITY.md §1.2.
+    ///
+    /// One-to-one conversations are excluded: there, being cut off is the peer's
+    /// `contact.banned` flag, handled by `isConversationForBlockedContact()`.
+    func isSelfRemovedFromGroup() -> Bool {
+        guard self.isSwarm(), self.type != .oneToOne else { return false }
+
+        let all = self.getAllParticipants()
+        // An empty roster means it has not loaded yet — never read that as a
+        // removal, or every group would lock its input bar on launch.
+        guard !all.isEmpty else { return false }
+
+        guard let me = all.first(where: { $0.isLocal }) else { return true }
+        return me.role == .banned || me.role == .left
+    }
+
     func clearMessages() {
         messages = [MessageModel]()
         newMessages.accept(LoadedMessages(messages: [MessageModel](), fromHistory: false))

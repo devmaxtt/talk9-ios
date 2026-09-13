@@ -75,6 +75,9 @@ class ConversationViewModel: Stateable, ViewModel, ObservableObject, Identifiabl
     let injectionBag: InjectionBag
 
     internal let disposeBag = DisposeBag()
+    /// Replaced on every conversation assignment, so re-assigning a reused view
+    /// model cannot stack duplicate member-event subscriptions.
+    private var memberEventDisposeBag = DisposeBag()
 
     func closeAllPlayers() {
         self.swiftUIModel.transferHelper.closeAllPlayers()
@@ -262,6 +265,7 @@ class ConversationViewModel: Stateable, ViewModel, ObservableObject, Identifiabl
                 return
             }
             self.updateBlockedStatus()
+            self.subscribeMemberChanges()
             self.setupPresence()
             self.avatarProvider.updateIsGroup(!self.conversation.isDialog())
             self.updateName()
@@ -624,10 +628,14 @@ class ConversationViewModel: Stateable, ViewModel, ObservableObject, Identifiabl
 
     func updateBlockedStatus() {
         let blocked = isConversationForBlockedContact()
-        self.swiftUIModel.updateBlockedStatus(blocked: blocked)
+        // Being removed from a group cuts off sending just like a blocked
+        // contact does, so it feeds the same flag — but carries its own banner.
+        let removedFromGroup = self.conversation?.isSelfRemovedFromGroup() ?? false
+        self.swiftUIModel.updateBlockedStatus(blocked: blocked || removedFromGroup)
+        self.swiftUIModel.updateRemovedFromGroupStatus(removed: removedFromGroup)
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            self.isBlocked = blocked
+            self.isBlocked = blocked || removedFromGroup
         }
         self.updateNavigationBar.accept(true)
     }
@@ -638,6 +646,32 @@ class ConversationViewModel: Stateable, ViewModel, ObservableObject, Identifiabl
             guard let self = self else { return }
             self.nameWithSuffix = isSelfConversation ? self.name.withYourselfSuffix() : self.name
         }
+    }
+
+    /// Re-checks removal whenever the group roster changes, so the banner appears
+    /// the moment an admin removes us rather than on the next open.
+    ///
+    /// `ConversationsService.conversationMemberEvent` refreshes the roster before
+    /// emitting, so the conversation is already up to date here — no re-fetch and
+    /// no ordering assumption needed. See ANDROID_PARITY.md §1.2.
+    private func subscribeMemberChanges() {
+        self.memberEventDisposeBag = DisposeBag()
+        guard let conversation = self.conversation, conversation.isSwarm() else { return }
+        let conversationId = conversation.id
+        let accountId = conversation.accountId
+
+        self.conversationsService
+            .sharedResponseStream
+            .filter { event -> Bool in
+                event.eventType == ServiceEventType.conversationMemberEvent &&
+                    event.getEventInput(ServiceEventInput.accountId) == accountId &&
+                    event.getEventInput(ServiceEventInput.conversationId) == conversationId
+            }
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] _ in
+                self?.updateBlockedStatus()
+            })
+            .disposed(by: self.memberEventDisposeBag)
     }
 
     func isConversationForBlockedContact() -> Bool {
