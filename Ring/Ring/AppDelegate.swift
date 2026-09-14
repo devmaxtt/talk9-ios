@@ -445,6 +445,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         handshakeQueue.async { [weak self] in self?.appIsInBackgroundForHandshake = true }
         guard let account = self.accountService.currentAccount else { return }
         self.presenceService.subscribeBuddies(withAccount: account.id, withContacts: self.contactsService.contacts.value, subscribe: false)
+        // Moved here from sceneWillResignActive so it pairs with
+        // sceneWillEnterForeground; see the note there.
+        self.subscribeAllConversationParticipants(accountId: account.id, subscribe: false)
+        self.stopConnectionTimers()
     }
 
     func sceneWillEnterForeground() {
@@ -517,10 +521,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
 
     func sceneWillResignActive() {
-        guard let account = self.accountService.currentAccount else { return }
-        self.presenceService.subscribeBuddies(withAccount: account.id, withContacts: self.contactsService.contacts.value, subscribe: false)
-        self.subscribeAllConversationParticipants(accountId: account.id, subscribe: false)
-        self.stopConnectionTimers()
+        // [TALK9] Deliberately empty. The presence subscriptions and the connection
+        // timer used to be torn down here, paired against sceneWillEnterForeground —
+        // but the counterpart of willResignActive is didBecomeActive, not
+        // willEnterForeground. Every transient interruption that never backgrounds the
+        // app (Control Center, a notification banner, the call UI, the app switcher)
+        // therefore dropped the subscriptions for good.
+        //
+        // That matters because subscribeAllConversationParticipants is what keeps the
+        // daemon's presence refCount above zero, which is the workaround for
+        // rotateTrackedMembers() permanently untracking a peer after an ICE failure.
+        // With it gone, the presence manager holds no devices for the member,
+        // addKnownDevices contributes nothing on the next bootstrap, the connection
+        // fails again, and the conversation cannot recover even across a restart.
+        //
+        // Teardown now lives in sceneDidEnterBackground, which pairs correctly.
     }
 
     // MARK: - Connection Retry Helpers
@@ -951,8 +966,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     private func startConnectionTimers() {
         stopConnectionTimers()
         connectivityTimer = Timer.scheduledTimer(withTimeInterval: 5 * 60, repeats: true) { [weak self] _ in
-            self?.log.debug("AppDelegate: periodic connectivityChanged (TURN keepalive + bootstrap)")
-            self?.daemonService.connectivityChanged()
+            guard let self = self else { return }
+            // [TALK9] connectivityChanged() is not a keepalive. The daemon answers it by
+            // re-registering every enabled account and re-bootstrapping every
+            // conversation ("Bootstrap with 0 device(s)" for each), which drops the
+            // swarm connections that were carrying the conversation. When the rebuild
+            // then fails the chat is dead until something else re-registers the
+            // account — observed as a conversation working for five minutes and
+            // stopping, exactly one timer period.
+            //
+            // It was introduced speculatively in 01bbbf51 ("trying to find soluition")
+            // and, fired unconditionally, also bypasses the backoff gate that every
+            // other retry path goes through (NOTIFICATIONS.md §3 R8/R11). Keep it as a
+            // recovery path, but only for an account that is actually down; real
+            // network changes already arrive through NetworkService's NWPathMonitor.
+            guard let account = self.accountService.currentAccount else { return }
+            guard account.status != .registered else {
+                self.log.debug("AppDelegate: periodic check — account registered, leaving connections alone")
+                return
+            }
+            self.log.debug("AppDelegate: periodic connectivityChanged — account is \(account.status.rawValue), attempting recovery")
+            self.daemonService.connectivityChanged()
         }
     }
 
