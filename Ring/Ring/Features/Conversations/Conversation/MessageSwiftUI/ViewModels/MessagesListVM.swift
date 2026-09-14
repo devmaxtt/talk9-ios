@@ -530,9 +530,18 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
         guard let jamiId = conversation.getParticipants().first?.jamiId else { return }
         let accountId = conversation.accountId
         let conversationId = conversation.id
-        conversationService.removeConversation(conversationId: conversationId, accountId: accountId)
-        contactsService.sendContactRequest(jamiId: jamiId, accountId: accountId)
-        onResetConversation?()
+        // [TALK9] Both calls land in the daemon — removeConversation touches the
+        // conversation repository and sendContactRequest reaches addContact →
+        // syncDevices(). Called bare like this they ran on the main thread. The
+        // navigation callback stays on main, where its caller expects it.
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self = self else { return }
+            self.conversationService.removeConversation(conversationId: conversationId, accountId: accountId)
+            self.contactsService.sendContactRequest(jamiId: jamiId, accountId: accountId)
+            DispatchQueue.main.async { [weak self] in
+                self?.onResetConversation?()
+            }
+        }
     }
 
     func subscribeBestName(bestName: Observable<String>) {
@@ -564,6 +573,20 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
                                 withAccountId: conversation.accountId,
                                 avatar: avatar,
                                 alias: jamsName)
+            // [TALK9] sendContactRequest builds its Completable with Completable.create,
+            // whose body runs synchronously on the subscribing thread — here the main
+            // thread, straight off a SwiftUI button. That body reads the account profile
+            // from the database, serialises a vCard, calls into the daemon (which reaches
+            // syncDevices() and its DHT work) and writes a profile row back. The UI is
+            // frozen for all of it, and a long enough stall is a watchdog kill rather
+            // than a visible hang.
+            .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
+            // The completion has to come back to main. It calls connectivityChanged(),
+            // which makes the daemon re-register every enabled account and fans out a
+            // burst of signals; delivered on a background thread those reach the view
+            // models off-main, which SwiftUI reports as "Publishing changes from
+            // background threads is not allowed" and treats as undefined behaviour.
+            .observe(on: MainScheduler.instance)
             .subscribe(onCompleted: { [weak self, weak conversation] in
                 guard let self = self,
                       let conversation = conversation else { return }
@@ -574,10 +597,7 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
                                                         withJamiId: jamiId,
                                                         withFlag: true)
                 }
-                DispatchQueue.main.async {[weak self] in
-                    guard let self = self else { return }
-                    self.isTemporary = false
-                }
+                self.isTemporary = false
             }, onError: { [weak self] (_) in
                 self?.log.error("Error sending contact request")
             })
