@@ -1324,11 +1324,21 @@ extension AppDelegate {
                      didRegisterForRemoteNotificationsWithDeviceToken
                         deviceToken: Data) {
         let deviceTokenString = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-        print(deviceTokenString)
+        // Tagged so the token can be filtered out of the console — it is needed
+        // whenever the push gateway's credentials or environment are in question.
+        print("[Talk9-Token] APNs device token: \(deviceTokenString)")
         if let bundleIdentifier = Bundle.main.bundleIdentifier {
             self.accountService.setPushNotificationTopic(topic: bundleIdentifier)
         }
         self.accountService.setPushNotificationToken(token: deviceTokenString)
+    }
+
+    func application(_ application: UIApplication,
+                     didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        // Without this the failure is silent: no token is ever handed to the
+        // daemon, the DHT proxy never subscribes, and the symptom is simply that
+        // notifications stop arriving with nothing in the log to say why.
+        print("[Talk9-Token] APNs registration FAILED: \(error.localizedDescription)")
     }
 
     func application(
