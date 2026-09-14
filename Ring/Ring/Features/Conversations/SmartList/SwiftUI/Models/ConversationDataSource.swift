@@ -62,8 +62,24 @@ class ConversationDataSource: ObservableObject {
             .disposed(by: disposeBag)
     }
 
+    /// Maps the service's conversations to view models, guaranteeing each instance
+    /// appears at most once.
+    ///
+    /// ConversationViewModel is Identifiable without declaring an `id`, so SwiftUI
+    /// identifies rows by ObjectIdentifier — the object address. Two entries resolving
+    /// to the same instance make ForEach report "the ID occurs multiple times within
+    /// the collection, this will give undefined results", and the list stops
+    /// responding to input.
+    ///
+    /// They can resolve to the same instance: createOrRetrieveViewModel reuses any
+    /// view model whose conversation compares equal, and ConversationModel's ==
+    /// falls back to participant + accountId whenever either id is empty (see its
+    /// Equatable conformance). A temporary conversation and the real swarm
+    /// conversation for the same peer therefore compare equal, and while both are in
+    /// the source list they both map to the view model that already exists.
     private func mapConversationsToViewModels(_ conversations: [ConversationModel]) -> [ConversationViewModel] {
-        conversations.compactMap { conversationModel -> ConversationViewModel? in
+        var seen = Set<ObjectIdentifier>()
+        return conversations.compactMap { conversationModel -> ConversationViewModel? in
             let isBlocked = isConversationWithBlockedContact(conversationModel)
             guard let newViewModel = createOrRetrieveViewModel(for: conversationModel,
                                                                isBlocked: isBlocked) else {
@@ -76,6 +92,9 @@ class ConversationDataSource: ObservableObject {
                 return nil
             }
 
+            guard seen.insert(ObjectIdentifier(newViewModel)).inserted else {
+                return nil
+            }
             onNewConversationViewModelCreated?(conversationModel)
             return newViewModel
         }
@@ -145,6 +164,10 @@ class ConversationDataSource: ObservableObject {
         }
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
+            // This fires on contactAdded, the same moment the mapping pass above is
+            // rebuilding the list, so the view model can already be present. Inserting
+            // it again puts one instance in the array twice.
+            guard !self.conversationViewModels.contains(where: { $0 === viewModel }) else { return }
             let safeIndex = min(targetIndex, self.conversationViewModels.count)
             self.conversationViewModels.insert(viewModel, at: safeIndex)
         }
