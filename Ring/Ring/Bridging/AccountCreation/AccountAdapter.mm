@@ -23,6 +23,16 @@
 
 #import "jami/configurationmanager_interface.h"
 #import "RegistrationResponse.h"
+#import <os/log.h>
+
+// [TALK9] os_log with a single %{public}@ argument, not NSLog with %{public}s.
+// NSLog forwards to the unified log but does not honour the public annotation on C
+// strings: Console renders those arguments as <private>, and once annotated, as
+// <decode: missing data>. Formatting first and passing one public NSString is the
+// pattern the notification extension already uses successfully.
+#define TALK9_LOG(fmt, ...) \
+    os_log(OS_LOG_DEFAULT, "%{public}@", [NSString stringWithFormat:(fmt), ##__VA_ARGS__])
+
 
 @implementation AccountAdapter
 
@@ -72,7 +82,7 @@ static id <AccountAdapterDelegate> _delegate;
         for (const auto& key : iceKeys) {
             auto it = details.find(key);
             if (it != details.end()) {
-                NSLog(@"[Talk9-ICE][Transport] account=%s  %s = %s",
+                TALK9_LOG(@"[Talk9-ICE][Transport] account=%s  %s = %s",
                       account_id.c_str(), key.c_str(), it->second.c_str());
             }
         }
@@ -86,7 +96,7 @@ static id <AccountAdapterDelegate> _delegate;
     confHandlers.insert(exportable_callback<ConfigurationSignal::RegistrationStateChanged>([&](const std::string& account_id, const std::string& state, int detailsCode, const std::string& detailsStr) {
         // [Talk9-ICE] Registration state is the final outcome of ICE/TURN negotiation.
         // code 0 = success; non-zero = failure reason (SIP response code or internal code).
-        NSLog(@"[Talk9-ICE][RegState] account=%s  state=%s  code=%d  msg=%s",
+        TALK9_LOG(@"[Talk9-ICE][RegState] account=%s  state=%s  code=%d  msg=%s",
               account_id.c_str(), state.c_str(), detailsCode, detailsStr.c_str());
         if (AccountAdapter.delegate) {
             auto accountId = [NSString stringWithUTF8String:account_id.c_str()];

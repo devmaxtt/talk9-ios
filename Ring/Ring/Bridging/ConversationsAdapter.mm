@@ -24,6 +24,16 @@
 #import "Utils.h"
 #import "jami/configurationmanager_interface.h"
 #import "jami/conversation_interface.h"
+#import <os/log.h>
+
+// [TALK9] os_log with a single %{public}@ argument, not NSLog with %{public}s.
+// NSLog forwards to the unified log but does not honour the public annotation on C
+// strings: Console renders those arguments as <private>, and once annotated, as
+// <decode: missing data>. Formatting first and passing one public NSString is the
+// pattern the notification extension already uses successfully.
+#define TALK9_LOG(fmt, ...) \
+    os_log(OS_LOG_DEFAULT, "%{public}@", [NSString stringWithFormat:(fmt), ##__VA_ARGS__])
+
 
 @implementation SwarmMessageWrap
 
@@ -192,10 +202,10 @@ static id <MessagesAdapterDelegate> _messagesDelegate;
         // SwarmBootstrapFailed means the peer was untracked — connection will stay stuck
         // until re-registration triggers startTracking() again.
         if (code == 0) {
-            NSLog(@"[Talk9-ICE][Swarm] ✅ SwarmConnected  conv=%s  account=%s",
+            TALK9_LOG(@"[Talk9-ICE][Swarm] ✅ SwarmConnected  conv=%s  account=%s",
                   conversationId.c_str(), accountId.c_str());
         } else {
-            NSLog(@"[Talk9-ICE][Swarm] ❌ SwarmBootstrapFailed  code=%d  reason=%s  conv=%s  account=%s",
+            TALK9_LOG(@"[Talk9-ICE][Swarm] ❌ SwarmBootstrapFailed  code=%d  reason=%s  conv=%s  account=%s",
                   code, what.c_str(), conversationId.c_str(), accountId.c_str());
         }
         if (ConversationsAdapter.messagesDelegate) {

@@ -236,11 +236,18 @@ class ConversationsManager {
 
     @objc
     func appMovedToBackground() {
+        log.debug("[Talk9-Diag] UIApplication.didEnterBackground → deactivating accounts")
         appState.accept(.appEnterBackground)
     }
 
     @objc
     func appMovedForeground() {
+        // This is the ONLY path that re-activates the accounts. It hangs off the
+        // UIApplication-level notification while the rest of the app drives its
+        // lifecycle through UIScene, and the two do not fire identically — a cold
+        // launch straight into the foreground raises the scene callback but not this
+        // one. If the account is UNREGISTERED and this line is absent, that gap is why.
+        log.debug("[Talk9-Diag] UIApplication.willEnterForeground → reactivating accounts")
         appState.accept(.appEnterForeground)
     }
 

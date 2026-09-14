@@ -75,6 +75,7 @@
 		0E8E9A0520483E1200DA8E8B /* TitleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E8E9A0420483E1200DA8E8B /* TitleView.swift */; };
 		0E983E6E1FC77C3E0082103E /* ConversationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E983E6D1FC77C3E0082103E /* ConversationModel.swift */; };
 		0E99F1A022417A0400CF8BD6 /* JamiURI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E99F19F22417A0400CF8BD6 /* JamiURI.swift */; };
+		0E99F1A022417A0400CF8BD7 /* UnifiedLogDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E99F19F22417A0400CF8BD7 /* UnifiedLogDestination.swift */; };
 		0EABD3852303600B00DE7ACF /* default.wav in Resources */ = {isa = PBXBuildFile; fileRef = 0EABD3842303600B00DE7ACF /* default.wav */; };
 		0EBB72A92034F44200D88F46 /* ProfilesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EBB72A82034F44200D88F46 /* ProfilesService.swift */; };
 		0EC7808F2424FDAE000A04C5 /* CustomActionTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC7808E2424FDAE000A04C5 /* CustomActionTextView.swift */; };
@@ -768,6 +769,7 @@
 		0E8E9A0420483E1200DA8E8B /* TitleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleView.swift; sourceTree = "<group>"; };
 		0E983E6D1FC77C3E0082103E /* ConversationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationModel.swift; sourceTree = "<group>"; };
 		0E99F19F22417A0400CF8BD6 /* JamiURI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JamiURI.swift; sourceTree = "<group>"; };
+		0E99F19F22417A0400CF8BD7 /* UnifiedLogDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnifiedLogDestination.swift; sourceTree = "<group>"; };
 		0EABD3842303600B00DE7ACF /* default.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = default.wav; sourceTree = "<group>"; };
 		0EB12451224AB1030025F8CA /* ContactsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ContactsUI.framework; path = System/Library/Frameworks/ContactsUI.framework; sourceTree = SDKROOT; };
 		0EBB72A82034F44200D88F46 /* ProfilesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilesService.swift; sourceTree = "<group>"; };
@@ -3098,6 +3100,7 @@
 				0EE1B54F1F75AD4700BA98EE /* VCardUtils.swift */,
 				0E44B62E202B9DE40060F71B /* LocalNotificationsHelper.swift */,
 				0E99F19F22417A0400CF8BD6 /* JamiURI.swift */,
+				0E99F19F22417A0400CF8BD7 /* UnifiedLogDestination.swift */,
 				260AE62429B65A4B00D66D5E /* ContactsUtils.swift */,
 				260AE63F29C23AEC00D66D5E /* CallsHelper.swift */,
 				26A0B1C22026091300ABCD03 /* DevMode.swift */,
@@ -4305,6 +4308,7 @@
 				26E081242BC07824001B4C18 /* RequestsViewModel.swift in Sources */,
 				264FB66229775B1C00BEFBBF /* SystemService.swift in Sources */,
 				0E99F1A022417A0400CF8BD6 /* JamiURI.swift in Sources */,
+				0E99F1A022417A0400CF8BD7 /* UnifiedLogDestination.swift in Sources */,
 				1A5DC02E1F3565640075E8EF /* ConversationViewModel.swift in Sources */,
 				0EBB72A92034F44200D88F46 /* ProfilesService.swift in Sources */,
 				0E13A91C22B844B100A12A54 /* NSUserActivity+Call.swift in Sources */,

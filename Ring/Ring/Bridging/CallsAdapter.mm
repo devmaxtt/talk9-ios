@@ -22,6 +22,16 @@
 #import "jami/conversation_interface.h"
 #import "Ring-Swift.h"
 #import <os/log.h>
+#import <os/log.h>
+
+// [TALK9] os_log with a single %{public}@ argument, not NSLog with %{public}s.
+// NSLog forwards to the unified log but does not honour the public annotation on C
+// strings: Console renders those arguments as <private>, and once annotated, as
+// <decode: missing data>. Formatting first and passing one public NSString is the
+// pattern the notification extension already uses successfully.
+#define TALK9_LOG(fmt, ...) \
+    os_log(OS_LOG_DEFAULT, "%{public}@", [NSString stringWithFormat:(fmt), ##__VA_ARGS__])
+
 
 using namespace libjami;
 
@@ -57,10 +67,10 @@ static id <CallsAdapterDelegate> _delegate;
         //   404 = Not Found (peer not on DHT)
         //   0   = normal hang-up / no error
         if (errorCode != 0) {
-            NSLog(@"[Talk9-ICE][CallFail] callId=%s  account=%s  state=%s  pjsipCode=%d",
+            TALK9_LOG(@"[Talk9-ICE][CallFail] callId=%s  account=%s  state=%s  pjsipCode=%d",
                   callId.c_str(), accountId.c_str(), state.c_str(), errorCode);
         } else {
-            NSLog(@"[Talk9-ICE][CallState] callId=%s  account=%s  state=%s",
+            TALK9_LOG(@"[Talk9-ICE][CallState] callId=%s  account=%s  state=%s",
                   callId.c_str(), accountId.c_str(), state.c_str());
         }
         if (CallsAdapter.delegate) {
@@ -112,7 +122,7 @@ static id <CallsAdapterDelegate> _delegate;
                                                                                    const std::vector<std::map<std::string, std::string>>& media) {
         // [Talk9-ICE] Media negotiation events show the ICE/SDP exchange outcome.
         // event values: "negotiating", "succeeded", "failed"
-        NSLog(@"[Talk9-ICE][MediaNeg] callId=%s  event=%s",
+        TALK9_LOG(@"[Talk9-ICE][MediaNeg] callId=%s  event=%s",
               callId.c_str(), event.c_str());
         if (CallsAdapter.delegate) {
             NSString* eventString = [NSString stringWithUTF8String:event.c_str()];

@@ -700,7 +700,15 @@ class AccountsService: AccountAdapterDelegate {
     }
 
     func registrationStateChanged(for accountId: String, state: String) {
-        log.debug("[Talk9-ICE][Swift] accountId=\(accountId)  state=\(state)")
+        // [TALK9] An account only registers when `Account.enable` (persisted) and the
+        // daemon's volatile `active` flag are BOTH set — isUsable() in account.h. The
+        // volatile half is reported through VolatileDetailsChanged, but `Account.enable`
+        // is not, so an UNREGISTERED account that is disabled on disk looked identical
+        // in the log to one that was merely deactivated for the background. Report it
+        // here, where the state that raised the question is already being logged.
+        let enabledOnDisk = self.getAccount(fromAccountId: accountId)?
+            .details?.get(withConfigKeyModel: ConfigKeyModel(withKey: .accountEnable)) ?? "?"
+        log.debug("[Talk9-ICE][Swift] accountId=\(accountId)  state=\(state)  Account.enable=\(enabledOnDisk)")
         if let account = self.getAccount(fromAccountId: accountId) {
             /*
              Detect when a new account is generated and keys are ready.
@@ -814,11 +822,18 @@ class AccountsService: AccountAdapterDelegate {
         self.accountAdapter.pushNotificationReceived(accountId, message: notificationData)
     }
 
-    func setAccountsActive(active: Bool) {
+    // [TALK9] The active flag is volatile and toggled from several places
+    // (foreground/background transitions, the prewarm guard, call preview). When an
+    // account ends up UNREGISTERED with code=0 the only question that matters is which
+    // of them last turned it off, and that was previously unrecoverable from the log.
+    // #function/#line bind to the call site, so no caller has to pass anything.
+    func setAccountsActive(active: Bool, caller: String = #function, line: Int = #line) {
+        log.debug("[Talk9-Diag] setAccountsActive(\(active)) ← \(caller):\(line)")
         self.accountAdapter.setAccountsActive(active)
     }
 
-    func setAccountActive(active: Bool, accountId: String) {
+    func setAccountActive(active: Bool, accountId: String, caller: String = #function, line: Int = #line) {
+        log.debug("[Talk9-Diag] setAccountActive(\(active)) account=\(accountId) ← \(caller):\(line)")
         self.accountAdapter.setAccountActive(accountId, active: active)
     }
 }
@@ -889,11 +904,12 @@ extension AccountsService {
         self.setAccountProperty(property: property, value: newValue, accountId: accountId)
     }
 
-    func enableAccount(accountId: String, enable: Bool) {
+    func enableAccount(accountId: String, enable: Bool, caller: String = #function, line: Int = #line) {
         guard let account = self.getAccount(fromAccountId: accountId) else { return }
         /* The daemon does not send updates for account enable status.
          Therefore, we need to manually set the enable configuration.
          */
+        log.debug("[Talk9-Diag] enableAccount(\(enable)) account=\(accountId) ← \(caller):\(line)")
         account.setEnable(enable: enable)
         self.accountAdapter.enableAccount(accountId, active: enable)
     }

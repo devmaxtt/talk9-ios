@@ -163,6 +163,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         console.format = "$Dyyyy-MM-dd HH:mm:ss.SSS$d $C$L$c: $M"
         #if DEBUG
         log.addDestination(console)
+        log.addDestination(UnifiedLogDestination())
         #else
         log.removeAllDestinations()
         #endif
