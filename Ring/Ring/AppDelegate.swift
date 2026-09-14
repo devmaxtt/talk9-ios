@@ -236,11 +236,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 // so never deactivate while a call is in flight, or the account
                 // never registers and the 15 s unhandeled-call timeout kills the
                 // call. Post-call cleanup is updateBackgroundState's job.
+                //
+                // [TALK9] This assertion is two-sided on purpose. startDaemon() above is
+                // deliberately delayed 1 s, while ConversationsManager sends its
+                // activation from the BehaviorRelay replay (~T+0) and again on
+                // willEnterForeground (~T+0.2). Manager::setAccountActive returns
+                // silently when the account is not loaded yet, so BOTH of those land
+                // before the daemon exists and are dropped — the "appMovedForeground
+                // restores it" path described above never actually runs on a cold
+                // launch. It only looked correct because Account::active_ defaults to
+                // true. The same drop hits previewPendingCall on a VoIP cold launch.
+                // Now that the daemon is ready, state the intent explicitly instead of
+                // relying on a default plus two no-ops.
                 if UIApplication.shared.applicationState == .background
                     && !self.presentingCallScreen
                     && !self.callsProvider.hasActiveCalls() {
                     self.log.debug("[Talk9-Diag] background launch (prewarm?) — keeping accounts inactive")
                     self.accountService.setAccountsActive(active: false)
+                } else {
+                    self.log.debug("[Talk9-Diag] daemon ready, app not backgrounded — asserting accounts active")
+                    self.accountService.setAccountsActive(active: true)
                 }
                 self.prepareAccounts()
             }
