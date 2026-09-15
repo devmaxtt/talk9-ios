@@ -258,6 +258,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                     self.accountService.setAccountsActive(active: true)
                 }
                 self.prepareAccounts()
+                // [TALK9] sceneDidBecomeActive already fired, a second or more ago,
+                // and found no account to work with. Now there is one.
+                if UIApplication.shared.applicationState != .background {
+                    self.activateAccountDependentWork()
+                }
             }
         }
         NotificationCenter.default.addObserver(self, selector: #selector(registerNotifications),
@@ -491,8 +496,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func sceneDidBecomeActive() {
         self.clearBadgeNumber()
         self.removePendingNotifications()
+        self.activateAccountDependentWork()
+    }
+
+    /// The part of becoming active that needs a loaded account.
+    ///
+    /// On a cold launch sceneDidBecomeActive runs almost immediately, while
+    /// startDaemon() is deliberately held back a second and the accounts load after
+    /// that — so currentAccount is still nil and every statement below used to be
+    /// skipped by a bare `guard ... else { return }`. sceneDidBecomeActive does not
+    /// fire again unless the app resigns active and returns, so on a normal launch
+    /// none of this ran at all: no presence subscription (which is what keeps the
+    /// daemon from permanently untracking a peer after an ICE failure), no
+    /// connection timer, no push drain, no NSE suppression state.
+    ///
+    /// It is therefore called twice — here, and again once the daemon is up — and is
+    /// written to be safe to repeat: startConnectionTimers() invalidates any previous
+    /// timer, the subscriptions are idempotent, and processPendingPushDataWhenReady
+    /// is a no-op with nothing pending.
+    func activateAccountDependentWork() {
         guard let account = self.accountService.currentAccount else { return }
         self.presenceService.subscribeBuddies(withAccount: account.id, withContacts: self.contactsService.contacts.value, subscribe: true)
+        self.subscribeAllConversationParticipants(accountId: account.id, subscribe: true)
         self.startConnectionTimers()
         // [TALK9] Drain pushes that arrived while the app was backgrounded.
         // The NSE saves every push payload to notificationData, but the only
