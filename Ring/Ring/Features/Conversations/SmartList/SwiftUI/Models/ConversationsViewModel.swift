@@ -358,6 +358,22 @@ class ConversationsViewModel: ObservableObject {
                 .asObservable()
                 .subscribe(onCompleted: { [weak self, weak conversationViewModel] in
                     guard let conversationViewModel = conversationViewModel else { return }
+                    // [TALK9] Tell the daemon to drop the swarm conversation too.
+                    // removeContact only removes the contact — JamiAccount::removeContact
+                    // forwards to AccountManager::removeContact and stops there, and
+                    // removeContactConversation is documented as being for non-swarm
+                    // contacts. removeConversationFromDB below only clears this app's
+                    // SQLite, its saved files and the in-memory array, so without this
+                    // the conversation stays in the daemon: still listed, still
+                    // bootstrapped, still competing for the connection to the peer's
+                    // device. Re-adding the contact then arrives with a fresh
+                    // conversationId and the old one is never reclaimed, which is how a
+                    // test account reached seventeen conversations behind a UI showing
+                    // one. Also marks it left so the extension suppresses late pushes.
+                    if conversationViewModel.conversation.isSwarm(), !conversationId.isEmpty {
+                        self?.conversationsService.removeConversation(conversationId: conversationId,
+                                                                     accountId: accountId)
+                    }
                     self?.conversationsService
                         .removeConversationFromDB(conversation: conversationViewModel.conversation,
                                                   keepConversation: false)
@@ -381,6 +397,22 @@ class ConversationsViewModel: ObservableObject {
                 .asObservable()
                 .subscribe(onCompleted: { [weak self, weak conversationViewModel] in
                     guard let conversationViewModel = conversationViewModel else { return }
+                    // [TALK9] Tell the daemon to drop the swarm conversation too.
+                    // removeContact only removes the contact — JamiAccount::removeContact
+                    // forwards to AccountManager::removeContact and stops there, and
+                    // removeContactConversation is documented as being for non-swarm
+                    // contacts. removeConversationFromDB below only clears this app's
+                    // SQLite, its saved files and the in-memory array, so without this
+                    // the conversation stays in the daemon: still listed, still
+                    // bootstrapped, still competing for the connection to the peer's
+                    // device. Re-adding the contact then arrives with a fresh
+                    // conversationId and the old one is never reclaimed, which is how a
+                    // test account reached seventeen conversations behind a UI showing
+                    // one. Also marks it left so the extension suppresses late pushes.
+                    if conversationViewModel.conversation.isSwarm(), !conversationId.isEmpty {
+                        self?.conversationsService.removeConversation(conversationId: conversationId,
+                                                                     accountId: accountId)
+                    }
                     self?.conversationsService
                         .removeConversationFromDB(conversation: conversationViewModel.conversation,
                                                   keepConversation: false)
