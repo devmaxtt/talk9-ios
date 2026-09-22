@@ -203,6 +203,38 @@ enum Talk9PushQueue {
     }
 }
 
+// [TALK9] Per-conversation banner dedup markers, shared so the main app can
+// reset them. The NSE writes one marker per (convId, peerId): the file content
+// is the latest banner's request id, its existence means "this conversation
+// already has a banner up and has already rung once".
+//
+// The marker used to be considered stale after talk9DedupWindowSeconds, which
+// let a sender's connection retries each ring as if they were new messages —
+// one undelivered message produces a fresh PeerConnectionRequest (new value id)
+// every 30-80 s for as long as the recipient stays offline, so neither the
+// value-id claim nor the 12 s window could collapse them. The window now only
+// decides whether to stay silent; the marker itself lives until the app comes
+// to the foreground. See NOTIFICATIONS.md.
+enum Talk9BannerDedup {
+    static var directory: URL? {
+        guard let caches = Constants.cachesPath else { return nil }
+        let dir = caches.appendingPathComponent("talk9-push-dedup", isDirectory: true)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir
+    }
+
+    /// The user is looking at the app, so every conversation earns the right to
+    /// ring again. Called on foreground; a failure here only costs an extra
+    /// banner sound, never a lost message.
+    static func reset() {
+        guard let dir = directory,
+              let files = try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil) else { return }
+        for file in files {
+            try? FileManager.default.removeItem(at: file)
+        }
+    }
+}
+
 public class Constants: NSObject {
     @objc public static let notificationReceived = "m.talk.talk9.notificationExtension.receivedNotification" as CFString
     @objc public static let notificationAppIsActive = "m.talk.talk9.appActive" as CFString

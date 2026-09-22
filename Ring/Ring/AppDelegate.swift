@@ -459,6 +459,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func sceneWillEnterForeground() {
         handshakeQueue.async { [weak self] in self?.appIsInBackgroundForHandshake = false }
         self.updateNotificationAvailability()
+        // [TALK9] The user is back in the app, so every conversation may ring
+        // again on its next push. Deliberately ahead of the currentAccount
+        // guard below: the markers are account-independent and leaving them
+        // behind would silence the next real message. Racing an NSE that is
+        // mid-write only costs one extra banner sound — never a lost message.
+        Talk9BannerDedup.reset()
         guard let account = self.accountService.currentAccount else {
             self.daemonService.connectivityChanged()
             return

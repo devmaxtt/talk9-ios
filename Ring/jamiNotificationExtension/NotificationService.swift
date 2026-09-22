@@ -571,19 +571,28 @@ class NotificationService: UNNotificationServiceExtension {
                     break // routes to finish()'s !decryptYieldedRealMessage SUPPRESS branch
                 }
             }
-            // [TALK9] Burst collapse (R3: replace, don't suppress). A single
-            // voice message fans out as ~4 alerts within ~9s — same conv, same
-            // peer, DIFFERENT value ids — so neither the server nor the
-            // value-id gate above can collapse them. Followers used to take
-            // the SUPPRESS path, which also silenced a genuinely NEW second
-            // message from the same peer (a text at t0 swallowed the voice
-            // message at t+5s — the "voice notification never came" report).
-            // Now a follower REPLACES the predecessor's banner: it records the
-            // previous request id (removed in finish() right before delivery)
-            // and goes silent — a burst still collapses to one banner, content
-            // refreshed, one sound, and no real message is ever dropped.
-            if let predecessorId = burstPredecessorBannerId(convId: convId, peerId: peerId) {
-                log("[Talk9-Notif] gitMessage: burst follower within \(Int(Constants.talk9DedupWindowSeconds))s for convId='\(convId.prefix(8))' peerId='\(peerId.prefix(16))' — will replace banner \(predecessorId.prefix(12))")
+            // [TALK9] Per-conversation banner collapse (R3: replace, never
+            // suppress — suppressing would drop a genuinely new message, which
+            // is how the "voice notification never came" report happened).
+            // The first push for a conversation rings; every later one replaces
+            // the standing banner and stays SILENT, however far apart they are.
+            //
+            // The 12 s window this used to enforce was calibrated for one voice
+            // message fanning out into ~4 alerts within ~9 s. It does not cover
+            // the dominant case: an undelivered message makes the SENDER retry
+            // the connection every 30-80 s for as long as the recipient stays
+            // offline, each retry carrying a brand-new PeerConnectionRequest id,
+            // so the value-id claim above misses them too and every retry used
+            // to ring. Ringing again is pure noise anyway — while the app is
+            // dead the body is always the generic fallback, so a second card
+            // carries nothing the first one did not.
+            //
+            // Talk9BannerDedup.reset() clears the markers when the app reaches
+            // the foreground, so the next genuinely new message rings again.
+            let predecessor = burstPredecessor(convId: convId, peerId: peerId)
+            if let predecessorId = predecessor.id {
+                let kind = predecessor.withinBurst ? "burst follower" : "sender retry"
+                log("[Talk9-Notif] gitMessage: \(kind) for convId='\(convId.prefix(8))' peerId='\(peerId.prefix(16))' — replacing banner \(predecessorId.prefix(12)), silent")
                 self.replacePreviousBannerId = predecessorId
                 self.bestAttemptContent.sound = nil
             }
@@ -1031,9 +1040,9 @@ class NotificationService: UNNotificationServiceExtension {
     /// leave 2 banners (last marker write wins; the next follower removes one
     /// of them). Worst case is a transient 2-stack — never 4, never a lost
     /// message.
-    private func burstPredecessorBannerId(convId: String, peerId: String) -> String? {
+    private func burstPredecessor(convId: String, peerId: String) -> (id: String?, withinBurst: Bool) {
         guard !peerId.isEmpty, let dir = Self.dedupMarkerDirectory() else {
-            return nil
+            return (nil, false)
         }
         // convId/peerId are hex identifiers — safe to use in a filename.
         let marker = dir.appendingPathComponent("\(convId)_\(peerId)")
@@ -1044,7 +1053,7 @@ class NotificationService: UNNotificationServiceExtension {
             }
             close(fd)
             Self.pruneDedupMarkers(in: dir)
-            return nil
+            return (nil, false)
         }
         let isFresh: Bool
         if let attrs = try? FileManager.default.attributesOfItem(atPath: marker.path),
@@ -1059,10 +1068,14 @@ class NotificationService: UNNotificationServiceExtension {
         // Take over the marker: our banner is now the burst's latest (the
         // atomic rewrite also refreshes mtime, restarting the window).
         try? requestIdentifier.data(using: .utf8)?.write(to: marker, options: .atomic)
-        guard isFresh, let predecessorId = predecessorId, !predecessorId.isEmpty else {
-            return nil
+        // [TALK9] The predecessor is returned whether or not the window is
+        // fresh: a stale marker means the previous banner is STILL the only one
+        // this conversation should own, not that a new one may stack on top.
+        // isFresh now only answers "is this a burst follower", i.e. stay silent.
+        guard let predecessorId = predecessorId, !predecessorId.isEmpty else {
+            return (nil, isFresh)
         }
-        return predecessorId
+        return (predecessorId, isFresh)
     }
 
     /// [TALK9] R3: cross-process claim of a DHT value id — returns true exactly
@@ -1110,15 +1123,10 @@ class NotificationService: UNNotificationServiceExtension {
         }
     }
 
+    /// Shared with the main app, which clears these markers on foreground
+    /// (Talk9BannerDedup.reset) to restore every conversation's right to ring.
     private static func dedupMarkerDirectory() -> URL? {
-        guard let container = FileManager.default
-                .containerURL(forSecurityApplicationGroupIdentifier: Constants.appGroupIdentifier) else {
-            return nil
-        }
-        let dir = container.appendingPathComponent("Library/Caches/talk9-push-dedup",
-                                                   isDirectory: true)
-        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        return dir
+        return Talk9BannerDedup.directory
     }
 
     /// Housekeeping: markers older than an hour are useless — remove them so
