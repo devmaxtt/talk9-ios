@@ -960,6 +960,8 @@ internal enum L10n {
     internal static let search = L10n.tr("Localizable", "global.search", fallback: "Searching…")
     /// Share
     internal static let share = L10n.tr("Localizable", "global.share", fallback: "Share")
+    /// Sign out
+    internal static let signOut = L10n.tr("Localizable", "global.signOut", fallback: "Sign out")
     /// Support Talk9 project
     internal static let supportJami = L10n.tr("Localizable", "global.supportJami", fallback: "Support Talk9 project")
     /// Time

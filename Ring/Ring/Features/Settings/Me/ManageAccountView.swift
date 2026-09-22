@@ -54,7 +54,7 @@ struct ManageAccountView: View {
                     } label: {
                         HStack {
                             Spacer()
-                            Text(L10n.Global.removeAccount)
+                            Text(L10n.Global.signOut)
                                 .foregroundColor(Color(UIColor.jamiFailure))
                             Spacer()
                         }
@@ -75,7 +75,7 @@ struct ManageAccountView: View {
 
     func removalAlertContent() -> some View {
         VStack(spacing: 20) {
-            Text(L10n.Global.removeAccount)
+            Text(L10n.Global.signOut)
                 .font(.headline)
             Text(L10n.AccountPage.removeAccountMessage)
                 .font(.subheadline)
@@ -94,7 +94,7 @@ struct ManageAccountView: View {
                 Button(action: {
                     model.removeAccount(statePublisher: self.state)
                 }, label: {
-                    Text(L10n.Global.remove)
+                    Text(L10n.Global.signOut)
                         .foregroundColor(Color(UIColor.jamiFailure))
                 })
             }

@@ -27,6 +27,7 @@
 "global.cancel" = "Cancel";
 "global.blockContact" = "Block contact";
 "global.removeAccount" = "Remove account";
+"global.signOut" = "Sign out";
 "global.incomingCall" = "Incoming call";
 "global.ok" = "OK";
 "global.close" = "Close";

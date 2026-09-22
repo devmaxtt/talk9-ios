@@ -27,6 +27,7 @@
 "global.cancel" = "取消";
 "global.blockContact" = "阻擋連絡人";
 "global.removeAccount" = "移除账户";
+"global.signOut" = "退出登录";
 "global.incomingCall" = "來電";
 "global.ok" = "確定";
 "global.close" = "關閉";
