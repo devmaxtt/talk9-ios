@@ -450,7 +450,19 @@ class NotificationService: UNNotificationServiceExtension {
                   String(id.prefix(12)), "\(cypherLen)", mapKeys)
 
             guard idsToProcess.contains(id) || processAll else {
-                NSLog("[Talk9-Push]   ✗ id not in idsToProcess: %@", String(id.prefix(12)))
+                // [TALK9-DIAG] Probe the value the server did NOT name. If this
+                // one decrypts while the named one throws, the `ids` field is
+                // pointing at the wrong value (e.g. the copy encrypted for a
+                // different device of this account) and the fix is to fall back
+                // to the rest of the stream instead of giving up. Costs one
+                // extra decrypt per skipped value — diagnostics only.
+                let probe = adapterService.decrypt(keyPath: keyURL.path,
+                                                   accountId: self.accountId,
+                                                   messagesPath: treatedMessagesURL.path,
+                                                   value: map)
+                NSLog("[Talk9-Push]   ✗ id not in idsToProcess: %{public}@ probe=%{public}@",
+                      id, String(describing: probe))
+                Self.diagAppend("SKIP    id=\(id) probe=\(probe) wanted=[\(idsToProcess.sorted().joined(separator: ","))]")
                 log("Skipping line; ID is not in the list: \(id)")
                 return
             }
@@ -484,6 +496,10 @@ class NotificationService: UNNotificationServiceExtension {
         // apart — far outside the burst window. A value we already acted on
         // must never ring CallKit or produce a banner a second time.
         let valueId = map["id"] as? String ?? ""
+        // [TALK9-DIAG] Counterpart to the SKIP line above: what the value the
+        // server DID name actually decrypted to. `unknown` here next to a
+        // decodable SKIP above is the smoking gun.
+        Self.diagAppend("PROCESS id=\(valueId) result=\(result)")
         switch result {
         case .call(let peerId, let hasVideo):
             guard self.claimUnseenValue(valueId) else {
@@ -1125,6 +1141,38 @@ class NotificationService: UNNotificationServiceExtension {
 
     /// Shared with the main app, which clears these markers on foreground
     /// (Talk9BannerDedup.reset) to restore every conversation's right to ring.
+    // MARK: - [TALK9-DIAG] Temporary decrypt diagnostics
+    //
+    // Why this exists: a push arrived, the NSE ran, the DHT stream returned two
+    // values, the one the server named in `ids` threw inside decrypt(), and the
+    // other one was skipped without ever being tried — so the user got nothing.
+    // These helpers record what every value in the stream looks like and whether
+    // it could have been decrypted, so the choice the `ids` field makes can be
+    // checked against reality.
+    //
+    // Device logs are not persisted on iOS, so this also appends to a file in
+    // the App Group: reproduce whenever, pull the file afterwards.
+    //
+    // DELETE the whole section, its two call sites, and the %{public}s changes
+    // in Adapter.mm once the root cause is known.
+    static func diagAppend(_ line: String) {
+        guard let caches = Constants.cachesPath else { return }
+        let file = caches.appendingPathComponent("talk9-diag.log")
+        // Cheap cap so a long-running reproduction cannot fill the container.
+        if let size = (try? FileManager.default.attributesOfItem(atPath: file.path))?[.size] as? Int,
+           size > 1_000_000 {
+            try? FileManager.default.removeItem(at: file)
+        }
+        let stamp = ISO8601DateFormatter().string(from: Date())
+        let entry = "\(stamp) \(line)\n"
+        // O_APPEND makes each write atomic across the parallel NSE processes a
+        // burst spawns — no locking, no interleaved half-lines.
+        let fd = open(file.path, O_WRONLY | O_CREAT | O_APPEND, 0o644)
+        guard fd >= 0 else { return }
+        _ = entry.withCString { write(fd, $0, strlen($0)) }
+        close(fd)
+    }
+
     private static func dedupMarkerDirectory() -> URL? {
         return Talk9BannerDedup.directory
     }

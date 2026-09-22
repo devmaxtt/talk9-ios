@@ -417,9 +417,13 @@ static NSDictionary* pendingPushData = nil;
         }
         return @{@(peerId.c_str()): @(peerCR.connType.c_str())};
     } catch (const std::exception& e) {
-        NSLog(@"[Talk9-Decrypt] exception: %s", e.what());
+        // [TALK9-DIAG] %{public}s so the reason is not redacted to <private>.
+        // Remove together with the other TALK9-DIAG blocks once the
+        // "push arrives but decrypt throws" case is understood.
+        NSLog(@"[Talk9-Decrypt] exception: %{public}s (valueId=%{public}@)",
+              e.what(), [value objectForKey:@"id"]);
     } catch (...) {
-        NSLog(@"[Talk9-Decrypt] unknown exception");
+        NSLog(@"[Talk9-Decrypt] unknown exception (valueId=%{public}@)", [value objectForKey:@"id"]);
     }
     return {};
 }

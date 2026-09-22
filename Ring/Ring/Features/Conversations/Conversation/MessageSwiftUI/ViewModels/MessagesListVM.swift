@@ -570,6 +570,25 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
                                                 .appendingPathComponent("\(jamiId).crt").path)
             || fileManager.fileExists(atPath: repo.appendingPathComponent("members")
                                         .appendingPathComponent("\(jamiId).crt").path)
+        // [TALK9-DIAG] Names the certificates actually present, so a repository
+        // that came down incomplete can be told apart from one this account was
+        // genuinely never a member of. Remove with the other TALK9-DIAG blocks.
+        let names: (String) -> String = { sub in
+            let entries = (try? FileManager.default.contentsOfDirectory(
+                atPath: repo.appendingPathComponent(sub).path)) ?? []
+            return entries.map { $0.replacingOccurrences(of: ".crt", with: "").prefix(12) + "…" }
+                .joined(separator: ",")
+        }
+        // NSLog, not SwiftyBeaver: only NSLog reaches the unified system log, which
+        // is what Console.app shows when attached to the device. %{public}@ keeps
+        // the ids from being redacted to <private>.
+        NSLog("[Talk9-Post] conv=%{public}@ me=%{public}@ canPost=%{public}@ repoExists=%{public}@ admins=[%{public}@] members=[%{public}@]",
+              String(conversation.id.prefix(12)),
+              String(jamiId.prefix(12)),
+              canPost ? "YES" : "NO",
+              FileManager.default.fileExists(atPath: repo.path) ? "YES" : "NO",
+              names("admins"),
+              names("members"))
         if cannotPost != !canPost {
             cannotPost = !canPost
         }
