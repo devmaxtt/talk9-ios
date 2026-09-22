@@ -140,7 +140,16 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
         }
         return name
     }
-    @Published var isSyncing: Bool = false
+    @Published var isSyncing: Bool = false {
+        didSet {
+            // A sync finishing is the moment the repository may have become
+            // writable (or may have turned out not to be), so re-check.
+            if oldValue != isSyncing { refreshPostingAbility() }
+        }
+    }
+    /// The local repository exists but this account cannot commit to it, so
+    /// sending would fail silently. See `refreshPostingAbility()`.
+    @Published var cannotPost: Bool = false
     @Published var isBlocked: Bool = false
     /// Removed from (or left) this group: the input bar is replaced by a banner
     /// saying so, instead of silently disappearing. See ANDROID_PARITY.md §1.2.
@@ -521,6 +530,49 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
         presenceService.subscribeBuddy(withAccountId: account.id,
                                        withJamiId: contact.hash,
                                        withFlag: true)
+    }
+
+    /// Whether this account is allowed to write to the conversation's git
+    /// repository. Mirrors the daemon's own pre-commit check
+    /// (`ConversationRepository::Impl::validateDevice`, conversationrepository.cpp):
+    /// it requires `admins/<uri>.crt` or `members/<uri>.crt` to exist, and
+    /// refuses to create the commit otherwise — logging "Invalid parent path
+    /// (not in members or admins)" and dropping the message with no callback,
+    /// so the UI clears the input box and the message simply vanishes.
+    ///
+    /// A repository can end up in this state after switching accounts or after
+    /// signing in on a new device, where the conversation was synced but this
+    /// account's certificate never landed in it.
+    ///
+    /// Reading the daemon's files directly is deliberate: the daemon decides by
+    /// what is on disk, so anything else (a members list from memory) could
+    /// disagree with the check that actually rejects the commit. The NSE already
+    /// reads this tree the same way (`conversationExistsOnDisk`).
+    ///
+    /// Fails open — when anything is unavailable we assume posting works rather
+    /// than blocking a conversation that is actually fine.
+    func refreshPostingAbility() {
+        guard !isTemporary,
+              let jamiId = accountService.getAccount(fromAccountId: conversation.accountId)?.jamiId,
+              !jamiId.isEmpty,
+              let documents = Constants.documentsPath else {
+            cannotPost = false
+            return
+        }
+        let repo = documents
+            .appendingPathComponent(conversation.accountId)
+            .appendingPathComponent("conversations")
+            .appendingPathComponent(conversation.id)
+        let fileManager = FileManager.default
+        // Not cloned yet is a different situation (still arriving), but it looks
+        // the same to the user and wants the same banner, so it counts here too.
+        let canPost = fileManager.fileExists(atPath: repo.appendingPathComponent("admins")
+                                                .appendingPathComponent("\(jamiId).crt").path)
+            || fileManager.fileExists(atPath: repo.appendingPathComponent("members")
+                                        .appendingPathComponent("\(jamiId).crt").path)
+        if cannotPost != !canPost {
+            cannotPost = !canPost
+        }
     }
 
     /// Called by ConversationViewModel to navigate back after a successful reset.

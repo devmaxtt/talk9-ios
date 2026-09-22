@@ -108,6 +108,10 @@ struct MessagesListView: View {
 // #endif
         }
         .environment(\.avatarProviderFactory, model.makeAvatarFactory() as AvatarProviderFactory?)
+        // [TALK9] Check on open rather than in init: isTemporary and the account
+        // are settled by now, and a repository can also have become writable
+        // since the last time this conversation was on screen.
+        .onAppear { model.refreshPostingAbility() }
         .onChange(of: model.screenTapped, perform: { _ in
             /* We cannot use SwiftUI's onTapGesture here because it would
              interfere with the interactions of the buttons in the player view.
@@ -186,7 +190,12 @@ struct MessagesListView: View {
                 LocationSharingView(model: model)
             }
 
-            if model.isSyncing {
+            // [TALK9] cannotPost: the repository exists but this account is not
+            // in its members/admins, so the daemon silently refuses the commit
+            // and a sent message just disappears. Same banner as syncing — from
+            // the user's side both mean "this conversation is not ready yet" —
+            // and the same Reset button is the way out of both.
+            if model.isSyncing || model.cannotPost {
                 syncView()
             }
 
@@ -438,10 +447,12 @@ struct MessagesListView: View {
 
     func syncView() -> some View {
         VStack(spacing: 12) {
-            Text(model.syncMessage)
+            Text(model.isSyncing ? model.syncMessage : "Fetching conversation…")
                 .frame(maxWidth: .infinity)
                 .multilineTextAlignment(.center)
-            Text("If this takes too long, you can reset the conversation.")
+            Text(model.isSyncing
+                 ? "If this takes too long, you can reset the conversation."
+                 : "This conversation is not ready yet, so messages cannot be sent. Resetting usually fixes it.")
                 .font(.footnote)
                 .foregroundColor(.secondary)
                 .frame(maxWidth: .infinity)
