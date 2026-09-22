@@ -423,3 +423,147 @@ TURN 与其他敏感凭证见 Android 仓库 `IOS_SYNC.md` §1，此处不复制
 
 > zsh 陷阱：`grep -rl "kw" $SRC` 在 zsh 下不做变量分词，多路径会被当成单一路径而静默返回空。
 > 请直接写出路径，或用 `${=SRC}`。这个坑在本次比对中造成过一轮假阴性。
+
+---
+
+## 7. Android 修过的 bug × iOS 核查（2026-09-22）
+
+> **与 §1–§5 的区别**：前面几节记的是「Android 有、iOS 没有」的**功能缺口**。
+> 本节记的是「Android 修过的**缺陷**，iOS 是否同种病」—— 角度不同，结论不能互相套用。
+>
+> **基线**：Android `master` @ `b51e3444d`（2026-09-03，v1.0.29）；iOS 分支
+> `feature/upstream-call-video-fixes`，含 `b4a89490`（2026-09-17）。
+>
+> **方法**：Android 的 commit message 大量只写 "Update"，缺陷要从 `git show` 的实际 diff 里挖；
+> 每一条再到 iOS 全树查实作确认。**本节所有「iOS 免疫」的结论都附了代码证据，直接采信。**
+
+### 7.1 iOS 同样存在
+
+| # | 缺陷 | Android 修复 | iOS 落点 |
+|---|---|---|---|
+| **B1** | 群组消息通知看不出是哪个群 | `20ffb8256`、`de8cfdd39` | `NotificationService.swift:622/667`、`ConversationsManager.swift:664` |
+| **B2** | re-invite 被 `conversationReady` 提前吞掉 | `c09638dfb` | `RequestsService.swift:131-144` + `RequestsViewModel.swift:297` ⚠️ 见 7.3 |
+| **B3** | 重复邀请不刷新列表 | （iOS 独有写法问题） | `RequestsService.swift:409-413` |
+| **B4** | 相册 QR 解码在主线程 | `d163b8daf` | `ScanViewController.swift:251` |
+
+#### B1 群组消息通知看不出是哪个群 🔴
+
+Android title 改为群名、body 改为 `"Alice: Hello"`，并把 `isGroupConversation` 从
+`contacts.size > 2` 的启发式换成 `cvm.isGroup()`。
+
+iOS 的 NSE **完全不区分群聊与单聊**：title 恒为发送者名，body 是主 app 写的纯文本缓存、无发送者前缀。
+三个群同时来消息，锁屏上只有一串人名。`threadIdentifier` 已按会话分组（`:858`），折叠对、标题错。
+
+> ⚠️ **不要拿 §1.6（语音时长）的「架构性阻断」套这一条 —— 两者不同。**
+> §1.6 做不到，是因为写缓存的时刻语音**档案还没下载**；
+> 而**群名在写缓存时已经知道**。落点在主 app 而非 NSE。
+>
+> NSE 里那个 `getConversationTitle()`（`:1780`）**不能用**：它走 `conversationInfos()` 这个
+> C++ 调用、需要 daemon 在跑，而 NSE 不许启动 daemon（`NOTIFICATIONS.md` §2.4 红线）。
+> 它目前只服务通话通知，那条路径下主 app 是活的。
+
+#### B2 re-invite 被 conversationReady 提前吞掉 ⚠️ 结论已修正，见 7.3
+
+#### B3 重复邀请不刷新列表（次要）
+
+`RequestsService.conversationRequestReceived()` 在已存在同 id 的 request 时，
+`request.updatefrom(dictionary:)` 改了对象就 `return`，**没有调用 `requests.accept()`**。
+BehaviorRelay 不发新值 → 订阅方收不到更新。
+
+只影响同一 conversationId 的重复邀请（re-invite 通常携新 id），故列为次要。
+
+#### B4 相册 QR 解码在主线程（次要）
+
+Android 把相册解码挪到 `Dispatchers.IO`。iOS 在主线程跑 `CIDetectorAccuracyHigh`
+（`ScanViewController.swift:251` 的 `DispatchQueue.main.async` → `decodeQRCode`）。
+CIDetector 比 zxing 快，但 12MP 照片仍会明显卡顿。
+
+### 7.2 iOS 免疫（附证据，勿重查）
+
+| Android 修的 bug | iOS 为什么不中招 |
+|---|---|
+| self-ban 用 `username` 比对失败（`813402814`、`e45265692`） | iOS 用 `isLocal`，由 accountURI hash 比对得出 — `ConversationModel.swift:346` |
+| 历史重放把旧 `group_removed` 重新应用、覆盖正确状态（`db5230f99`、`de8cfdd39`） | `isSelfRemovedFromGroup()` 每次从成员名单**现算**，不缓存状态，无重放路径 |
+| `conversationReady` 时 LEFT/BLOCKED 成员残留、role 不更新（`e6c538f09`） | `addParticipantsFromArray()` 每次**整表重建** — `ConversationModel.swift:343` |
+| ~10 处 RxJava 主线程阻塞致 UI 冻结（`689b54d9f`） | iOS 全树无 `.toBlocking()` / `DispatchQueue.main.sync` / `semaphore.wait()` |
+| 位置共享只订 GPS provider、无 last-known 种子（`d487d6923`） | 已有 last-known 种子 `LocationSharingService.swift:258`；CoreLocation 自动选源 |
+| proximity wake lock 释放太晚、挂断后贴耳黑屏（`5821b5f59`） | iOS 无手动管理代码（只有两处 `= false`），近距离感应由 CallKit/AVAudioSession 托管 |
+| 开机自动同步、前台服务 `RemoteServiceException`（`689b54d9f` 主体） | Android 平台限定，见 §3 |
+| SmartList 把「已被移出群组」显示在 1:1（`db5230f99`） | `isSelfRemovedFromGroup()` 已 guard `type != .oneToOne` |
+| 文件传输通知用 `random.nextInt()` 累积重复（`84669be98`） | iOS 等价体是「一条语音 = 4 个 push = 4 条横幅」，`NOTIFICATIONS.md` 已记为结构性问题，只有 R5 根治 |
+
+### 7.3 🔴 B2 的结论修正：不要照搬 Android 的修法
+
+初判是「iOS 的 `RequestsService.conversationReady` 无条件移除 request，照 Android 加个
+`role == .invited` 的提前返回即可」。**查过 daemon 与 UI 层之后，这个修法既不充分、也可能已无必要。**
+
+**(a) 只改数据层无效 —— 还有第二条移除路径**
+
+`RequestsViewModel.filterRequestsNotInConversations()`（`:297`）：
+
+```swift
+let conversationIds = Set(conversations.map { $0.id })
+return requests.filter { $0.accountId == accountId && !conversationIds.contains($0.conversationId) }
+```
+
+只要该 conversationId 已进 `conversationService.conversations`，UI 就把这条 request 滤掉。
+而 `ConversationsService.conversationReady` 的 `conversation == nil` 分支会 `addSwarm(...)`
+把它加进去。**只在 `RequestsService` 加 role 检查，邀请照样不显示。**
+
+**(b) 主路径上 self 其实已经是 MEMBER，不是 INVITED**
+
+daemon `conversation_module.cpp:868-896`（`handlePendingConversation`）：
+
+```cpp
+auto commitId = conversation->join();   // ← 同步写 repo：删 invited/uri.crt，写 members/uri.crt
+...
+emitSignal<libjami::ConversationSignal::ConversationReady>(accountId_, conversationId);
+```
+
+`ConversationRepository::join()`（`conversationrepository.cpp`）是**同步**档案操作，
+在 emit 之前完成。所以 clone 完成这条主路径上，发信号时 self 已是 member ——
+此时移除 request 是**正确**行为，加 role 检查拦不到东西。
+
+Android 那个 bug 依赖一个前提：**本地残留着上次离开时没清掉的 repo**，
+于是 re-invite 走了不同分支、self 停在 INVITED。
+
+**(c) iOS 的这个前提已被 `b4a89490`（2026-09-17）堵住，但只堵了新增**
+
+该提交让离开/删除会话时真正调用 daemon 的 `removeConversation()`，不再留残留 repo。
+**但它的提交信息自己写明：「This does not reclaim conversations already orphaned」** ——
+升级前就已孤立的会话不会被回收。
+
+> **这解释了为什么客户回报 #2「间歇性」**：老帐号本地有残留 repo → 复现；
+> 干净帐号 → 不复现。与 memory `customer_request_status.md` 的描述吻合。
+
+**(d) 因此正确的动作顺序是：先验证，再决定改不改**
+
+不要先改代码。在 `ConversationsService.conversationReady`（`:438`）加一行日志，
+打印该会话 self 的 role（`conversation.getLocalParticipants()?.role`），
+用**老帐号**跑一次「离开群 → 管理员重新邀请」：
+
+| 打印结果 | 结论 |
+|---|---|
+| `invited` | Android 那条路径在 iOS 复现 → 按 7.4 的 B2 方案修 |
+| `member` / 会话不存在 | 根因不在这里，`b4a89490` 已解决 → **不要改**，去查 push 抑制集与 `filterRequestsNotInConversations` |
+
+**附带确认（好消息）**：daemon 的 `getConversationMembers` 调用
+`conv.getMembers(true, includeBanned)` —— 第一个参数 `includeInvited = **true**`。
+所以 INVITED 的自己**在**成员名单里、role 为 `.invited`，而 `.invited` ≠ `.banned`/`.left`
+→ `isSelfRemovedFromGroup()` 回 `false`。**§1.2 已上线的功能不会把「待接受邀请」误判成
+「被移出群组」**，账本 §0-A 列出的「最严重失败模式」里这一分支可以划掉。
+
+### 7.4 改动影响评估
+
+动手前逐条对照。风险等级按「可能波及的既有行为」评。
+
+| # | 改动范围 | 风险 | 波及面与注意事项 |
+|---|---|---|---|
+| **B1** | `ConversationsManager.cacheMessageForNotification()` 增写群名+作者名；NSE 读取端拼 title/body | 🟡 中 | ① 1:1 **不能**加前缀，否则「张三: 张三: 你好」；判定用 `type != .oneToOne && isSwarm()`，不要用成员数启发式（Android 正是栽在这）<br>② 群名可能为空（用户没设名），要 fallback 到成员名拼接<br>③ `authorId` 是 hash，需经 nameService/contactsService 解析成显示名 —— **这是本项主要工作量**<br>④ 缓存结构变更：新增 key 而非改既有 `body` 语义，旧版 NSE 读到新缓存仍能工作。升级瞬间的旧条目受 2 秒新鲜度窗口保护，影响可忽略<br>⑤ 主 app 与 NSE 是两个 target，**两边都要改、一起发版** |
+| **B2** | 见 7.3 —— **先验证，不要先改** | 🔴 高 | 若贸然在 `ConversationsService.conversationReady` 拦截 `addSwarm`：会话不进列表 → 若 daemon 在接受后**不再**补发 `ConversationReady`，会话将**永远不出现**。这是比原 bug 更糟的失败模式。<br>下游订阅者已核实无碍：`AppDelegate:629` 只重置重试计数、`ConversationViewModel:326` 只建 swarmInfo。<br>`markConversationAsActive()` 在方法最开头、serialQueue 之外，不受影响 → NSE 白名单照常更新 ✓ |
+| **B3** | `conversationRequestReceived` 的 early-return 前补 `requests.accept(values)` | 🟢 低 | 订阅方 `RequestsViewModel.processNewRequests` 走 `findNewRequests`/`findOutdatedRequests` 差分，重复 accept 同一数组只多一次无变化计算，不会重复插入。`SwarmInfo:258` 读 `.value`，不受 accept 影响 |
+| **B4** | 解码挪到背景 queue | 🟢 低 | 回调必须切回主线程：`onCodeScanned?`、`presentInvalidQRAlert`、`AudioServicesPlayAlertSound` 都在 `handleScannedImage` 里 |
+
+**共同红线**：B1 与 B2 都碰通知/邀请链路，改前先读 `NOTIFICATIONS.md` 的红线与 §6 方法论；
+B2 属于「修在根因层」的判断题，按 §6⑤ 处理，不要用症状层补丁硬凑。
+
