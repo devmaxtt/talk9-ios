@@ -645,7 +645,7 @@ class NotificationService: UNNotificationServiceExtension {
                 //    thread — it would drop the sender's name back over the group.
                 //    Decided here, before the request is sent, so no cross-thread
                 //    flag is needed to suppress it later.
-                if self.freshCachedMessage(convId: convId, senderId: peerId)?.groupTitle == nil {
+                if self.groupTitle(convId: convId, senderId: peerId) == nil {
                     self.lookupSenderName(peerId: peerId)
                 }
             }
@@ -749,28 +749,70 @@ class NotificationService: UNNotificationServiceExtension {
         // NOTIFICATIONS.md §2.1) four processes each burned 2 s of the 30 s budget
         // and held their 24 MB memory allowance for nothing.
         guard !pendingSenderId.isEmpty else { return }
-        guard let cached = freshCachedMessage(convId: pendingConvId, senderId: pendingSenderId) else {
+
+        // The cache supplies the body only, and usually misses: the app deactivates
+        // its accounts on entering the background, so the daemon is not running to
+        // write one. A miss leaves the baseline "New message" in place — it must not
+        // skip the group title below, which is read from disk and does not depend on
+        // the app having been alive.
+        if let cached = freshCachedMessage(convId: pendingConvId, senderId: pendingSenderId) {
+            bestAttemptContent.body = cached.body
+        } else {
             log("[Talk9-Notif] cache: miss or stale — showing 'New message'")
-            return
         }
-        bestAttemptContent.body = cached.body
 
         // [TALK9] Group banner: title it with the group and move the sender into
         // the body ("Alice: ..."), the way WhatsApp does. Without this every group
         // message is titled with the sender alone, so several active groups are
         // indistinguishable on the lock screen.
         //
-        // groupTitle is only written for a named group, so a one-to-one banner and
-        // an unnamed group both fall through untouched. The sender prefix is
-        // dropped when there is no local vCard — the same degradation the title
-        // already takes in that case, and better than printing a raw hash.
-        guard let groupTitle = cached.groupTitle, !groupTitle.isEmpty else { return }
+        // A title is only resolved for a named group, so a one-to-one banner and an
+        // unnamed group both fall through untouched. The sender prefix is dropped
+        // when there is no local vCard — the same degradation the title already
+        // takes in that case, and better than printing a raw hash.
+        guard let groupTitle = groupTitle(convId: pendingConvId, senderId: pendingSenderId) else { return }
         bestAttemptContent.title = groupTitle
         if let sender = contactProfileName(accountId: accountId, contactId: pendingSenderId),
            !sender.isEmpty {
-            bestAttemptContent.body = sender + ": " + cached.body
+            bestAttemptContent.body = sender + ": " + bestAttemptContent.body
         }
     }
+
+    /// The group's name for this push, or nil when it is not a named group.
+    ///
+    /// The cache is only a fast path and is usually absent: the app deactivates its
+    /// accounts on entering the background, so the daemon stops handling messages
+    /// and never gets to write one. The repository on disk is the reliable source —
+    /// the daemon wrote it when the conversation last synced, and reading a file
+    /// needs no daemon here.
+    private func groupTitle(convId: String, senderId: String) -> String? {
+        if let cached = freshCachedMessage(convId: convId, senderId: senderId)?.groupTitle,
+           !cached.isEmpty {
+            return cached
+        }
+        return groupTitleOnDisk(accountId: accountId, convId: convId)
+    }
+
+    /// Reads the group's name out of the conversation repository the daemon keeps
+    /// at <documents>/<accountId>/conversations/<convId>/, the same tree
+    /// contactProfileName() reads a sender's vCard from.
+    ///
+    /// A non-empty title is the whole test, and it is what distinguishes a group
+    /// here: a one-to-one conversation never carries one. Counting members cannot
+    /// do it — a two-person group and a one-to-one both have two — and an earlier
+    /// attempt to guard on it rejected every real group, because the daemon files
+    /// members by role across members/, admins/ and invited/, so members/ alone
+    /// holds only part of the roster.
+    private func groupTitleOnDisk(accountId: String, convId: String) -> String? {
+        guard !convId.isEmpty, let documents = Constants.documentsPath else { return nil }
+        let profilePath = documents.path + "/" + accountId + "/conversations/" + convId + "/profile.vcf"
+        guard FileManager.default.fileExists(atPath: profilePath),
+              let title = VCardUtils.getNameFromVCard(filePath: profilePath)?
+                .trimmingCharacters(in: .whitespacesAndNewlines),
+              !title.isEmpty else { return nil }
+        return title
+    }
+
 
     /// One `talk9_last_msg_*` entry, as written by the main app's daemon.
     private struct CachedMessage {

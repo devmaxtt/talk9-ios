@@ -454,13 +454,27 @@ Android title 改为群名、body 改为 `"Alice: Hello"`，并把 `isGroupConve
 iOS 的 NSE **完全不区分群聊与单聊**：title 恒为发送者名，body 是主 app 写的纯文本缓存、无发送者前缀。
 三个群同时来消息，锁屏上只有一串人名。`threadIdentifier` 已按会话分组（`:858`），折叠对、标题错。
 
-> ⚠️ **不要拿 §1.6（语音时长）的「架构性阻断」套这一条 —— 两者不同。**
-> §1.6 做不到，是因为写缓存的时刻语音**档案还没下载**；
-> 而**群名在写缓存时已经知道**。落点在主 app 而非 NSE。
+> ⚠️ **2026-09-22 更正 —— 本节初版写「落点在主 app」，是错的。**
 >
-> NSE 里那个 `getConversationTitle()`（`:1780`）**不能用**：它走 `conversationInfos()` 这个
-> C++ 调用、需要 daemon 在跑，而 NSE 不许启动 daemon（`NOTIFICATIONS.md` §2.4 红线）。
-> 它目前只服务通话通知，那条路径下主 app 是活的。
+> 初版的论证是：§1.6 做不到是因为写缓存时语音档案还没下载，而群名在写缓存时已经知道，
+> 所以落点在主 app。**前半对，结论错。** 两者其实卡在同一个地方，只是原因不同：
+> **`cacheMessageForNotification` 根本不会被执行。**
+>
+> App 一进背景就 `setAccountsActive(false)`（`ConversationsManager.updateBackgroundState`），
+> daemon 不再处理新讯息，`newInteraction` 不触发，自然没人写缓存。
+> 真机验证：App 在**背景**收到群讯息，标题仍是寄件者名。
+>
+> **可行的落点是 NSE 自己读档**，不需要 daemon：群名存在
+> `<documents>/<accountId>/conversations/<convId>/profile.vcf` 的 `FN` 栏位
+> （对应关系见 daemon `ConversationRepository::infosFromVCard`），
+> 而 NSE 本来就在读同一棵目录树下的 vCard（`contactProfileName`），
+> 也已经有 `VCardUtils.getNameFromVCard()`。以 `members/` 下的凭证数 > 2 排除一对一。
+>
+> ⚠️ NSE 里那个 `getConversationTitle()`（`:1780`）仍然**不能用**：它走 `conversationInfos()`
+> 这个 C++ 调用、需要 daemon 在跑（`NOTIFICATIONS.md` §2.4 红线），只服务通话通知
+> ——那条路径下主 app 是活的。**读档案和呼叫 daemon 是两回事，别混为一谈。**
+>
+> 主 app 写的 `groupTitle` 保留为快路径（App 还活着时命中），但不是主要来源。
 
 #### B2 re-invite 被 conversationReady 提前吞掉 ⚠️ 结论已修正，见 7.3
 
