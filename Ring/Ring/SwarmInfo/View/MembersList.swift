@@ -61,8 +61,17 @@ struct MemberItem: View {
     let isLocalParticipant: Bool
 
     private var displayName: String {
-        let name = participant.finalName.value.isEmpty ? participant.jamiId : participant.finalName.value
-        return isLocalParticipant ? name.withYourselfSuffix() : name
+        // ParticipantInfo seeds finalName with the jamiId, so an unresolved member
+        // reads back as their hash rather than as an empty string — hence the
+        // comparison instead of an isEmpty check.
+        let resolved = participant.finalName.value
+        let hasRealName = !resolved.isEmpty && resolved != participant.jamiId
+        guard isLocalParticipant else {
+            return hasRealName ? resolved : participant.jamiId
+        }
+        // Our own row: the hash tells the user nothing they do not already know,
+        // so show "You" on its own instead of "<40 hex chars> (You)".
+        return hasRealName ? resolved.withYourselfSuffix() : L10n.Conversation.yourself
     }
 
     private var roleText: String {

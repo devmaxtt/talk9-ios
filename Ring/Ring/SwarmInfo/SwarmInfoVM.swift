@@ -182,7 +182,11 @@ class SwarmInfoVM: ObservableObject {
     // MARK: - Title and Description Editing
 
     func presentTitleEditView() {
-        editableTitle = ""
+        // Seed the field with the current name. Starting empty hid the existing
+        // name, and because saveTitle() only bails out when the text is unchanged,
+        // confirming without typing wrote an empty title — which drops the group
+        // back to the member-name label the UI generates when none is set.
+        editableTitle = title
         DispatchQueue.main.async { [weak self] in
             self?.isShowingTitleAlert = true
         }
@@ -199,7 +203,8 @@ class SwarmInfoVM: ObservableObject {
     }
 
     func presentDescriptionEditView() {
-        editableDescription = ""
+        // Seed with the current description — same reasoning as presentTitleEditView().
+        editableDescription = description
         DispatchQueue.main.async { [weak self] in
             self?.isShowingDescriptionAlert = true
         }
