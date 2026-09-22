@@ -118,7 +118,7 @@ class RequestsService {
                 }
                 /// check if contact request already accepted
                 if contactsId.contains(contactRequest.participants.first?.jamiId ?? "") {
-                    return
+                    continue
                 }
                 currentRequests.append(contactRequest)
             }
