@@ -62,6 +62,10 @@ class SwarmCreationUIModel: ObservableObject {
             .subscribe { [weak self] infos in
                 guard let self = self else { return }
                 self.participantsRows = [ParticipantRow]()
+                // [TALK9] Rebuild this too. It only ever appended, so every refresh
+                // stacked another copy of the list and the search results repeated
+                // each person — invisible while the list was always empty.
+                self.filteredArray = [ParticipantRow]()
                 for info in infos {
                     let participant = ParticipantRow(participantData: info)
                     self.participantsRows.append(participant)
@@ -71,13 +75,24 @@ class SwarmCreationUIModel: ObservableObject {
 
             }
             .disposed(by: self.disposeBag)
-        injectionBag
-            .contactsService
-            .contacts
-            .asObservable()
-            .subscribe { [weak self] contacts in
+        // [TALK9] Offer conversation peers as well as contacts — same reasoning as
+        // SwarmInfoVM.invitablePeople(). addContacts() clears its list on every
+        // call, so both sources have to arrive in one array.
+        Observable
+            .combineLatest(injectionBag.contactsService.contacts.asObservable(),
+                           injectionBag.conversationsService.conversations.asObservable())
+            .subscribe { [weak self] contacts, conversations in
                 guard let self = self else { return }
-                self.swarmInfo.addContacts(contacts: contacts)
+                var people = contacts
+                var seen = Set(contacts.map { $0.hash })
+                for conversation in conversations
+                where conversation.accountId == accountId && conversation.isCoredialog() {
+                    guard let jamiId = conversation.getParticipants().first?.jamiId,
+                          !jamiId.isEmpty,
+                          seen.insert(jamiId).inserted else { continue }
+                    people.append(ContactModel(withUri: JamiURI(schema: .ring, infoHash: jamiId)))
+                }
+                self.swarmInfo.addContacts(contacts: people)
             } onError: { _ in
             }
             .disposed(by: self.disposeBag)

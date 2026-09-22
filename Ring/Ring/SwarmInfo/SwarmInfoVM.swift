@@ -271,11 +271,46 @@ class SwarmInfoVM: ObservableObject {
             })
             .disposed(by: self.contactsSubscriptionsDisposeBag)
 
-        injectionBag.contactsService.contacts
-            .subscribe(onNext: { [weak self] contacts in
-                self?.swarmInfo.addContacts(contacts: contacts)
+        // [TALK9] Offer conversation peers as well as contacts. addContacts() clears
+        // its list on every call, so the two sources have to arrive together in one
+        // array rather than as two subscriptions.
+        Observable
+            .combineLatest(injectionBag.contactsService.contacts.asObservable(),
+                           injectionBag.conversationsService.conversations.asObservable())
+            .subscribe(onNext: { [weak self] contacts, conversations in
+                guard let self = self else { return }
+                self.swarmInfo.addContacts(contacts: self.invitablePeople(contacts: contacts,
+                                                                          conversations: conversations))
             })
             .disposed(by: self.contactsSubscriptionsDisposeBag)
+    }
+
+    /// Everyone worth offering as a group member: the contact list, plus the peer
+    /// of every one-to-one conversation on this account.
+    ///
+    /// An account can hold conversations without holding contacts — accepting a
+    /// conversation request never reaches addContact, only sending one does — so a
+    /// contacts-only list is empty for anyone who has been contacted rather than
+    /// doing the contacting. Broadcast picks its recipients from conversations for
+    /// the same reason.
+    ///
+    /// Contacts are added first and win on duplicates: a peer who is both keeps the
+    /// contact entry, which carries the banned flag that addContacts() filters on.
+    /// Conversations already in the group are dropped by addContacts()'s own
+    /// member check, and getParticipants() excludes us.
+    private func invitablePeople(contacts: [ContactModel],
+                                 conversations: [ConversationModel]) -> [ContactModel] {
+        guard let accountId = conversation?.accountId else { return contacts }
+        var result = contacts
+        var seen = Set(contacts.map { $0.hash })
+        for conversation in conversations
+        where conversation.accountId == accountId && conversation.isCoredialog() {
+            guard let jamiId = conversation.getParticipants().first?.jamiId,
+                  !jamiId.isEmpty,
+                  seen.insert(jamiId).inserted else { continue }
+            result.append(ContactModel(withUri: JamiURI(schema: .ring, infoHash: jamiId)))
+        }
+        return result
     }
 
     func removeExistingSubscription() {
