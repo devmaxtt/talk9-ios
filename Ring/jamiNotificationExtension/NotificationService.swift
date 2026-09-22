@@ -638,8 +638,16 @@ class NotificationService: UNNotificationServiceExtension {
                     self.bestAttemptContent.title = realName
                 }
                 log("[Talk9-Notif] vCard name: \(localName ?? "none — waiting for nameserver")")
-                // 2. Try name server lookup (async, may find registered username)
-                self.lookupSenderName(peerId: peerId)
+                // 2. Try name server lookup (async, may find registered username).
+                //    [TALK9] Skipped for a group: that banner is titled with the
+                //    group name, and this lookup's completion assigns
+                //    bestAttemptContent.title unconditionally, from the URLSession
+                //    thread — it would drop the sender's name back over the group.
+                //    Decided here, before the request is sent, so no cross-thread
+                //    flag is needed to suppress it later.
+                if self.freshCachedMessage(convId: convId, senderId: peerId)?.groupTitle == nil {
+                    self.lookupSenderName(peerId: peerId)
+                }
             }
             // peerId empty → title stays empty → finish() suppresses
             self.handleGitMessage(convId: convId, loadAll: convId.isEmpty) // async
@@ -740,44 +748,77 @@ class NotificationService: UNNotificationServiceExtension {
         // (one voice message = ~4 pushes = 4 parallel NSE processes, see
         // NOTIFICATIONS.md §2.1) four processes each burned 2 s of the 30 s budget
         // and held their 24 MB memory allowance for nothing.
-        guard !pendingSenderId.isEmpty,
-              let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
+        guard !pendingSenderId.isEmpty else { return }
+        guard let cached = freshCachedMessage(convId: pendingConvId, senderId: pendingSenderId) else {
+            log("[Talk9-Notif] cache: miss or stale — showing 'New message'")
+            return
+        }
+        bestAttemptContent.body = cached.body
+
+        // [TALK9] Group banner: title it with the group and move the sender into
+        // the body ("Alice: ..."), the way WhatsApp does. Without this every group
+        // message is titled with the sender alone, so several active groups are
+        // indistinguishable on the lock screen.
+        //
+        // groupTitle is only written for a named group, so a one-to-one banner and
+        // an unnamed group both fall through untouched. The sender prefix is
+        // dropped when there is no local vCard — the same degradation the title
+        // already takes in that case, and better than printing a raw hash.
+        guard let groupTitle = cached.groupTitle, !groupTitle.isEmpty else { return }
+        bestAttemptContent.title = groupTitle
+        if let sender = contactProfileName(accountId: accountId, contactId: pendingSenderId),
+           !sender.isEmpty {
+            bestAttemptContent.body = sender + ": " + cached.body
+        }
+    }
+
+    /// One `talk9_last_msg_*` entry, as written by the main app's daemon.
+    private struct CachedMessage {
+        let body: String
+        /// Set only for a named group conversation — see
+        /// `ConversationsManager.groupTitleForNotification()` for why an unnamed
+        /// group deliberately leaves this nil.
+        let groupTitle: String?
+    }
+
+    /// The freshest cache entry the main app wrote for this push, or nil.
+    ///
+    /// Shared by `handleGitMessage` and by the group check that has to run before
+    /// the sender-name lookup is started, so the two cannot disagree about whether
+    /// this push belongs to a group.
+    ///
+    /// Only entries written before this instance started are accepted; see the
+    /// note at the top of `handleGitMessage` for why waiting for a newer one
+    /// cannot help.
+    private func freshCachedMessage(convId: String, senderId: String) -> CachedMessage? {
+        guard let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return nil }
         // Only accept cache entries written within 2 seconds before this extension
         // instance started (covers clock skew / daemon-faster-than-extension races).
         // The old 10s grace was too large: it would pick up already-read messages if
         // the user received one within the preceding 10s and then a new push arrived.
         let freshThreshold = extensionStartTime - 2.0
-        var cachedBody: String?
 
-        func freshBody(from entry: [AnyHashable: Any]?) -> String? {
+        func parse(_ entry: [AnyHashable: Any]?) -> CachedMessage? {
             guard let entry = entry,
                   let body = entry["body"] as? String, !body.isEmpty,
                   let ts = entry["ts"] as? TimeInterval,
                   ts >= freshThreshold else { return nil }
-            return body
+            return CachedMessage(body: body, groupTitle: entry["groupTitle"] as? String)
         }
 
         // 1. Try per-conversation key (convId present in push payload)
-        if !pendingConvId.isEmpty {
-            let convKey = Constants.talk9LastMessageKeyPrefix + accountId + "_" + pendingConvId
-            if let body = freshBody(from: defaults.dictionary(forKey: convKey)) {
-                cachedBody = body
-                log("[Talk9-Notif] cache: fresh conv key '\(body.prefix(40))'")
-            }
+        if !convId.isEmpty,
+           let cached = parse(defaults.dictionary(forKey: Constants.talk9LastMessageKeyPrefix + accountId + "_" + convId)) {
+            log("[Talk9-Notif] cache: fresh conv key '\(cached.body.prefix(40))'")
+            return cached
         }
         // 2. Fall back to per-sender key (convId empty or conv key missed)
-        if cachedBody == nil {
-            let senderKey = Constants.talk9LastMessageKeyPrefix + "sender_" + accountId + "_" + pendingSenderId
-            if let body = freshBody(from: defaults.dictionary(forKey: senderKey)) {
-                cachedBody = body
-                log("[Talk9-Notif] cache: fresh sender key '\(body.prefix(40))'")
-            }
+        if !senderId.isEmpty,
+           let cached = parse(defaults.dictionary(forKey: Constants.talk9LastMessageKeyPrefix + "sender_" + accountId + "_" + senderId)) {
+            log("[Talk9-Notif] cache: fresh sender key '\(cached.body.prefix(40))'")
+            return cached
         }
-        if let body = cachedBody {
-            bestAttemptContent.body = body
-        } else {
-            log("[Talk9-Notif] cache: miss or stale — showing 'New message'")
-        }
+        return nil
     }
 
     private func verifyTasksStatus() {

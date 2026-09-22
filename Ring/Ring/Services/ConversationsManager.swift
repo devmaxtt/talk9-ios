@@ -773,12 +773,48 @@ extension ConversationsManager {
     private func cacheMessageForNotification(accountId: String, conversationId: String, authorId: String, body: String) {
         guard let defaults = UserDefaults(suiteName: Constants.appGroupIdentifier) else { return }
         let timestamp = Date().timeIntervalSince1970
+        // [TALK9] Carry the group's name so the extension can title a group banner
+        // with the group and prefix the body with the sender, instead of titling it
+        // with the sender alone — three groups at once are otherwise just three
+        // names on the lock screen. Only the name travels: the extension resolves
+        // the sender itself, from the same vCards it already uses for the title.
+        var convEntry: [String: Any] = ["body": body, "authorId": authorId, "ts": timestamp]
+        var senderEntry: [String: Any] = ["body": body, "ts": timestamp]
+        if let groupTitle = self.groupTitleForNotification(accountId: accountId, conversationId: conversationId) {
+            convEntry["groupTitle"] = groupTitle
+            senderEntry["groupTitle"] = groupTitle
+        }
         // Key by conversation — used when the extension knows the convId
         let convKey = Constants.talk9LastMessageKeyPrefix + accountId + "_" + conversationId
-        defaults.set(["body": body, "authorId": authorId, "ts": timestamp], forKey: convKey)
+        defaults.set(convEntry, forKey: convKey)
         // Key by sender — fallback when extension doesn't receive a convId in the push payload
         let senderKey = Constants.talk9LastMessageKeyPrefix + "sender_" + accountId + "_" + authorId
-        defaults.set(["body": body, "ts": timestamp], forKey: senderKey)
+        defaults.set(senderEntry, forKey: senderKey)
+    }
+
+    /// The group's name for a notification banner, or nil when titling the banner
+    /// with it would be wrong or worse than what ships today.
+    ///
+    /// nil is the safe answer everywhere: the extension then keeps titling the
+    /// banner with the sender's name, which is the current behaviour. Neither
+    /// guard is defensive padding — each one is a case that regresses:
+    ///
+    /// - Not a group: a one-to-one banner would read "Bob" / "Bob: hi".
+    /// - No stored title: an unnamed group has none. The UI composes one from
+    ///   member names at render time (`SwarmInfo`), so nothing is persisted here.
+    ///   Forwarding "" would leave the extension with an empty title, which it
+    ///   replaces with a generic "Talk9 / New message" — the message text is lost.
+    ///
+    /// Reading the conversation is safe on this thread: `getConversationForId`
+    /// only filters the in-memory relay and never enters the service's serial
+    /// queue, so it cannot deadlock against the `insertMessages` call below.
+    private func groupTitleForNotification(accountId: String, conversationId: String) -> String? {
+        guard let conversation = self.conversationService
+                .getConversationForId(conversationId: conversationId, accountId: accountId),
+              conversation.isSwarm(),
+              conversation.type != .oneToOne else { return nil }
+        let title = conversation.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        return title.isEmpty ? nil : title
     }
 }
 
