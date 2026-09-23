@@ -1552,11 +1552,22 @@ extension NotificationService {
 
     private func contactProfileName(accountId: String, contactId: String) -> String? {
         guard let documents = Constants.documentsPath else { return nil }
-        let uri = "ring:" + contactId
-        let path = documents.path + "/" + "\(accountId)" + "/profiles/" + "\(Data(uri.utf8).base64EncodedString()).vcf"
-        if !FileManager.default.fileExists(atPath: path) { return nil }
-
-        return VCardUtils.getNameFromVCard(filePath: path)
+        let directory = documents.path + "/" + accountId + "/profiles/"
+        // Two writers, two naming schemes for the same directory: the app saves a
+        // contact's vCard under base64("ring:<hash>"), the daemon saves a peer's
+        // under base64("<hash>") — see JamiAccount, which keys on the bare
+        // accountId. Only the app's form was tried here, so a group member who is
+        // not also a contact resolved to nothing and their message lost the
+        // "<sender>: " prefix.
+        for uri in ["ring:" + contactId, contactId] {
+            let path = directory + Data(uri.utf8).base64EncodedString() + ".vcf"
+            guard FileManager.default.fileExists(atPath: path),
+                  let name = VCardUtils.getNameFromVCard(filePath: path)?
+                    .trimmingCharacters(in: .whitespacesAndNewlines),
+                  !name.isEmpty else { continue }
+            return name
+        }
+        return nil
     }
 
     // MARK: - [TALK9] Unknown-peer filtering
