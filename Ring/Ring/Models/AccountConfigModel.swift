@@ -48,6 +48,22 @@ class AccountConfigModel {
      */
     private let log = SwiftyBeaver.self
 
+    /// Config keys the daemon sends that this client has no `ConfigKey` case for.
+    /// Reported once each: the daemon repeats them on every account update, which
+    /// during registration is several times a second, and a few hundred identical
+    /// lines bury everything else in the log. The keys are still dropped from
+    /// `configValues` exactly as before — this only changes what is printed.
+    private static var reportedUnknownKeys = Set<String>()
+    private static let reportedUnknownKeysLock = NSLock()
+
+    private func reportUnknownKey(_ key: String) {
+        Self.reportedUnknownKeysLock.lock()
+        let isFirstTime = Self.reportedUnknownKeys.insert(key).inserted
+        Self.reportedUnknownKeysLock.unlock()
+        guard isFirstTime else { return }
+        log.warning("Unable to find key: \(key) — reported once, later occurrences are suppressed")
+    }
+
     /**
      Constructor.
 
@@ -64,7 +80,7 @@ class AccountConfigModel {
                     configValues.updateValue(value, forKey: configKeyModel)
                 } else {
                     // ~ The key given in parameter is not known from Ring.
-                    log.warning("Unable to find key: \(key)")
+                    reportUnknownKey(key)
                 }
             }
         }
@@ -121,7 +137,7 @@ class AccountConfigModel {
                 configValues.updateValue(value, forKey: configKeyModel)
             } else {
                 // ~ The key given in parameter is not known from Ring.
-                log.warning("Unable to find key: \(key)")
+                reportUnknownKey(key)
             }
         }
     }
