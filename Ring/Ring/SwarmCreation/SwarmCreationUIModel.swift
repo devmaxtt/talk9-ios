@@ -141,7 +141,7 @@ class SwarmCreationUIModel: ObservableObject {
     func setDataToInitial() {
         self.image = initialImage
         self.swarmName = initialSwarmName
-        self.swarmDescription = initialSwarmName
+        self.swarmDescription = initialSwarmDescription
     }
 
     var hasProfileImage: Bool {

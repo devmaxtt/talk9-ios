@@ -133,6 +133,11 @@ struct SwarmCreationUI: View {
 
     func swarmProfileButton() -> some View {
         Button(action: {
+            // Snapshot what is on screen now, so Cancel restores this state rather
+            // than emptying the fields. takeCurrentDataSnapshot() existed but had no
+            // caller, which left the "initial" values permanently blank — cancelling
+            // after a save wiped a name the user had already entered.
+            list.takeCurrentDataSnapshot()
             isPresentingProfile = true
         }, label: {
             HStack {
@@ -154,8 +159,12 @@ struct SwarmCreationUI: View {
                 }
                 Spacer()
                     .frame(width: 12)
-                Text(L10n.Swarm.customize)
+                // Show the name once there is one: the sheet's Save button only
+                // closes the sheet (the fields write straight through), so this row
+                // is the only confirmation the user gets that anything was kept.
+                Text(list.swarmName.isEmpty ? L10n.Swarm.customize : list.swarmName)
                     .foregroundColor(Color(UIColor.label))
+                    .lineLimit(1)
                 Spacer()
                 Image(systemName: "pencil")
                     .resizable()
