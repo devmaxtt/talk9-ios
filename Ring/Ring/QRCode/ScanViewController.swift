@@ -43,6 +43,8 @@ class ScanViewController: UIViewController, StoryboardBased, AVCaptureMetadataOu
 
     var scannedQrCode: Bool = false
     var lastInvalidScanTime: Date?
+    private var decodingOverlay: UIView?
+    private var decodingOverlayWork: DispatchWorkItem?
     // captureSession manages capture activity and coordinates between input device and captures outputs
     var captureSession: AVCaptureSession?
     var videoPreviewLayer: AVCaptureVideoPreviewLayer?
@@ -246,28 +248,85 @@ class ScanViewController: UIViewController, StoryboardBased, AVCaptureMetadataOu
         picker.dismiss(animated: true, completion: nil)
         guard let provider = results.first?.itemProvider,
               provider.canLoadObject(ofClass: UIImage.self) else { return }
+        // Claim the scan for the duration. The capture session keeps running behind
+        // the picker, so a code drifting into frame while we decode would call
+        // onCodeScanned() a second time and race this one to the callback. This is
+        // the same flag the camera path sets once it has a result; the failure path
+        // below clears it so the camera can carry on.
+        scannedQrCode = true
+        scheduleDecodingOverlay()
         provider.loadObject(ofClass: UIImage.self) { [weak self] object, _ in
-            guard let self = self, let image = object as? UIImage else { return }
-            DispatchQueue.main.async {
-                self.handleScannedImage(image)
-            }
+            guard let self = self else { return }
+            // Already off the main thread here, and CIDetector at high accuracy on a
+            // 12 MP photo is not instant — decode before hopping back.
+            let decoded = (object as? UIImage).flatMap { self.decodeQRCode(from: $0) }
+            DispatchQueue.main.async { self.finishGalleryDecode(decoded) }
         }
     }
 
-    private func handleScannedImage(_ image: UIImage) {
-        guard let stringValue = self.decodeQRCode(from: image) else {
-            self.presentInvalidQRAlert(message: NSLocalizedString("scan.qrCodeNotFound",
-                                                                  value: "No QR code found in the selected image",
-                                                                  comment: "Shown when the picked image contains no QR code"))
+    private func finishGalleryDecode(_ decoded: String?) {
+        cancelDecodingOverlay()
+        // The sheet can be dismissed while a decode is in flight; presenting an
+        // alert or navigating from a detached view controller does nothing useful.
+        guard viewIfLoaded?.window != nil else { return }
+        guard let stringValue = decoded else {
+            scannedQrCode = false
+            presentInvalidQRAlert(message: NSLocalizedString("scan.qrCodeNotFound",
+                                                             value: "No QR code found in the selected image",
+                                                             comment: "Shown when the picked image contains no QR code"))
             return
         }
-        if let jamiId = self.jamiId(fromScanned: stringValue) {
-            AudioServicesPlayAlertSound(systemSoundId)
-            onCodeScanned?(jamiId)
-            self.scannedQrCode = true
-        } else {
-            self.presentInvalidQRAlert(message: "")
+        guard let jamiId = jamiId(fromScanned: stringValue) else {
+            scannedQrCode = false
+            presentInvalidQRAlert(message: "")
+            return
         }
+        AudioServicesPlayAlertSound(systemSoundId)
+        onCodeScanned?(jamiId)
+        // scannedQrCode stays set: this screen is done.
+    }
+
+    // MARK: - Decoding overlay
+
+    /// Shown only if decoding outlasts the delay. A photo that decodes in
+    /// 200 ms would otherwise flash a spinner for a single frame, which reads
+    /// worse than the brief pause it replaces.
+    private static let overlayDelay: TimeInterval = 0.3
+
+    private func scheduleDecodingOverlay() {
+        cancelDecodingOverlay()
+        let work = DispatchWorkItem { [weak self] in self?.installDecodingOverlay() }
+        decodingOverlayWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.overlayDelay, execute: work)
+    }
+
+    private func cancelDecodingOverlay() {
+        decodingOverlayWork?.cancel()
+        decodingOverlayWork = nil
+        decodingOverlay?.removeFromSuperview()
+        decodingOverlay = nil
+    }
+
+    private func installDecodingOverlay() {
+        guard decodingOverlay == nil, isViewLoaded else { return }
+        let overlay = UIView()
+        overlay.translatesAutoresizingMaskIntoConstraints = false
+        overlay.backgroundColor = UIColor.black.withAlphaComponent(0.45)
+        let spinner = UIActivityIndicatorView(style: .large)
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        spinner.color = .white
+        spinner.startAnimating()
+        overlay.addSubview(spinner)
+        view.addSubview(overlay)
+        NSLayoutConstraint.activate([
+            overlay.topAnchor.constraint(equalTo: view.topAnchor),
+            overlay.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            overlay.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            overlay.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            spinner.centerXAnchor.constraint(equalTo: overlay.centerXAnchor),
+            spinner.centerYAnchor.constraint(equalTo: overlay.centerYAnchor)
+        ])
+        decodingOverlay = overlay
     }
 
     private func decodeQRCode(from image: UIImage) -> String? {
