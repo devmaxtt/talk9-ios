@@ -226,6 +226,76 @@ struct MessagePanelView: View {
     }
 
     @ViewBuilder
+    private func voiceRecordButton() -> some View {
+        Button(action: {
+            isFocused = false
+            model.toggleVoiceRecording()
+        }, label: {
+            Image(systemName: "mic")
+                .font(.system(size: 20, weight: .light))
+                .foregroundColor(model.styling.secondaryTextColor)
+                .frame(width: defaultControlSize, height: defaultControlSize)
+                .contentShape(Rectangle())
+        })
+        .buttonStyle(.plain)
+        .accessibilityLabel(NSLocalizedString("conversation.recordVoiceMessage",
+                                              value: "Record voice message",
+                                              comment: "Accessibility label for the microphone button in the message bar"))
+    }
+
+    /// Replaces the whole bar while recording, so there is nowhere to type and no
+    /// doubt about what tapping send will do.
+    @ViewBuilder
+    private func voiceRecordingBar() -> some View {
+        HStack(alignment: .center, spacing: textContainerLeadingInset) {
+            Button(action: {
+                model.cancelVoiceRecording()
+            }, label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: 18, weight: .light))
+                    .foregroundColor(model.styling.secondaryTextColor)
+                    .frame(width: defaultControlSize, height: defaultControlSize)
+                    .contentShape(Rectangle())
+            })
+            .buttonStyle(.plain)
+            .accessibilityLabel(NSLocalizedString("conversation.cancelVoiceRecording",
+                                                  value: "Cancel recording",
+                                                  comment: "Accessibility label for discarding a voice recording"))
+
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(Color.red)
+                    .frame(width: 8, height: 8)
+                Text(model.voiceRecordDuration)
+                    .font(.system(size: 15).monospacedDigit())
+                    .foregroundColor(model.styling.secondaryTextColor)
+                Spacer()
+            }
+            .padding(.horizontal, textContainerLeadingInset)
+            .frame(height: defaultControlSize)
+            .background(
+                VisualEffect(style: .systemUltraThinMaterial, withVibrancy: false)
+                    .clipShape(RoundedRectangle(cornerRadius: defaultControlSize / 2))
+            )
+
+            Button(action: {
+                model.toggleVoiceRecording()
+            }, label: {
+                Image(systemName: "paperplane.fill")
+                    .resizable()
+                    .frame(width: sendIconSize, height: sendIconSize)
+                    .foregroundColor(model.styling.secondaryTextColor)
+                    .frame(width: defaultControlSize, height: defaultControlSize)
+                    .contentShape(Rectangle())
+            })
+            .buttonStyle(.plain)
+            .accessibilityLabel(NSLocalizedString("conversation.sendVoiceMessage",
+                                                  value: "Send voice message",
+                                                  comment: "Accessibility label for sending a recorded voice message"))
+        }
+    }
+
+    @ViewBuilder
     private func sendEmojiButton() -> some View {
         Button(action: {
             self.model.sendMessage(text: text)
@@ -261,12 +331,23 @@ struct MessagePanelView: View {
                     }
             }
 
-            HStack(alignment: .bottom, spacing: textContainerLeadingInset) {
-                moreActionsButton()
-                messageTextField()
+            if model.isRecordingVoice {
+                voiceRecordingBar()
+                    .padding(.top, padding)
+                    .padding(.bottom, isFocused ? padding : 0)
+            } else {
+                HStack(alignment: .bottom, spacing: textContainerLeadingInset) {
+                    moreActionsButton()
+                    messageTextField()
+                    // Hidden once there is text: whoever is typing is not about to
+                    // record, and the field gets the width back.
+                    if text.isEmpty {
+                        voiceRecordButton()
+                    }
+                }
+                .padding(.top, padding)
+                .padding(.bottom, isFocused ? padding : 0)
             }
-            .padding(.top, padding)
-            .padding(.bottom, isFocused ? padding : 0)
         }
         .onChange(of: model.isEdit) { _ in
             isFocused = model.isEdit

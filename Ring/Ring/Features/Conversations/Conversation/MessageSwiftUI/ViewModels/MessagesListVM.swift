@@ -386,6 +386,96 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
     }()
 
     private let messagePanelStateSubject = PublishSubject<State>()
+
+    // MARK: - Voice recording
+    //
+    // Recording in place in the message bar, rather than on the full-screen
+    // recorder MessagePanelState.recordAudio still opens. Only the audio path is
+    // here; MediaRecordViewModel keeps the video case, its camera preview and its
+    // playback controls, none of which apply inside a text field.
+
+    private var voiceRecordingFile = ""
+    private var voiceRecordingStartedAt: Date?
+    private var voiceRecordingTimer: Timer?
+
+    private static let voiceRecordingDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMdd_HHmmss"
+        return formatter
+    }()
+
+    func toggleVoiceRecording() {
+        if messagePanel.isRecordingVoice {
+            finishVoiceRecording(send: true)
+        } else {
+            startVoiceRecording()
+        }
+    }
+
+    private func startVoiceRecording() {
+        // A voice message playing into the microphone would be captured.
+        transferHelper.closeAllPlayers()
+        let name = Self.voiceRecordingDateFormatter.string(from: Date()) + "_" + String(UInt64.random(in: 0...9999))
+        guard let url = injectionBag.dataTransferService
+                .getFilePathForRecordings(forFile: name,
+                                          accountID: conversation.accountId,
+                                          conversationID: conversation.id,
+                                          isSwarm: conversation.isSwarm()),
+              let path = injectionBag.videoService.startLocalRecorder(audioOnly: true, path: url.path) else {
+            // Denied microphone permission lands here too: the recorder returns nil
+            // rather than throwing, so the bar simply does not switch.
+            return
+        }
+        voiceRecordingFile = path
+        voiceRecordingStartedAt = Date()
+        messagePanel.voiceRecordDuration = "0:00"
+        messagePanel.isRecordingVoice = true
+        voiceRecordingTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+            self?.updateVoiceRecordingDuration()
+        }
+    }
+
+    private func finishVoiceRecording(send: Bool) {
+        guard messagePanel.isRecordingVoice else { return }
+        voiceRecordingTimer?.invalidate()
+        voiceRecordingTimer = nil
+        voiceRecordingStartedAt = nil
+        messagePanel.isRecordingVoice = false
+
+        let path = voiceRecordingFile
+        voiceRecordingFile = ""
+        guard !path.isEmpty else { return }
+        injectionBag.videoService.stopLocalRecorder(path: path)
+        // Only the audio half of the teardown. videRecordingFinished() also flips the
+        // camera back and closes a video input — startLocalRecorder(audioOnly:) never
+        // opened one (it passes an empty device), and tearing down a camera that was
+        // never started is what logs the FigApplicationStateMonitor and AVAudioSession
+        // -50 errors.
+        injectionBag.videoService.stopAudioDevice()
+
+        guard send else {
+            try? FileManager.default.removeItem(atPath: path)
+            return
+        }
+        // The recorder is still flushing when stopLocalRecorder returns —
+        // MediaRecordViewModel waits a second before it can even open the file for
+        // playback. Sending immediately can pick up a truncated file. The bar has
+        // already reset, so this delay is not visible.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard let self = self, let conversation = self.conversation else { return }
+            self.injectionBag.dataTransferService
+                .sendFile(conversation: conversation,
+                          filePath: path,
+                          displayName: URL(fileURLWithPath: path).lastPathComponent,
+                          localIdentifier: nil)
+        }
+    }
+
+    private func updateVoiceRecordingDuration() {
+        guard let startedAt = voiceRecordingStartedAt else { return }
+        let elapsed = Int(Date().timeIntervalSince(startedAt))
+        messagePanel.voiceRecordDuration = String(format: "%d:%02d", elapsed / 60, elapsed % 60)
+    }
     lazy var messagePanelState: Observable<State> = {
         return self.messagePanelStateSubject.asObservable()
     }()
@@ -496,6 +586,10 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
         self.messagePanel = MessagePanelVM(messagePanelState: self.messagePanelStateSubject)
         self.callBannerViewModel = CallBannerViewModel(injectionBag: injectionBag, conversation: self.conversation, state: self.messagePanelStateSubject)
         self.contextMenuModel.currentJamiAccountId = self.accountService.currentAccount?.jamiId
+
+        // After every stored property is initialised: these closures capture self.
+        self.messagePanel.onVoiceRecordToggle = { [weak self] in self?.toggleVoiceRecording() }
+        self.messagePanel.onVoiceRecordCancel = { [weak self] in self?.finishVoiceRecording(send: false) }
 
         self.subscribeLocationEvents()
         self.subscribeSwarmPreferences()
@@ -652,17 +746,17 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
             // frozen for all of it, and a long enough stall is a watchdog kill rather
             // than a visible hang.
             .subscribe(on: ConcurrentDispatchQueueScheduler(qos: .background))
-            // The completion has to come back to main. It calls connectivityChanged(),
-            // which makes the daemon re-register every enabled account and fans out a
-            // burst of signals; delivered on a background thread those reach the view
-            // models off-main, which SwiftUI reports as "Publishing changes from
-            // background threads is not allowed" and treats as undefined behaviour.
+            // The completion writes isTemporary, which the view observes, so it has to
+            // land on main.
             .observe(on: MainScheduler.instance)
             .subscribe(onCompleted: { [weak self, weak conversation] in
                 guard let self = self,
                       let conversation = conversation else { return }
-                // Reset connection manager state so new ICE connections are not blocked by stale isConnecting flag
-                self.injectionBag.daemonService.connectivityChanged()
+                // [TALK9] Do not call connectivityChanged() here. DRingAdapter runs it
+                // synchronously on the main thread by design, and the daemon answers it
+                // by re-registering every enabled account — tearing down and rebuilding
+                // DHT/ICE/TURN. That froze the app for the whole teardown at exactly the
+                // moment isTemporary flipped the view over to the chat.
                 if conversation.isDialog() {
                     self.presenceService.subscribeBuddy(withAccountId: conversation.accountId,
                                                         withJamiId: jamiId,
@@ -784,6 +878,7 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
 
     func subscribeReactions() {
         self.conversation.reactionsUpdated
+            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] messageId in
                 guard let self = self else { return }
                 self.reactionsUpdated(messageId: messageId)
@@ -817,6 +912,7 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
 
     func subscribeMessageUpdates() {
         self.conversation.messageUpdated
+            .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] messageId in
                 guard let self = self else { return }
                 self.messageUpdated(messageId: messageId)

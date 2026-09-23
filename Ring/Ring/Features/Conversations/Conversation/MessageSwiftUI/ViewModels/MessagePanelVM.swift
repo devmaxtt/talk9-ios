@@ -29,6 +29,15 @@ class MessagePanelVM: ObservableObject, MessageAppearanceProtocol {
     @Published var isEdit: Bool = false
     @Published var avatarImage: UIImage?
     @Published var inReplyTo = ""
+
+    // [TALK9] Voice recording state. The work itself lives in MessagesListVM —
+    // this view model is constructed with nothing but an event subject and has no
+    // services or conversation of its own, by design.
+    @Published var isRecordingVoice = false
+    @Published var voiceRecordDuration = "0:00"
+    /// Wired by MessagesListVM. Toggle starts a recording, or stops and sends one.
+    var onVoiceRecordToggle: (() -> Void)?
+    var onVoiceRecordCancel: (() -> Void)?
     var styling: MessageStyling = MessageStyling()
 
     private let messagePanelState: PublishSubject<State>
@@ -94,6 +103,14 @@ class MessagePanelVM: ObservableObject, MessageAppearanceProtocol {
 
     func recordAudio() {
         messagePanelState.onNext(MessagePanelState.recordAudio)
+    }
+
+    func toggleVoiceRecording() {
+        onVoiceRecordToggle?()
+    }
+
+    func cancelVoiceRecording() {
+        onVoiceRecordCancel?()
     }
 
     func sendFile() {
