@@ -953,8 +953,7 @@ class NotificationService: UNNotificationServiceExtension {
             // Tag real-message banners with a per-conversation thread so iOS
             // groups them by chat on the lock screen, while staying outside the
             // "talk9.suppressed" namespace the cleanup paths filter on.
-            let convThread = (bestAttemptContent.userInfo[Constants.NotificationUserInfoKeys.conversationID.rawValue] as? String) ?? ""
-            self.bestAttemptContent.threadIdentifier = convThread.isEmpty ? "talk9.real" : "talk9.real." + convThread
+            self.bestAttemptContent.threadIdentifier = bannerThreadIdentifier(userInfo: bestAttemptContent.userInfo)
             // Take advantage of this real-message delivery to sweep any orphaned
             // suppressed empty cards from previous pushes whose async cleanup never
             // completed. Cheap insurance against accumulation on the lock screen.
@@ -1005,6 +1004,32 @@ class NotificationService: UNNotificationServiceExtension {
     /// repeated suppressed notifications into a single group in the notification center.
     /// Explicit sound=nil and badge=0 belt-and-suspenders the silencing in case
     /// .passive isn't respected on a particular iOS version / settings combo.
+    /// The thread iOS groups this banner under.
+    ///
+    /// The conversation id is preferred and keeps a group together no matter who
+    /// posted. It is not always in the push though — the extension handles an empty
+    /// one throughout — and every banner that lacked it used to land in one shared
+    /// "talk9.real" bucket alongside every other conversation's, which is why the
+    /// same contact's notifications grouped sometimes and not others. Falling back
+    /// to the sender keeps those together at least.
+    ///
+    /// Everything stays under the "talk9.real" prefix, outside the
+    /// "talk9.suppressed" namespace the cleanup paths filter on.
+    private func bannerThreadIdentifier(userInfo: [AnyHashable: Any]) -> String {
+        let convId = userInfo[Constants.NotificationUserInfoKeys.conversationID.rawValue] as? String ?? ""
+        let peerId = userInfo[Constants.NotificationUserInfoKeys.participantID.rawValue] as? String ?? ""
+        let thread: String
+        if !convId.isEmpty {
+            thread = "talk9.real." + convId
+        } else if !peerId.isEmpty {
+            thread = "talk9.real.peer." + peerId
+        } else {
+            thread = "talk9.real"
+        }
+        return thread
+    }
+
+
     private func makeSuppressedContent() -> UNMutableNotificationContent {
         let content = UNMutableNotificationContent()
         content.title = " "
@@ -1805,8 +1830,7 @@ extension NotificationService {
         setNotificationCount(notification: content)
         // Per-conversation thread: groups by chat on the lock screen and stays
         // outside the "talk9.suppressed" namespace the cleanup paths filter on.
-        let convThread = (content.userInfo[Constants.NotificationUserInfoKeys.conversationID.rawValue] as? String) ?? ""
-        content.threadIdentifier = convThread.isEmpty ? "talk9.real" : "talk9.real." + convThread
+        content.threadIdentifier = bannerThreadIdentifier(userInfo: content.userInfo)
         let notificationTrigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.01, repeats: false)
         let notificationRequest = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: notificationTrigger)
         UNUserNotificationCenter.current().add(notificationRequest) { [weak self] (error) in
