@@ -1696,12 +1696,16 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
         DispatchQueue.global(qos: .background).async {[weak self] in
             guard let self = self else { return }
             guard let account = self.accountService.getAccount(fromAccountId: self.conversation.accountId) else { return }
+            // Someone who is not in the contact list can still have a profile on this
+            // device: the daemon syncs a conversation member's vCard, and it is the
+            // same profile the conversation title already renders. Returning here
+            // skipped that lookup entirely and left a system message reading
+            // "<40 hex chars> has joined the conversation" for good whenever the
+            // name server had nothing either. Only the placeholder is kept.
             if self.contactsService.contact(withHash: id) == nil {
                 DispatchQueue.main.async { [weak self] in
                     self?.updateName(name: id, jamiId: id)
-                    self?.nameLookup(id: id)
                 }
-                return
             }
             let schema: URIType = account.type == .sip ? .sip : .ring
             guard let contactURI = JamiURI(schema: schema, infoHash: id).uriString else { return }
@@ -1718,8 +1722,11 @@ class MessagesListVM: ObservableObject, AvatarRelayProviding {
                     if let data = profile.photo?.toImageData() {
                         self.updateAvatar(imageData: data, jamiId: id)
                     }
+                    // A placeholder equal to the id is not a name — without this the
+                    // fallback below never runs for a non-contact, because the
+                    // placeholder assigned above is not empty.
                     let name = self.names[id]?.value
-                    if name?.isEmpty ?? true {
+                    if name?.isEmpty ?? true || name == id {
                         self.nameLookup(id: id)
                     }
                 })
